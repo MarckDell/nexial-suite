@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexial Suite - Sistema Empresarial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-glow: #9d5bff;
+            --secondary: #00f5ff;
+            --accent: #ffd700;
+            --success: #00ff41;
+            --danger: #ff0055;
+            --dark: #0f0f23;
+            --darker: #070710;
+            --neon-shadow: 0 0 15px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--darker);
+            color: #f0f0ff;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 20%);
+        }
+        
+        /* Header Cyberpunk */
+        .cyber-header {
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cyber-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cyber-nav { display: flex; gap: 2rem; }
+        .cyber-nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .cyber-nav a:hover {
+            background: rgba(124, 58, 237, 0.2);
+            color: var(--secondary);
+        }
+        
+        .cyber-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .cyber-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--neon-shadow) rgba(124, 58, 237, 0.5);
+        }
+        
+        /* Hero Cyberpunk */
+        .cyber-hero {
+            padding: 12rem 2rem 6rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .cyber-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+        }
+        
+        .cyber-subtitle {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+        
+        /* Features Cyberpunk */
+        .cyber-features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .cyber-card {
+            background: rgba(15, 15, 35, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.1), transparent);
+            transition: 0.5s;
+        }
+        
+        .cyber-card:hover::before { left: 100%; }
+        .cyber-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(124, 58, 237, 0.2);
+        }
+        
+        .cyber-card h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        /* Registration Cyberpunk */
+        .cyber-registration {
+            padding: 6rem 2rem;
+            background: var(--darker);
+        }
+        
+        .cyber-form {
+            background: rgba(15, 15, 35, 0.8);
+            padding: 2.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+        }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+        }
+        
+        .warning-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid var(--accent);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        /* Footer Cyberpunk */
+        .cyber-footer {
+            background: rgba(7, 7, 16, 0.95);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(124, 58, 237, 0.3);
+            text-align: center;
+        }
+        
+        /* Modal Cyberpunk (FULL SCREEN) */
+        .cyber-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 7, 16, 0.98);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: rgba(15, 15, 35, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            z-index: 10;
+        }
+        .close-modal:hover { opacity: 1; }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        
+        .modal-header h2 {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        
+        .info-banner {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .info-banner h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .protection-banner {
+            background: rgba(0, 255, 65, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        
+        .protection-banner h3 {
+            color: var(--success);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="cyber-header">
+        <div class="cyber-logo">
+            <i class="fas fa-brain"></i>
+            NEXIAL SUITE
+        </div>
+        <nav class="cyber-nav">
+            <a href="#inicio">Inicio</a>
+            <a href="#caracteristicas">Sistema</a>
+            <a href="#ventajas">Ventajas</a>
+            <a href="#" onclick="openRegisterModal()">Registro</a>
+        </nav>
+        <button class="cyber-btn" onclick="openLoginModal()">
+            <i class="fas fa-sign-in-alt"></i> Acceso
+        </button>
+    </header>
+
+    <!-- Hero -->
+    <section class="cyber-hero" id="inicio">
+        <h1>Transforma tu Gestión Empresarial</h1>
+        <p class="cyber-subtitle">
+            Sistema integral por áreas especializadas. Control total, máxima eficiencia.
+            Apps para ventas, distribución y almacenes en tiempo real.
+        </p>
+        <button class="cyber-btn" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;" onclick="openRegisterModal()">
+            <i class="fas fa-rocket"></i> COMENZAR PRUEBA GRATUITA
+        </button>
+    </section>
+
+    <!-- Features -->
+    <section class="cyber-features" id="caracteristicas">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="color: var(--secondary); font-size: 2.5rem;">SISTEMA POR ÁREAS ESPECIALIZADAS</h2>
+            <p style="opacity: 0.8;">Cada área con funciones específicas y control total</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="cyber-card">
+                <h3><i class="fas fa-crown"></i> DIRECCIÓN EJECUTIVA</h3>
+                <p>Control total de su empresa. Dashboard ejecutivo completo con visibilidad de todas las áreas.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>Supervisión todas las áreas</li>
+                    <li>Reportes consolidados en tiempo real</li>
+                    <li>Gestión estratégica y toma de decisiones</li>
+                    <li>Control financiero completo</li>
+                    <li>Monitoreo de producción y ventas</li>
+                </ul>
+            </div>
+            
+            <div class="cyber-card">
+                <h3><i class="fas fa-chart-line"></i> DIRECCIÓN COMERCIAL</h3>
+                <p>Ventas, inventario, rutas y gestión comercial especializada con apps móviles.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>Asignación de zonas geográficas a vendedores</li>
+                    <li>Control de inventario en tiempo real</li>
+                    <li>Optimización de rutas de distribución</li>
+                    <li>Seguimiento de pedidos GPS</li>
+                    <li>Mapas y geolocalización avanzada</li>
+                    <li>Asignación de productos a vendedores</li>
+                    <li>Aprobación de clientes y pedidos</li>
+                </ul>
+            </div>
+            
+            <div class="cyber-card">
+                <h3><i class="fas fa-calculator"></i> ADMINISTRACIÓN & FINANZAS</h3>
+                <p>Contabilidad, nómina, facturación y gestión financiera completa.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>Gestión de usuarios y empleados</li>
+                    <li>Recursos humanos completo</li>
+                    <li>Contabilidad automatizada</li>
+                    <li>Facturación electrónica</li>
+                    <li>Cálculo de comisiones y sueldos</li>
+                    <li>Gestión de proveedores</li>
+                    <li>Reportes financieros detallados</li>
+                </ul>
+            </div>
+            
+            <div class="cyber-card">
+                <h3><i class="fas fa-mobile-alt"></i> APPS ESPECIALIZADAS</h3>
+                <p>Aplicaciones móviles para cada función operativa.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>App Vendedor: Pedidos en campo</li>
+                    <li>App Almacén: Control de inventario</li>
+                    <li>App Distribuidor: Rutas y entregas</li>
+                    <li>Trabajo offline con sincronización</li>
+                    <li>Notificaciones push en tiempo real</li>
+                    <li>Fotos y firmas digitales</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ventajas -->
+    <section class="cyber-features" id="ventajas" style="background: var(--dark);">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="color: var(--accent); font-size: 2.5rem;">VENTAJAS DEL SISTEMA</h2>
+            <p style="opacity: 0.8;">Todo lo que necesitas en una sola plataforma</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="cyber-card">
+                <h3><i class="fas fa-sync-alt"></i> TIEMPO REAL</h3>
+                <p>Todas las áreas actualizadas al instante. Lo que ve el vendedor en campo lo ve el jefe en su oficina.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>Ventas registradas al instante</li>
+                    <li>Stock actualizado en tiempo real</li>
+                    <li>Ubicación de distribuidores en vivo</li>
+                    <li>Notificaciones inmediatas</li>
+                </ul>
+            </div>
+            
+            <div class="cyber-card">
+                <h3><i class="fas fa-shield-alt"></i> SEGURIDAD TOTAL</h3>
+                <p>Datos protegidos con encriptación de extremo a extremo. Cada empresa solo ve su información.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>Separación de datos por empresa</li>
+                    <li>Roles y permisos granulares</li>
+                    <li>Backup automático diario</li>
+                    <li>Cumplimiento normativo</li>
+                </ul>
+            </div>
+            
+            <div class="cyber-card">
+                <h3><i class="fas fa-chart-bar"></i> REPORTES AVANZADOS</h3>
+                <p>Análisis detallado de cada aspecto del negocio. Toma decisiones basadas en datos reales.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>Dashboard ejecutivo personalizable</li>
+                    <li>Reportes financieros automáticos</li>
+                    <li>Análisis de ventas por zona</li>
+                    <li>Proyecciones y tendencias</li>
+                </ul>
+            </div>
+            
+            <div class="cyber-card">
+                <h3><i class="fas fa-cogs"></i> INTEGRACIÓN COMPLETA</h3>
+                <p>Todas las áreas conectadas entre sí. Finanzas ve lo de ventas, ventas ve lo de almacén.</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <li>Flujo de trabajo automatizado</li>
+                    <li>Aprobaciones electrónicas</li>
+                    <li>Comunicación entre áreas</li>
+                    <li>Historial completo de operaciones</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="cyber-footer">
+        <div class="cyber-logo" style="justify-content: center; margin-bottom: 1rem;">
+            <i class="fas fa-brain"></i>
+            NEXIAL SUITE
+        </div>
+        <p style="opacity: 0.8; margin-bottom: 2rem;">Sistema de Gestión Empresarial Integral</p>
+        
+        <div style="display: flex; justify-content: center; gap: 2rem; margin: 2rem 0;">
+            <a href="#inicio" style="color: var(--secondary); text-decoration: none;">Inicio</a>
+            <a href="#caracteristicas" style="color: var(--secondary); text-decoration: none;">Sistema</a>
+            <a href="#ventajas" style="color: var(--secondary); text-decoration: none;">Ventajas</a>
+            <a href="#" onclick="openRegisterModal()" style="color: var(--secondary); text-decoration: none;">Registro</a>
+            <a href="#" onclick="openLoginModal()" style="color: var(--secondary); text-decoration: none;">Acceso</a>
+        </div>
+        
+        <p>© 2025 Nexial Suite. Todos los derechos reservados.</p>
+        <p style="margin-top: 1rem; opacity: 0.7;">
+            <i class="fas fa-phone"></i> +591 69800833 | 
+            <i class="fas fa-envelope"></i> marcelodanielcc@gmail.com
+        </p>
+    </footer>
+
+    <!-- ===== MODAL DE LOGIN ===== -->
+    <div class="cyber-modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeLoginModal()">×</button>
+            
+            <div class="modal-header">
+                <h2><i class="fas fa-sign-in-alt"></i> ACCESO AL SISTEMA</h2>
+                <p style="color: rgba(255,255,255,0.7);">Ingresa con tus credenciales</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Usuario o Email</label>
+                <input type="text" id="loginUser" placeholder="usuario@empresa.com" autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Contraseña</label>
+                <div class="password-wrapper">
+                    <input type="password" id="loginPass" placeholder="Tu contraseña">
+                    <button type="button" class="toggle-password" onclick="togglePassword('loginPass')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div style="text-align: right; margin: 1rem 0;">
+                <a href="#" onclick="recoverPassword()" style="color: var(--primary); text-decoration: none;">
+                    <i class="fas fa-unlock-alt"></i> ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+            
+            <button class="cyber-btn" style="width: 100%; padding: 1rem; font-size: 1.1rem;" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA
+            </button>
+            
+            <div style="text-align: center; margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 0.5rem;">Usuarios Demo (Presiona ENTER para acceder)</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
+                    <span style="background: rgba(124,58,237,0.2); padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem;">admin / 123</span>
+                    <span style="background: rgba(0,255,65,0.2); padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem;">jefe@empresa1.com / 123</span>
+                    <span style="background: rgba(255,170,0,0.2); padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem;">comercial@empresa1.com / 123</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE REGISTRO EMPRESA ===== -->
+    <div class="cyber-modal" id="registerModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeRegisterModal()">×</button>
+            
+            <div class="modal-header">
+                <h2><i class="fas fa-building"></i> REGISTRO DE EMPRESA</h2>
+                <p style="color: rgba(255,255,255,0.7);">Completa los datos de tu empresa</p>
+            </div>
+            
+            <div class="info-banner">
+                <h3><i class="fas fa-gift"></i> 30 DÍAS DE PRUEBA GRATUITA</h3>
+                <p>Sin compromiso - Sin cargos ocultos</p>
+            </div>
+            
+            <form id="registerForm" onsubmit="registerCompanyStep1(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Razón Social *</label>
+                    <input type="text" id="companyName" required placeholder="Ej: Mi Empresa S.A.">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> RUC/NIT *</label>
+                    <input type="text" id="companyRUC" required placeholder="Número de identificación fiscal">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-industry"></i> Tipo de Industria *</label>
+                    <select id="companyIndustry" required>
+                        <option value="">Seleccionar industria</option>
+                        <option value="Tecnología">Tecnología</option>
+                        <option value="Comercio">Comercio</option>
+                        <option value="Manufactura">Manufactura</option>
+                        <option value="Servicios">Servicios</option>
+                        <option value="Alimentos">Alimentos</option>
+                        <option value="Construcción">Construcción</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Primer Nombre *</label>
+                        <input type="text" id="firstName" required placeholder="Nombre">
+                    </div>
+                    <div class="form-group">
+                        <label>Segundo Nombre</label>
+                        <input type="text" id="secondName" placeholder="Segundo nombre">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Primer Apellido *</label>
+                        <input type="text" id="firstLastName" required placeholder="Apellido paterno">
+                    </div>
+                    <div class="form-group">
+                        <label>Segundo Apellido</label>
+                        <input type="text" id="secondLastName" placeholder="Apellido materno">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email Corporativo *</label>
+                    <input type="email" id="companyEmail" required placeholder="contacto@empresa.com">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Teléfono *</label>
+                    <input type="tel" id="companyPhone" required placeholder="+591 60000000">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Contraseña Administrador *</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="adminPassword" required minlength="8">
+                        <button type="button" class="toggle-password" onclick="togglePassword('adminPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small style="color: rgba(255,255,255,0.6);">Mínimo 8 caracteres</small>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Confirmar Contraseña *</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" required minlength="8">
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: start; gap: 0.5rem; color: rgba(255,255,255,0.9);">
+                        <input type="checkbox" required style="margin-top: 0.3rem;">
+                        <span>Acepto los términos y condiciones del servicio y autorizo el tratamiento de mis datos.</span>
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="cyber-btn" onclick="closeRegisterModal()" style="background: rgba(255,255,255,0.05); color: white;">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="cyber-btn">
+                        <i class="fas fa-arrow-right"></i> CONTINUAR CON TARJETA
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE TARJETA DE CRÉDITO ===== -->
+    <div class="cyber-modal" id="cardModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeCardModal()">×</button>
+            
+            <div class="modal-header">
+                <h2><i class="fas fa-credit-card"></i> DATOS DE PAGO</h2>
+                <p style="color: rgba(255,255,255,0.7);">Información de tarjeta para verificación</p>
+            </div>
+            
+            <div class="protection-banner">
+                <h3><i class="fas fa-shield-alt"></i> PROTECCIÓN AL USUARIO</h3>
+                <p><strong>PRIMER MES COMPLETAMENTE GRATIS</strong></p>
+                <p>Registre su empresa ahora y disfrute de 30 días completos de uso gratuito.</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Sin cargos ocultos, sin sorpresas.</p>
+            </div>
+            
+            <div class="info-banner" style="background: rgba(255,215,0,0.1); border-color: var(--accent);">
+                <h3><i class="fas fa-info-circle"></i> IMPORTANTE</h3>
+                <p>Sus datos de tarjeta son requeridos únicamente para verificación.</p>
+                <p><strong>NO se realizará ningún cobro durante los primeros 30 días.</strong></p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Pasado el mes de prueba, usted autorizará los pagos desde su panel de control.</p>
+            </div>
+            
+            <form id="cardForm" onsubmit="registerCompanyStep2(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-credit-card"></i> Número de Tarjeta *</label>
+                    <input type="text" id="cardNumber" required placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Vencimiento *</label>
+                        <input type="text" id="cardExpiry" required placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV *</label>
+                        <input type="text" id="cardCVV" required placeholder="123" maxlength="4">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nombre en la Tarjeta *</label>
+                    <input type="text" id="cardName" required placeholder="Como aparece en la tarjeta">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: flex; align-items: start; gap: 0.5rem; color: rgba(255,255,255,0.9);">
+                        <input type="checkbox" required style="margin-top: 0.3rem;">
+                        <span>Autorizo que los datos de mi tarjeta sean almacenados de forma segura para futuros pagos, los cuales requerirán mi autorización expresa desde el panel administrativo. Entiendo que NO se me cobrará durante los primeros 30 días.</span>
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="cyber-btn" onclick="backToRegister()" style="background: rgba(255,255,255,0.05); color: white;">
+                        <i class="fas fa-arrow-left"></i> VOLVER
+                    </button>
+                    <button type="submit" class="cyber-btn">
+                        <i class="fas fa-check-circle"></i> COMPLETAR REGISTRO
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwQp_rQ1rkoH5QGIjnE_smqq_CAbCozc8OdiO5yTg2v7T5SRid9u6OMCD_5viXu6HVp/exec';
+        let registeredCompanyData = null;
+        
+        // =============================================
+        // MANEJO DE MODALES
+        // =============================================
+        
+        function openLoginModal() {
+            closeAllModals();
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('loginUser').focus();
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        function openRegisterModal() {
+            closeAllModals();
+            document.getElementById('registerModal').style.display = 'flex';
+            document.getElementById('companyName').focus();
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeRegisterModal() {
+            document.getElementById('registerModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            resetRegisterForm();
+        }
+        
+        function openCardModal() {
+            closeAllModals();
+            document.getElementById('cardModal').style.display = 'flex';
+            document.getElementById('cardNumber').focus();
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeCardModal() {
+            document.getElementById('cardModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            resetCardForm();
+        }
+        
+        function closeAllModals() {
+            document.querySelectorAll('.cyber-modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            document.body.style.overflow = 'auto';
+        }
+        
+        function backToRegister() {
+            closeCardModal();
+            openRegisterModal();
+        }
+        
+        // =============================================
+        // FUNCIONES DEL FORMULARIO
+        // =============================================
+        
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+            field.type = field.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+        
+        function resetRegisterForm() {
+            document.getElementById('registerForm').reset();
+            registeredCompanyData = null;
+        }
+        
+        function resetCardForm() {
+            document.getElementById('cardForm').reset();
+        }
+        
+        // Enter para login
+        document.getElementById('loginPass')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+        
+        // =============================================
+        // REGISTRO PASO 1 - DATOS EMPRESA
+        // =============================================
+        
+        function registerCompanyStep1(event) {
+            event.preventDefault();
+            
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+            
+            if (password.length < 8) {
+                alert('Contraseña mínimo 8 caracteres');
+                return;
+            }
+            
+            // Guardar datos temporalmente
+            registeredCompanyData = {
+                nombre: document.getElementById('companyName').value,
+                ruc: document.getElementById('companyRUC').value,
+                industria: document.getElementById('companyIndustry').value,
+                primer_nombre: document.getElementById('firstName').value,
+                segundo_nombre: document.getElementById('secondName').value,
+                primer_apellido: document.getElementById('firstLastName').value,
+                segundo_apellido: document.getElementById('secondLastName').value,
+                email: document.getElementById('companyEmail').value,
+                telefono: document.getElementById('companyPhone').value,
+                password: password
+            };
+            
+            // Validar campos requeridos
+            const required = ['nombre', 'ruc', 'industria', 'primer_nombre', 
+                            'primer_apellido', 'email', 'telefono'];
+            
+            for (const field of required) {
+                if (!registeredCompanyData[field]) {
+                    alert(`Por favor complete el campo: ${field.replace('_', ' ')}`);
+                    return;
+                }
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(registeredCompanyData.email)) {
+                alert('Por favor ingrese un email válido');
+                return;
+            }
+            
+            // Ir a modal de tarjeta
+            closeRegisterModal();
+            setTimeout(openCardModal, 300);
+        }
+        
+        // =============================================
+        // REGISTRO PASO 2 - DATOS TARJETA
+        // =============================================
+        
+        function registerCompanyStep2(event) {
+            event.preventDefault();
+            
+            if (!registeredCompanyData) {
+                alert('Error: Datos de empresa no encontrados. Por favor comience de nuevo.');
+                closeCardModal();
+                openRegisterModal();
+                return;
+            }
+            
+            const cardData = {
+                tarjeta_numero: document.getElementById('cardNumber').value,
+                tarjeta_vencimiento: document.getElementById('cardExpiry').value,
+                tarjeta_cvv: document.getElementById('cardCVV').value,
+                tarjeta_nombre: document.getElementById('cardName').value
+            };
+            
+            // Validar datos de tarjeta
+            if (!cardData.tarjeta_numero || !cardData.tarjeta_vencimiento || 
+                !cardData.tarjeta_cvv || !cardData.tarjeta_nombre) {
+                alert('Complete todos los datos de la tarjeta');
+                return;
+            }
+            
+            // Validar formato de número de tarjeta
+            const cardNumberClean = cardData.tarjeta_numero.replace(/\s/g, '');
+            if (cardNumberClean.length < 15 || cardNumberClean.length > 19) {
+                alert('Número de tarjeta inválido');
+                return;
+            }
+            
+            // Validar fecha de vencimiento
+            const expiryRegex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
+            if (!expiryRegex.test(cardData.tarjeta_vencimiento)) {
+                alert('Fecha de vencimiento inválida. Use formato MM/AA');
+                return;
+            }
+            
+            // Validar CVV
+            if (cardData.tarjeta_cvv.length < 3 || cardData.tarjeta_cvv.length > 4) {
+                alert('CVV inválido');
+                return;
+            }
+            
+            // Simular registro exitoso
+            simulateRegistration(cardData);
+        }
+        
+        function simulateRegistration(cardData) {
+            // Mostrar loading
+            const submitBtn = document.querySelector('#cardForm button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
+            submitBtn.disabled = true;
+            
+            // Simular delay de red
+            setTimeout(() => {
+                // Combinar datos
+                const fullData = {
+                    ...registeredCompanyData,
+                    ...cardData
+                };
+                
+                // Aquí iría la llamada real a la API
+                // const response = await fetch(API_URL, { ... });
+                
+                // Simular éxito
+                const empresaId = 'EMP-' + Math.floor(Math.random() * 10000);
+                
+                // Mostrar mensaje de éxito
+                closeCardModal();
+                
+                // Crear modal de éxito
+                const successModal = document.createElement('div');
+                successModal.className = 'cyber-modal';
+                successModal.style.display = 'flex';
+                successModal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 style="color: var(--success);"><i class="fas fa-check-circle"></i> ¡REGISTRO EXITOSO!</h2>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                            <h3 style="color: var(--secondary); margin-bottom: 1rem;">¡Bienvenido a Nexial Suite!</h3>
+                            
+                            <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                                <p><strong>Empresa:</strong> ${registeredCompanyData.nombre}</p>
+                                <p><strong>ID de Empresa:</strong> ${empresaId}</p>
+                                <p><strong>Usuario:</strong> ${registeredCompanyData.email}</p>
+                                <p><strong>Contraseña:</strong> La que registró</p>
+                            </div>
+                            
+                            <div class="info-banner">
+                                <h4><i class="fas fa-gift"></i> PRUEBA GRATUITA ACTIVADA</h4>
+                                <p>Tienes 30 días completos de acceso gratuito a todas las funciones.</p>
+                            </div>
+                            
+                            <div style="margin-top: 2rem;">
+                                <button class="cyber-btn" onclick="accessAfterRegister()" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                                    <i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA
+                                </button>
+                                <button class="cyber-btn" onclick="closeSuccessModal(this)" style="width: 100%; margin-top: 1rem; background: rgba(255,255,255,0.05); color: white;">
+                                    CERRAR
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(successModal);
+                document.body.style.overflow = 'hidden';
+                
+                // Resetear formularios
+                resetRegisterForm();
+                resetCardForm();
+                registeredCompanyData = null;
+                
+            }, 2000);
+        }
+        
+        function closeSuccessModal(button) {
+            const modal = button.closest('.cyber-modal');
+            modal.remove();
+            document.body.style.overflow = 'auto';
+        }
+        
+        function accessAfterRegister() {
+            // Cerrar modal de éxito
+            document.querySelector('.cyber-modal:last-child')?.remove();
+            document.body.style.overflow = 'auto';
+            
+            // Abrir modal de login con el email registrado
+            openLoginModal();
+            if (registeredCompanyData) {
+                document.getElementById('loginUser').value = registeredCompanyData.email;
+                document.getElementById('loginPass').focus();
+            }
+        }
+        
+        // =============================================
+        // LOGIN
+        // =============================================
+        
+        async function login() {
+            const user = document.getElementById('loginUser').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            if (!user || !pass) {
+                alert('Complete usuario y contraseña');
+                return;
+            }
+            
+            try {
+                // Simular login
+                const demoUsers = {
+                    'admin': { role: 'super', nombre: 'Administrador Corporativo', empresa: 'NEXIAL SUITE' },
+                    'jefe@empresa1.com': { role: 'jefe', nombre: 'Juan Pérez', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
+                    'comercial@empresa1.com': { role: 'comercial', nombre: 'María López', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
+                    'admin@empresa1.com': { role: 'admin', nombre: 'Carlos Rodríguez', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
+                    'vendedor1': { role: 'vendedor', nombre: 'Roberto Silva', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
+                    'almacen1': { role: 'almacen', nombre: 'Ana García', empresa: 'TecnoSoluciones SAC', empresa_id: 1 }
+                };
+                
+                // Verificar usuario demo
+                const demoUser = demoUsers[user];
+                if (demoUser && pass === '123') {
+                    // Guardar en localStorage
+                    localStorage.setItem('nexial_user', JSON.stringify({
+                        username: user,
+                        ...demoUser
+                    }));
+                    
+                    // Redirigir a dashboard
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                // Si no es usuario demo, intentar con API
+                const response = await fetch(`${API_URL}?action=login&email=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('nexial_user', JSON.stringify(data.user));
+                    localStorage.setItem('nexial_token', data.token);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Credenciales incorrectas');
+                }
+            } catch (error) {
+                alert('Error de conexión');
+            }
+        }
+        
+        // =============================================
+        // FUNCIONES AUXILIARES
+        // =============================================
+        
+        function recoverPassword() {
+            const email = prompt('Ingrese su email para recuperar contraseña:');
+            if (email) {
+                alert(`Se ha enviado un enlace de recuperación a: ${email}\n\nRevise su bandeja de entrada.`);
+            }
+        }
+        
+        // Formatear número de tarjeta
+        document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            e.target.value = value.substring(0, 19);
+        });
+        
+        // Formatear fecha de vencimiento
+        document.getElementById('cardExpiry')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value.substring(0, 5);
+        });
+        
+        // Cerrar modal al hacer click fuera
+        document.querySelectorAll('.cyber-modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    const modalId = this.id;
+                    if (modalId === 'loginModal') closeLoginModal();
+                    else if (modalId === 'registerModal') closeRegisterModal();
+                    else if (modalId === 'cardModal') closeCardModal();
+                    else this.style.display = 'none';
+                }
+            });
+        });
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Nexial Suite - Página de Inicio cargada');
+        });
+    </script>
+</body>
+</html>
