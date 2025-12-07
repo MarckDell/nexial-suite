@@ -1663,10 +1663,10 @@
                                             <td>${usuariosEmpresa.length}</td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button class="action-btn view" onclick="viewEmpresaCompleta(${empresa.id})" title="Ver Todo">
+                                                    <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.id}')" title="Ver Detalles">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button class="action-btn edit" onclick="editEmpresa(${empresa.id})" title="Editar">
+                                                    <button class="action-btn edit" onclick="editEmpresa('${empresa.id}')" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <button class="action-btn view" onclick="accessAsJefeEmpresa(${empresa.id})" title="Acceder como Jefe">
@@ -2805,11 +2805,451 @@
             `);
         }
 
-        function markAllAsRead() {
-            notifications.forEach(notif => notif.read = true);
-            document.querySelector('.notification-badge').textContent = '0';
-            closeModal();
-        }
+        function markAllAsRead() // =============================================
+// FUNCIONES DE SUPER ADMIN
+// =============================================
+
+function showNuevaEmpresaModal() {
+  showModal('Nueva Empresa', `
+    <div style="max-width: 600px;">
+      <div class="form-group">
+        <label>Razón Social *</label>
+        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa SAC">
+      </div>
+      
+      <div class="form-group">
+        <label>RUC *</label>
+        <input type="text" id="nuevaEmpresaRUC" placeholder="20123456789">
+      </div>
+      
+      <div class="form-group">
+        <label>Industria</label>
+        <select id="nuevaEmpresaIndustria">
+          <option value="Tecnología">Tecnología</option>
+          <option value="Comercio">Comercio</option>
+          <option value="Manufactura">Manufactura</option>
+          <option value="Servicios">Servicios</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Contacto Principal *</label>
+        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez">
+      </div>
+      
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com">
+      </div>
+      
+      <div class="form-group">
+        <label>Teléfono *</label>
+        <input type="text" id="nuevaEmpresaTelefono" placeholder="987654321">
+      </div>
+      
+      <div class="form-group">
+        <label>Contraseña Jefe *</label>
+        <input type="password" id="nuevaEmpresaPassword" value="123">
+      </div>
+      
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" onclick="crearNuevaEmpresa()" style="flex: 1;">
+          <i class="fas fa-plus"></i> Crear Empresa
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function crearNuevaEmpresa() {
+  const empresaData = {
+    token: localStorage.getItem('nexial_token'),
+    nombre: document.getElementById('nuevaEmpresaNombre').value,
+    ruc: document.getElementById('nuevaEmpresaRUC').value,
+    industria: document.getElementById('nuevaEmpresaIndustria').value,
+    primer_nombre: document.getElementById('nuevaEmpresaContacto').value.split(' ')[0],
+    primer_apellido: document.getElementById('nuevaEmpresaContacto').value.split(' ')[1] || '',
+    email: document.getElementById('nuevaEmpresaEmail').value,
+    telefono: document.getElementById('nuevaEmpresaTelefono').value,
+    password: document.getElementById('nuevaEmpresaPassword').value,
+    tarjeta_numero: '4111111111111111',
+    tarjeta_vencimiento: '12/30',
+    tarjeta_cvv: '123',
+    tarjeta_nombre: document.getElementById('nuevaEmpresaContacto').value
+  };
+  
+  // Validar campos requeridos
+  const required = ['nombre', 'ruc', 'email', 'telefono'];
+  for (const field of required) {
+    if (!empresaData[field]) {
+      showNotification('error', 'Error', `Complete el campo: ${field}`);
+      return;
+    }
+  }
+  
+  fetch('https://script.google.com/macros/s/AKfycbwoPv3w2uikXap4YOI4V97iVQ3gpWPpcDqDnbQV2TBrfCwAL2gb1HoOMEGG6QbxRtKEOg/exec', {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'registerCompany',
+      ...empresaData
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showNotification('success', 'Éxito', `Empresa creada: ${data.empresa_id}`);
+      closeModal();
+      loadSuperDashboard();
+    } else {
+      showNotification('error', 'Error', data.error || 'Error al crear empresa');
+    }
+  })
+  .catch(error => {
+    showNotification('error', 'Error', 'Error de conexión');
+  });
+}
+
+function viewEmpresaCompleta(empresaId) {
+  const empresa = database.empresas.find(e => e.id === empresaId);
+  if (!empresa) return;
+  
+  const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
+  const empleadosEmpresa = database.empleados.filter(e => e.empresa_id === empresaId);
+  
+  showModal(`Empresa: ${empresa.nombre}`, `
+    <div style="max-width: 800px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+          <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
+          <p><strong>RUC:</strong> ${empresa.ruc || 'No registrado'}</p>
+          <p><strong>Industria:</strong> ${empresa.industria || 'No especificada'}</p>
+          <p><strong>Contacto:</strong> ${empresa.contacto || 'No registrado'}</p>
+          <p><strong>Email:</strong> ${empresa.email || 'No registrado'}</p>
+          <p><strong>Teléfono:</strong> ${empresa.telefono || 'No registrado'}</p>
+          <p><strong>Estado:</strong> ${empresa.estado || 'Inactiva'}</p>
+        </div>
+        
+        <div>
+          <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
+          <p><strong>Usuarios:</strong> ${usuariosEmpresa.length}</p>
+          <p><strong>Empleados:</strong> ${empleadosEmpresa.length}</p>
+          <p><strong>Fecha Registro:</strong> ${empresa.fecharegistro || 'No disponible'}</p>
+        </div>
+      </div>
+      
+      <div style="margin-top: 2rem;">
+        <h4 style="color: var(--secondary); margin-bottom: 1rem;">Usuarios</h4>
+        <div style="max-height: 200px; overflow-y: auto;">
+          ${usuariosEmpresa.map(usuario => `
+            <div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <strong>${usuario.nombre}</strong> (${usuario.email}) - ${usuario.role}
+            </div>
+          `).join('')}
+          ${usuariosEmpresa.length === 0 ? '<p style="text-align: center; color: rgba(255,255,255,0.5);">No hay usuarios</p>' : ''}
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button class="btn" onclick="editEmpresa(${empresaId})" style="flex: 1;">
+          <i class="fas fa-edit"></i> Editar
+        </button>
+        <button class="btn btn-primary" onclick="accessAsJefeEmpresa(${empresaId})" style="flex: 1;">
+          <i class="fas fa-sign-in-alt"></i> Acceder como Jefe
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function editEmpresa(empresaId) {
+  const empresa = database.empresas.find(e => e.id === empresaId);
+  if (!empresa) return;
+  
+  showModal(`Editar Empresa: ${empresa.nombre}`, `
+    <div style="max-width: 600px;">
+      <div class="form-group">
+        <label>Razón Social</label>
+        <input type="text" id="editEmpresaNombre" value="${empresa.nombre || ''}">
+      </div>
+      
+      <div class="form-group">
+        <label>RUC</label>
+        <input type="text" id="editEmpresaRUC" value="${empresa.ruc || ''}">
+      </div>
+      
+      <div class="form-group">
+        <label>Contacto</label>
+        <input type="text" id="editEmpresaContacto" value="${empresa.contacto || ''}">
+      </div>
+      
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="editEmpresaEmail" value="${empresa.email || ''}">
+      </div>
+      
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="text" id="editEmpresaTelefono" value="${empresa.telefono || ''}">
+      </div>
+      
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="editEmpresaEstado">
+          <option value="Activa" ${empresa.estado === 'Activa' ? 'selected' : ''}>Activa</option>
+          <option value="Inactiva" ${empresa.estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
+          <option value="Pendiente">Pendiente</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" onclick="guardarEdicionEmpresa(${empresaId})" style="flex: 1;">
+          <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function guardarEdicionEmpresa(empresaId) {
+  const empresaData = {
+    token: localStorage.getItem('nexial_token'),
+    id: empresaId,
+    nombre: document.getElementById('editEmpresaNombre').value,
+    ruc: document.getElementById('editEmpresaRUC').value,
+    contacto: document.getElementById('editEmpresaContacto').value,
+    email: document.getElementById('editEmpresaEmail').value,
+    telefono: document.getElementById('editEmpresaTelefono').value,
+    estado: document.getElementById('editEmpresaEstado').value
+  };
+  
+  fetch('https://script.google.com/macros/s/AKfycbwoPv3w2uikXap4YOI4V97iVQ3gpWPpcDqDnbQV2TBrfCwAL2gb1HoOMEGG6QbxRtKEOg/exec', {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'updateEmpresa',
+      ...empresaData
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showNotification('success', 'Éxito', 'Empresa actualizada');
+      closeModal();
+      loadSuperDashboard();
+    } else {
+      showNotification('error', 'Error', data.error);
+    }
+  });
+}
+
+function accessAsJefeEmpresa(empresaId) {
+  const empresa = database.empresas.find(e => e.id === empresaId);
+  if (!empresa) return;
+  
+  showConfirmation(
+    'Acceder como Jefe',
+    `¿Acceder a la empresa "${empresa.nombre}" como jefe?`,
+    function() {
+      // Cambiar temporalmente el rol del usuario actual
+      currentUser.role = 'jefe';
+      currentUser.empresa = empresa.nombre;
+      currentUser.empresa_id = empresaId;
+      currentCompany = empresa;
+      
+      // Reconfigurar interfaz
+      configureInterface();
+      
+      showNotification('success', 'Modo Jefe', `Ahora eres jefe de ${empresa.nombre}`);
+    }
+  );
+}
+
+function loadEmpresasManagement() {
+  document.getElementById('pageTitle').textContent = 'Gestión de Empresas - Super Admin';
+  
+  document.getElementById('viewSuper').innerHTML = `
+    <div class="table-card">
+      <div class="table-header">
+        <h3 class="table-title">Empresas del Sistema</h3>
+        <div class="table-actions">
+          <button class="btn btn-primary" onclick="showNuevaEmpresaModal()">
+            <i class="fas fa-plus"></i> Nueva Empresa
+          </button>
+          <button class="btn" onclick="loadSuperDashboard()">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+          </button>
+        </div>
+      </div>
+      
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Empresa</th>
+              <th>RUC</th>
+              <th>Contacto</th>
+              <th>Estado</th>
+              <th>Usuarios</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${database.empresas.map(empresa => {
+              const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresa.id);
+              return `
+                <tr>
+                  <td><code>${empresa.id}</code></td>
+                  <td>
+                    <strong>${empresa.nombre}</strong><br>
+                    <small style="color: rgba(255,255,255,0.5);">${empresa.email || ''}</small>
+                  </td>
+                  <td>${empresa.ruc || ''}</td>
+                  <td>${empresa.contacto || ''}</td>
+                  <td>
+                    <span class="status-badge ${empresa.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
+                      ${empresa.estado || 'Inactiva'}
+                    </span>
+                  </td>
+                  <td>${usuariosEmpresa.length}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.id}')" title="Ver Detalles">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="action-btn edit" onclick="editEmpresa('${empresa.id}')" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="action-btn view" onclick="manageUsuariosEmpresa('${empresa.id}')" title="Usuarios">
+                        <i class="fas fa-users"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function manageUsuariosEmpresa(empresaId) {
+  const empresa = database.empresas.find(e => e.id === empresaId);
+  if (!empresa) return;
+  
+  showModal(`Usuarios de ${empresa.nombre}`, `
+    <div style="max-width: 800px;">
+      <div style="margin-bottom: 1.5rem;">
+        <button class="btn btn-primary" onclick="showNuevoUsuarioModal('${empresaId}')">
+          <i class="fas fa-user-plus"></i> Agregar Usuario
+        </button>
+      </div>
+      
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(124,58,237,0.3);">
+              <th style="padding: 0.5rem; text-align: left;">Nombre</th>
+              <th style="padding: 0.5rem; text-align: left;">Email</th>
+              <th style="padding: 0.5rem; text-align: left;">Rol</th>
+              <th style="padding: 0.5rem; text-align: left;">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${database.usuarios.filter(u => u.empresa_id === empresaId).map(usuario => `
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <td style="padding: 0.5rem;">${usuario.nombre}</td>
+                <td style="padding: 0.5rem;">${usuario.email}</td>
+                <td style="padding: 0.5rem;">
+                  <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.role)}; font-size: 0.8rem;">
+                    ${usuario.role}
+                  </span>
+                </td>
+                <td style="padding: 0.5rem;">
+                  <span class="status-badge ${usuario.activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                    ${usuario.activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                  </span>
+                </td>
+              </tr>
+            `).join('')}
+            ${database.usuarios.filter(u => u.empresa_id === empresaId).length === 0 ? `
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                  No hay usuarios para esta empresa
+                </td>
+              </tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `);
+}
+
+function getRoleColor(role) {
+  switch(role) {
+    case 'super': return 'rgba(255,0,85,0.2)';
+    case 'jefe': return 'rgba(0,255,65,0.2)';
+    case 'comercial': return 'rgba(255,170,0,0.2)';
+    case 'admin': return 'rgba(0,170,255,0.2)';
+    case 'vendedor': return 'rgba(124,58,237,0.2)';
+    default: return 'rgba(255,255,255,0.1)';
+  }
+}
+
+function showNuevoUsuarioModal(empresaId) {
+  const empresa = database.empresas.find(e => e.id === empresaId);
+  showModal(`Nuevo Usuario - ${empresa.nombre}`, `
+    <div style="max-width: 500px;">
+      <div class="form-group">
+        <label>Nombre Completo *</label>
+        <input type="text" id="nuevoUsuarioNombre" placeholder="Juan Pérez">
+      </div>
+      
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="nuevoUsuarioEmail" placeholder="usuario@empresa.com">
+      </div>
+      
+      <div class="form-group">
+        <label>Rol *</label>
+        <select id="nuevoUsuarioRol">
+          <option value="jefe">Jefe Empresa</option>
+          <option value="comercial">Dirección Comercial</option>
+          <option value="admin">Administración y Finanzas</option>
+          <option value="vendedor">Vendedor App</option>
+          <option value="almacen">Almacén App</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Contraseña *</label>
+        <input type="text" id="nuevoUsuarioPassword" value="123">
+      </div>
+      
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" onclick="crearNuevoUsuario('${empresaId}')" style="flex: 1;">
+          <i class="fas fa-user-plus"></i> Crear Usuario
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function crearNuevoUsuario(empresaId) {
+  // Aquí implementarías la llamada a la API para crear usuario
+  showNotification('info', 'En desarrollo', 'Función de creación de usuarios en desarrollo');
+}
 
         // =============================================
         // FUNCIONES DE INICIALIZACIÓN Y SESIÓN
