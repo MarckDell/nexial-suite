@@ -71,6 +71,18 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         
         .login-card::before {
@@ -170,6 +182,12 @@
         #dashboardScreen {
             display: none;
             min-height: 100vh;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .dashboard-container {
@@ -187,6 +205,16 @@
             position: fixed;
             height: 100vh;
             z-index: 100;
+            animation: slideInLeft 0.5s ease-out;
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
         }
         
         .sidebar-header {
@@ -215,6 +243,16 @@
             font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
         }
         
         .user-badge.super-admin { background: var(--super-admin); }
@@ -271,11 +309,29 @@
             text-decoration: none;
             border-radius: 8px;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.1), transparent);
+            transition: 0.5s;
+        }
+        
+        .nav-link:hover::before {
+            left: 100%;
         }
         
         .nav-link:hover {
             background: rgba(124, 58, 237, 0.1);
             color: white;
+            transform: translateX(5px);
         }
         
         .nav-link.active {
@@ -303,6 +359,7 @@
         
         .logout-btn:hover {
             background: rgba(255, 0, 85, 0.2);
+            transform: translateY(-2px);
         }
         
         /* ===== MAIN CONTENT ===== */
@@ -341,6 +398,12 @@
             font-size: 1.2rem;
             cursor: pointer;
             padding: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .notification-btn:hover {
+            color: var(--secondary);
+            transform: rotate(15deg);
         }
         
         .notification-badge {
@@ -356,33 +419,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: pulse 1.5s infinite;
         }
         
-        .quick-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .quick-btn {
-            padding: 0.8rem 1.5rem;
-            background: rgba(124, 58, 237, 0.1);
-            border: 1px solid rgba(124, 58, 237, 0.3);
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .quick-btn:hover {
-            background: rgba(124, 58, 237, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* ===== DASHBOARD CARDS ===== */
+        /* ===== PANEL DE CONTROL CARDS ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -397,6 +437,25 @@
             border: 1px solid rgba(124, 58, 237, 0.2);
             position: relative;
             overflow: hidden;
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .stat-card::before {
@@ -407,6 +466,11 @@
             width: 5px;
             height: 100%;
             background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
         }
         
         .stat-header {
@@ -550,8 +614,13 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        .data-table tr {
+            transition: all 0.3s;
+        }
+        
         .data-table tr:hover {
             background: rgba(124, 58, 237, 0.05);
+            transform: translateX(5px);
         }
         
         .status-badge {
@@ -600,6 +669,62 @@
         
         .action-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        
+        .tab {
+            padding: 0.5rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .tab:hover {
+            color: white;
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .tab.active {
+            color: var(--secondary);
+            background: rgba(124, 58, 237, 0.2);
+        }
+        
+        .tab.active::after {
+            transform: scaleX(1);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         /* ===== MODALES ===== */
@@ -615,6 +740,7 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
         }
         
         .modal {
@@ -626,6 +752,18 @@
             max-height: 90vh;
             overflow-y: auto;
             border: 1px solid rgba(124, 58, 237, 0.3);
+            animation: modalSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         
         .modal-header {
@@ -649,16 +787,12 @@
             font-size: 1.5rem;
             cursor: pointer;
             opacity: 0.7;
+            transition: all 0.3s;
         }
         
         .modal-close:hover {
             opacity: 1;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            transform: rotate(90deg);
         }
         
         /* ===== VISTAS POR ROL ===== */
@@ -670,50 +804,36 @@
             display: block;
         }
         
-        /* ===== FORMULARIOS ===== */
-        .form-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 2rem;
-            border: 1px solid rgba(124, 58, 237, 0.2);
-            margin-bottom: 2rem;
-        }
-        
-        .form-section {
-            margin-bottom: 2rem;
-        }
-        
-        .form-section-title {
-            color: var(--secondary);
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(124, 58, 237, 0.3);
-        }
-        
-        /* ===== MAPA ===== */
-        .map-container {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid rgba(124, 58, 237, 0.2);
-            height: 500px;
-            margin-bottom: 2rem;
-        }
-        
-        .map-placeholder {
-            display: flex;
+        /* ===== CONFIRMATION DIALOG ===== */
+        .confirmation-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(7, 7, 16, 0.95);
+            backdrop-filter: blur(10px);
+            display: none;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            flex-direction: column;
-            color: rgba(255, 255, 255, 0.5);
+            z-index: 1000;
         }
         
-        .map-placeholder i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
+        .confirmation-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            text-align: center;
+        }
+        
+        .confirmation-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
         }
         
         /* ===== RESPONSIVE ===== */
@@ -796,10 +916,6 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -851,7 +967,7 @@
         </div>
     </div>
 
-    <!-- ===== DASHBOARD PRINCIPAL ===== -->
+    <!-- ===== PANEL DE CONTROL PRINCIPAL ===== -->
     <div id="dashboardScreen">
         <div class="dashboard-container">
             <!-- SIDEBAR -->
@@ -874,7 +990,7 @@
                 </nav>
                 
                 <div class="sidebar-footer">
-                    <button class="logout-btn" onclick="logout()">
+                    <button class="logout-btn" onclick="showLogoutConfirmation()">
                         <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                     </button>
                 </div>
@@ -884,17 +1000,13 @@
             <main class="main-content">
                 <!-- TOP BAR -->
                 <div class="top-bar">
-                    <h1 class="page-title" id="pageTitle">Dashboard Corporativo</h1>
+                    <h1 class="page-title" id="pageTitle">Panel de Control Corporativo</h1>
                     
                     <div class="top-actions">
                         <button class="notification-btn" onclick="toggleNotifications()">
                             <i class="fas fa-bell"></i>
                             <span class="notification-badge">0</span>
                         </button>
-                        
-                        <div class="quick-actions" id="quickActions">
-                            <!-- Acciones rápidas por rol -->
-                        </div>
                     </div>
                 </div>
 
@@ -944,6 +1056,22 @@
         </div>
     </div>
 
+    <!-- ===== DIALOGO DE CONFIRMACIÓN ===== -->
+    <div class="confirmation-dialog" id="confirmationDialog">
+        <div class="confirmation-content">
+            <h3 style="color: var(--secondary); margin-bottom: 1rem;" id="confirmationTitle">¿Estás seguro?</h3>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;" id="confirmationMessage"></p>
+            <div class="confirmation-buttons">
+                <button class="btn" onclick="hideConfirmation()" style="background: rgba(255,255,255,0.05); color: white;">
+                    Cancelar
+                </button>
+                <button class="btn btn-primary" id="confirmActionBtn">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // =============================================
         // VARIABLES GLOBALES Y CONFIGURACIÓN
@@ -953,16 +1081,15 @@
         let currentCompany = null;
         let notifications = [];
         
-        // Base de datos local (simulación)
+        // Base de datos local (limpia, solo admin)
         const database = {
             empresas: JSON.parse(localStorage.getItem('nexial_empresas')) || [],
             usuarios: JSON.parse(localStorage.getItem('nexial_usuarios')) || [],
             productos: JSON.parse(localStorage.getItem('nexial_productos')) || [],
             clientes: JSON.parse(localStorage.getItem('nexial_clientes')) || [],
             ventas: JSON.parse(localStorage.getItem('nexial_ventas')) || [],
-            pedidos: JSON.parse(localStorage.getItem('nexial_pedidos')) || [],
-            solicitudes: JSON.parse(localStorage.getItem('nexial_solicitudes')) || [],
             facturas: JSON.parse(localStorage.getItem('nexial_facturas')) || [],
+            solicitudes: JSON.parse(localStorage.getItem('nexial_solicitudes')) || [],
             comisiones: JSON.parse(localStorage.getItem('nexial_comisiones')) || [],
             empleados: JSON.parse(localStorage.getItem('nexial_empleados')) || [],
             proveedores: JSON.parse(localStorage.getItem('nexial_proveedores')) || [],
@@ -972,110 +1099,10 @@
             almacenes: JSON.parse(localStorage.getItem('nexial_almacenes')) || []
         };
 
-        // Usuarios demo para prueba
+        // Solo usuario admin
         const demoUsers = [
-            { username: 'admin', password: '123', role: 'super', nombre: 'Administrador Corporativo', empresa: 'NEXIAL SUITE' },
-            { username: 'jefe@empresa1.com', password: '123', role: 'jefe', nombre: 'Juan Pérez', empresa: 'TecnoSoluciones SAC' },
-            { username: 'comercial@empresa1.com', password: '123', role: 'comercial', nombre: 'María López', empresa: 'TecnoSoluciones SAC' },
-            { username: 'admin@empresa1.com', password: '123', role: 'admin', nombre: 'Carlos Rodríguez', empresa: 'TecnoSoluciones SAC' },
-            { username: 'vendedor1', password: '123', role: 'vendedor', nombre: 'Roberto Silva', empresa: 'TecnoSoluciones SAC' },
-            { username: 'almacen1', password: '123', role: 'almacen', nombre: 'Ana García', empresa: 'TecnoSoluciones SAC' }
+            { username: 'admin', password: '123', role: 'super', nombre: 'Administrador Corporativo', empresa: 'NEXIAL SUITE' }
         ];
-
-        // Datos demo iniciales
-        const demoData = {
-            empresas: [
-                {
-                    id: 1,
-                    nombre: "TecnoSoluciones SAC",
-                    ruc: "20123456789",
-                    industria: "Tecnología",
-                    contacto: "Juan Pérez",
-                    email: "jefe@tecnosoluciones.com",
-                    telefono: "987654321",
-                    direccion: "Av. Principal 123",
-                    ciudad: "Lima",
-                    estado: "Activa",
-                    fechaRegistro: "2024-01-15",
-                    tarjetaRegistrada: true,
-                    usuarios: 5
-                },
-                {
-                    id: 2,
-                    nombre: "Importaciones Globales",
-                    ruc: "20345678901",
-                    industria: "Comercio",
-                    contacto: "María Rodríguez",
-                    email: "contacto@importaciones.com",
-                    telefono: "987123456",
-                    direccion: "Av. Comercio 456",
-                    ciudad: "Lima",
-                    estado: "Activa",
-                    fechaRegistro: "2024-02-10",
-                    tarjetaRegistrada: true,
-                    usuarios: 3
-                }
-            ],
-            productos: [
-                { id: 1, codigo: "PROD-001", nombre: "Laptop Business", categoria: "Tecnología", precio: 1200, stock: 50, empresa_id: 1, peso: 2.5, volumen: 0.003 },
-                { id: 2, codigo: "PROD-002", nombre: "Mouse Inalámbrico", categoria: "Tecnología", precio: 25, stock: 200, empresa_id: 1, peso: 0.1, volumen: 0.0001 },
-                { id: 3, codigo: "PROD-003", nombre: "Teclado Mecánico", categoria: "Tecnología", precio: 45, stock: 150, empresa_id: 1, peso: 0.8, volumen: 0.0005 }
-            ],
-            clientes: [
-                { id: 1, nombre: "Importaciones Globales SAC", ruc: "20345678901", direccion: "Av. Comercio 456", telefono: "987123456", email: "contacto@importaciones.com", empresa_id: 1, vendedor_id: 5 },
-                { id: 2, nombre: "Distribuidora Norte SA", ruc: "20456789012", direccion: "Calle Industria 789", telefono: "987654987", email: "ventas@distribuidoranorte.com", empresa_id: 1, vendedor_id: 5 }
-            ],
-            empleados: [
-                { id: 1, nombre: "Juan Pérez", dni: "12345678", cargo: "Jefe Principal", email: "jefe@tecnosoluciones.com", telefono: "987654321", empresa_id: 1, area: "Dirección", sueldo: 5000 },
-                { id: 2, nombre: "María López", dni: "23456789", cargo: "Dirección Comercial", email: "comercial@tecnosoluciones.com", telefono: "987654322", empresa_id: 1, area: "Comercial", sueldo: 3500 },
-                { id: 3, nombre: "Carlos Rodríguez", dni: "34567890", cargo: "Administración y Finanzas", email: "admin@tecnosoluciones.com", telefono: "987654323", empresa_id: 1, area: "Administración", sueldo: 3200 },
-                { id: 4, nombre: "Roberto Silva", dni: "45678901", cargo: "Vendedor", email: "vendedor1@tecnosoluciones.com", telefono: "987654324", empresa_id: 1, area: "Comercial", sueldo: 1500 },
-                { id: 5, nombre: "Ana García", dni: "56789012", cargo: "Almacén", email: "almacen1@tecnosoluciones.com", telefono: "987654325", empresa_id: 1, area: "Almacén", sueldo: 1800 }
-            ],
-            zonas: [
-                { id: 1, nombre: "Zona Norte", descripcion: "Distritos del norte de Lima", empresa_id: 1, vendedor_id: 4, coordenadas: "-11.99, -77.06" },
-                { id: 2, nombre: "Zona Sur", descripcion: "Distritos del sur de Lima", empresa_id: 1, vendedor_id: 4, coordenadas: "-12.19, -76.97" }
-            ],
-            ventas: [
-                { id: 1, fecha: "2024-03-15", cliente_id: 1, vendedor_id: 4, total: 2450, estado: "Completada", empresa_id: 1 },
-                { id: 2, fecha: "2024-03-14", cliente_id: 2, vendedor_id: 4, total: 1250, estado: "Completada", empresa_id: 1 }
-            ],
-            facturas: [
-                { id: 1, numero: "FACT-0001", fecha: "2024-03-15", cliente_id: 1, total: 2450, estado: "Pagada", empresa_id: 1 },
-                { id: 2, numero: "FACT-0002", fecha: "2024-03-14", cliente_id: 2, total: 1250, estado: "Pagada", empresa_id: 1 }
-            ],
-            proveedores: [
-                { id: 1, nombre: "Importadora Tech SA", ruc: "20567890123", contacto: "Luis Mendoza", telefono: "987111222", email: "contacto@importadoratech.com", empresa_id: 1 },
-                { id: 2, nombre: "Distribuidora Electrónica", ruc: "20678901234", contacto: "Carmen Ruiz", telefono: "987333444", email: "ventas@distribuidoraelectronica.com", empresa_id: 1 }
-            ],
-            distribuidores: [
-                { id: 1, nombre: "Transportes Rápidos SA", vehiculo: "Camión 3T", capacidad_peso: 3000, capacidad_volumen: 15, contacto: "Pedro Gómez", telefono: "987555666", empresa_id: 1 },
-                { id: 2, nombre: "Logística Express", vehiculo: "Furgoneta 1.5T", capacidad_peso: 1500, capacidad_volumen: 8, contacto: "Laura Torres", telefono: "987777888", empresa_id: 1 }
-            ],
-            almacenes: [
-                { id: 1, nombre: "Almacén Principal", direccion: "Av. Industrial 123", capacidad: 1000, responsable_id: 5, empresa_id: 1 },
-                { id: 2, nombre: "Almacén Zona Norte", direccion: "Av. Los Olivos 456", capacidad: 500, responsable_id: 5, empresa_id: 1 }
-            ]
-        };
-
-        // Inicializar base de datos si está vacía
-        function initializeDatabase() {
-            Object.keys(database).forEach(key => {
-                if (database[key].length === 0 && demoData[key]) {
-                    database[key] = demoData[key];
-                    localStorage.setItem(`nexial_${key}`, JSON.stringify(database[key]));
-                }
-            });
-            
-            // Guardar usuarios demo si no existen
-            if (database.usuarios.length === 0) {
-                database.usuarios = demoUsers.map(user => ({
-                    ...user,
-                    empresa_id: user.role === 'super' ? null : 1
-                }));
-                localStorage.setItem('nexial_usuarios', JSON.stringify(database.usuarios));
-            }
-        }
 
         // =============================================
         // SISTEMA DE AUTENTICACIÓN
@@ -1254,7 +1281,7 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
                                         <i class="fas fa-tachometer-alt"></i>
-                                        <span>Dashboard Corporativo</span>
+                                        <span>Panel de Control Corporativo</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -1266,15 +1293,7 @@
                             </ul>
                         </div>
                     `,
-                    quickActions: `
-                        <button class="quick-btn" onclick="showNuevaEmpresaModal()">
-                            <i class="fas fa-plus"></i> Nueva Empresa
-                        </button>
-                        <button class="quick-btn" onclick="accessAsJefe()">
-                            <i class="fas fa-eye"></i> Ver como Jefe
-                        </button>
-                    `,
-                    pageTitle: 'Dashboard Corporativo - Super Usuario'
+                    pageTitle: 'Panel de Control Corporativo - Super Usuario'
                 },
                 'jefe': {
                     badgeClass: 'jefe',
@@ -1289,7 +1308,7 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link active" onclick="loadJefeDashboard()">
                                         <i class="fas fa-tachometer-alt"></i>
-                                        <span>Dashboard Ejecutivo</span>
+                                        <span>Panel de Control Ejecutivo</span>
                                     </a>
                                 </li>
                             </ul>
@@ -1312,37 +1331,8 @@
                                 </li>
                             </ul>
                         </div>
-                        
-                        <div class="nav-section">
-                            <div class="nav-title">CONTROL</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadGestionUsuarios()">
-                                        <i class="fas fa-users-cog"></i>
-                                        <span>Gestión de Usuarios</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadControlFinanciero()">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                        <span>Control Financiero</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
                     `,
-                    quickActions: `
-                        <button class="quick-btn" onclick="showNuevoUsuarioModal()">
-                            <i class="fas fa-user-plus"></i> Nuevo Usuario
-                        </button>
-                        <button class="quick-btn" onclick="accessComercial()">
-                            <i class="fas fa-eye"></i> Ver Comercial
-                        </button>
-                        <button class="quick-btn" onclick="accessAdmin()">
-                            <i class="fas fa-eye"></i> Ver Administración
-                        </button>
-                    `,
-                    pageTitle: `Dashboard Ejecutivo - ${currentCompany ? currentCompany.nombre : currentUser.empresa}`
+                    pageTitle: `Panel de Control Ejecutivo - ${currentCompany ? currentCompany.nombre : currentUser.empresa}`
                 },
                 'comercial': {
                     badgeClass: 'comercial',
@@ -1357,7 +1347,7 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link active" onclick="loadComercialDashboard()">
                                         <i class="fas fa-tachometer-alt"></i>
-                                        <span>Dashboard Comercial</span>
+                                        <span>Panel de Control Comercial</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -1412,20 +1402,6 @@
                             </ul>
                         </div>
                     `,
-                    quickActions: `
-                        <button class="quick-btn" onclick="showNuevaZonaModal()">
-                            <i class="fas fa-plus"></i> Nueva Zona
-                        </button>
-                        <button class="quick-btn" onclick="showNuevaRutaModal()">
-                            <i class="fas fa-route"></i> Nueva Ruta
-                        </button>
-                        <button class="quick-btn" onclick="showAsignarProductoModal()">
-                            <i class="fas fa-box"></i> Asignar Producto
-                        </button>
-                        <button class="quick-btn" onclick="showNuevoAlmacenModal()">
-                            <i class="fas fa-warehouse"></i> Nuevo Almacén
-                        </button>
-                    `,
                     pageTitle: `Dirección Comercial - ${currentUser.empresa}`
                 },
                 'admin': {
@@ -1441,49 +1417,13 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link active" onclick="loadAdminDashboard()">
                                         <i class="fas fa-tachometer-alt"></i>
-                                        <span>Dashboard Administrativo</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadGestionUsuariosAdmin()">
-                                        <i class="fas fa-users-cog"></i>
-                                        <span>Gestión de Usuarios</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadRecursosHumanos()">
-                                        <i class="fas fa-id-card"></i>
-                                        <span>Recursos Humanos</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="nav-title">FINANZAS</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadContabilidad()">
-                                        <i class="fas fa-calculator"></i>
-                                        <span>Contabilidad</span>
+                                        <span>Panel de Control Administrativo</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="#" class="nav-link" onclick="loadFacturacion()">
                                         <i class="fas fa-file-invoice-dollar"></i>
                                         <span>Facturación</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="nav-title">PROVEEDORES</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadProveedores()">
-                                        <i class="fas fa-truck-loading"></i>
-                                        <span>Gestión de Proveedores</span>
                                     </a>
                                 </li>
                             </ul>
@@ -1501,20 +1441,6 @@
                             </ul>
                         </div>
                     `,
-                    quickActions: `
-                        <button class="quick-btn" onclick="showNuevoEmpleadoModal()">
-                            <i class="fas fa-user-plus"></i> Nuevo Empleado
-                        </button>
-                        <button class="quick-btn" onclick="showNuevoProveedorModal()">
-                            <i class="fas fa-truck"></i> Nuevo Proveedor
-                        </button>
-                        <button class="quick-btn" onclick="showGenerarFacturaModal()">
-                            <i class="fas fa-file-invoice"></i> Generar Factura
-                        </button>
-                        <button class="quick-btn" onclick="showNuevoGastoModal()">
-                            <i class="fas fa-money-bill-wave"></i> Nuevo Gasto
-                        </button>
-                    `,
                     pageTitle: `Administración y Finanzas - ${currentUser.empresa}`
                 },
                 'vendedor': {
@@ -1530,7 +1456,7 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link active" onclick="loadVendedorDashboard()">
                                         <i class="fas fa-tachometer-alt"></i>
-                                        <span>Dashboard Vendedor</span>
+                                        <span>Panel de Control Vendedor</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -1554,14 +1480,6 @@
                             </ul>
                         </div>
                     `,
-                    quickActions: `
-                        <button class="quick-btn" onclick="showNuevoPedidoModal()">
-                            <i class="fas fa-plus"></i> Nuevo Pedido
-                        </button>
-                        <button class="quick-btn" onclick="showSolicitudClienteModal()">
-                            <i class="fas fa-user-plus"></i> Solicitar Cliente
-                        </button>
-                    `,
                     pageTitle: `App Vendedor - ${currentUser.empresa}`
                 },
                 'almacen': {
@@ -1577,7 +1495,7 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link active" onclick="loadAlmacenDashboard()">
                                         <i class="fas fa-tachometer-alt"></i>
-                                        <span>Dashboard Almacén</span>
+                                        <span>Panel de Control Almacén</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -1601,14 +1519,6 @@
                             </ul>
                         </div>
                     `,
-                    quickActions: `
-                        <button class="quick-btn" onclick="showNuevoIngresoModal()">
-                            <i class="fas fa-plus"></i> Nuevo Ingreso
-                        </button>
-                        <button class="quick-btn" onclick="showNuevoDespachoModal()">
-                            <i class="fas fa-truck"></i> Nuevo Despacho
-                        </button>
-                    `,
                     pageTitle: `App Almacén - ${currentUser.empresa}`
                 }
             };
@@ -1622,7 +1532,6 @@
             document.getElementById('userRole').textContent = config.userRole;
             document.getElementById('sidebarCompanyName').textContent = currentUser.empresa;
             document.getElementById('navMenu').innerHTML = config.navMenu;
-            document.getElementById('quickActions').innerHTML = config.quickActions;
             document.getElementById('pageTitle').textContent = config.pageTitle;
             
             // Mostrar vista correspondiente
@@ -1695,7 +1604,7 @@
                             <div class="stat-title">Ventas Totales</div>
                             <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                         </div>
-                        <div class="stat-value">$${database.ventas.reduce((sum, v) => sum + v.total, 0).toLocaleString()}</div>
+                        <div class="stat-value">$${database.ventas.reduce((sum, v) => sum + (v.total || 0), 0).toLocaleString()}</div>
                         <div class="stat-change positive">
                             <i class="fas fa-chart-line"></i> Todas las empresas
                         </div>
@@ -1706,7 +1615,7 @@
                             <div class="stat-title">Facturación</div>
                             <div class="stat-icon"><i class="fas fa-file-invoice"></i></div>
                         </div>
-                        <div class="stat-value">$${database.facturas.reduce((sum, f) => sum + f.total, 0).toLocaleString()}</div>
+                        <div class="stat-value">$${database.facturas.reduce((sum, f) => sum + (f.total || 0), 0).toLocaleString()}</div>
                         <div class="stat-change positive">
                             <i class="fas fa-receipt"></i> Total facturado
                         </div>
@@ -1717,7 +1626,7 @@
                     <div class="table-header">
                         <h3 class="table-title">Empresas del Sistema</h3>
                         <div class="table-actions">
-                            <button class="quick-btn" onclick="showNuevaEmpresaModal()">
+                            <button class="btn btn-primary" onclick="showNuevaEmpresaModal()">
                                 <i class="fas fa-plus"></i> Nueva Empresa
                             </button>
                         </div>
@@ -1731,28 +1640,27 @@
                                     <th>RUC</th>
                                     <th>Contacto</th>
                                     <th>Estado</th>
-                                    <th>Ventas</th>
+                                    <th>Usuarios</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="empresasTable">
                                 ${database.empresas.map(empresa => {
-                                    const ventasEmpresa = database.ventas.filter(v => v.empresa_id === empresa.id);
-                                    const totalVentas = ventasEmpresa.reduce((sum, v) => sum + v.total, 0);
+                                    const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresa.id);
                                     return `
                                         <tr>
                                             <td>
                                                 <strong>${empresa.nombre}</strong><br>
-                                                <small style="color: rgba(255,255,255,0.5);">${empresa.email}</small>
+                                                <small style="color: rgba(255,255,255,0.5);">${empresa.email || ''}</small>
                                             </td>
-                                            <td>${empresa.ruc}</td>
-                                            <td>${empresa.contacto}</td>
+                                            <td>${empresa.ruc || ''}</td>
+                                            <td>${empresa.contacto || ''}</td>
                                             <td>
                                                 <span class="status-badge ${empresa.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
-                                                    ${empresa.estado}
+                                                    ${empresa.estado || 'Inactiva'}
                                                 </span>
                                             </td>
-                                            <td>$${totalVentas.toLocaleString()}</td>
+                                            <td>${usuariosEmpresa.length}</td>
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="action-btn view" onclick="viewEmpresaCompleta(${empresa.id})" title="Ver Todo">
@@ -1769,6 +1677,14 @@
                                         </tr>
                                     `;
                                 }).join('')}
+                                ${database.empresas.length === 0 ? `
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-building" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay empresas registradas
+                                        </td>
+                                    </tr>
+                                ` : ''}
                             </tbody>
                         </table>
                     </div>
@@ -1779,253 +1695,242 @@
         // JEFE EMPRESA
         function loadJefeDashboard() {
             const empresaId = currentUser.empresa_id;
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            const ventas = database.ventas.filter(v => v.empresa_id === empresaId);
-            const totalVentas = ventas.reduce((sum, v) => sum + v.total, 0);
-            const clientesCount = database.clientes.filter(c => c.empresa_id === empresaId).length;
-            const empleadosCount = database.empleados.filter(e => e.empresa_id === empresaId).length;
-            const facturas = database.facturas.filter(f => f.empresa_id === empresaId);
-            const totalFacturado = facturas.reduce((sum, f) => sum + f.total, 0);
+            
+            // Obtener fecha actual
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Filtrar ventas del día
+            const ventasHoy = database.ventas.filter(v => 
+                v.empresa_id === empresaId && v.fecha === today
+            );
+            
+            const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0);
+            
+            // Facturación del día
+            const facturasHoy = database.facturas.filter(f => 
+                f.empresa_id === empresaId && f.fecha === today
+            );
+            const totalFacturadoHoy = facturasHoy.reduce((sum, f) => sum + (f.total || 0), 0);
+            
+            // Obtener productos vendidos hoy
+            const productosVendidosHoy = [];
+            ventasHoy.forEach(venta => {
+                if (venta.productos) {
+                    venta.productos.forEach(producto => {
+                        const existing = productosVendidosHoy.find(p => p.id === producto.id);
+                        if (existing) {
+                            existing.cantidad += producto.cantidad || 1;
+                            existing.total += producto.precio * (producto.cantidad || 1);
+                        } else {
+                            productosVendidosHoy.push({
+                                id: producto.id,
+                                nombre: producto.nombre,
+                                cantidad: producto.cantidad || 1,
+                                precio: producto.precio,
+                                total: producto.precio * (producto.cantidad || 1)
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Ordenar productos por cantidad vendida
+            productosVendidosHoy.sort((a, b) => b.cantidad - a.cantidad);
+            
+            // Obtener vendedores del día
+            const vendedoresHoy = [];
+            ventasHoy.forEach(venta => {
+                const vendedor = database.empleados.find(e => e.id === venta.vendedor_id);
+                if (vendedor) {
+                    const existing = vendedoresHoy.find(v => v.id === vendedor.id);
+                    if (existing) {
+                        existing.ventas += 1;
+                        existing.total += venta.total || 0;
+                    } else {
+                        vendedoresHoy.push({
+                            id: vendedor.id,
+                            nombre: vendedor.nombre,
+                            ventas: 1,
+                            total: venta.total || 0
+                        });
+                    }
+                }
+            });
+            
+            // Ordenar vendedores por total vendido
+            vendedoresHoy.sort((a, b) => b.total - a.total);
+            
+            // Obtener distribuciones del día
+            const distribucionesHoy = database.distribuidores.filter(d => 
+                d.empresa_id === empresaId && d.ultima_entrega === today
+            );
             
             document.getElementById('viewJefe').innerHTML = `
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Ventas del Mes</div>
+                            <div class="stat-title">Ventas del Día</div>
                             <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                         </div>
-                        <div class="stat-value">$${totalVentas.toLocaleString()}</div>
+                        <div class="stat-value">$${totalVentasHoy.toLocaleString()}</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> Total acumulado
+                            <i class="fas fa-arrow-up"></i> Hoy
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Clientes Activos</div>
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        </div>
-                        <div class="stat-value">${clientesCount}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> En cartera
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Empleados</div>
-                            <div class="stat-icon"><i class="fas fa-id-card"></i></div>
-                        </div>
-                        <div class="stat-value">${empleadosCount}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-users"></i> En empresa
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Facturación</div>
+                            <div class="stat-title">Facturación del Día</div>
                             <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
                         </div>
-                        <div class="stat-value">$${totalFacturado.toLocaleString()}</div>
+                        <div class="stat-value">$${totalFacturadoHoy.toLocaleString()}</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-chart-line"></i> Total
+                            <i class="fas fa-receipt"></i> Hoy
                         </div>
-                    </div>
-                </div>
-
-                <div class="charts-container">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Ventas Mensuales</h3>
-                        </div>
-                        <canvas id="ventasChart"></canvas>
                     </div>
                     
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title">Distribución por Área</h3>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Vendedores Activos</div>
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
                         </div>
-                        <canvas id="areasChart"></canvas>
+                        <div class="stat-value">${vendedoresHoy.length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-user-check"></i> Hoy
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Distribuciones</div>
+                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                        </div>
+                        <div class="stat-value">${distribucionesHoy.length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-shipping-fast"></i> Hoy
+                        </div>
                     </div>
                 </div>
 
                 <div class="table-card">
                     <div class="table-header">
-                        <h3 class="table-title">Acciones Rápidas</h3>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <button class="quick-btn" onclick="showNuevoUsuarioModal()" style="flex-direction: column; height: 120px;">
-                            <i class="fas fa-user-plus" style="font-size: 2rem;"></i>
-                            <span>Crear Nuevo Usuario</span>
-                        </button>
-                        <button class="quick-btn" onclick="accessComercial()" style="flex-direction: column; height: 120px;">
-                            <i class="fas fa-chart-line" style="font-size: 2rem;"></i>
-                            <span>Ver Dirección Comercial</span>
-                        </button>
-                        <button class="quick-btn" onclick="accessAdmin()" style="flex-direction: column; height: 120px;">
-                            <i class="fas fa-calculator" style="font-size: 2rem;"></i>
-                            <span>Ver Administración</span>
-                        </button>
-                        <button class="quick-btn" onclick="loadControlFinanciero()" style="flex-direction: column; height: 120px;">
-                            <i class="fas fa-money-bill-wave" style="font-size: 2rem;"></i>
-                            <span>Control Financiero</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Ventas Recientes</h3>
+                        <h3 class="table-title">Ventas por Vendedor (Hoy)</h3>
+                        <div class="table-actions">
+                            <select id="sortVendedores" onchange="sortVendedores()" style="background: rgba(255,255,255,0.05); color: white; padding: 0.5rem; border-radius: 6px; border: 1px solid rgba(124,58,237,0.3);">
+                                <option value="total">Ordenar por Monto</option>
+                                <option value="ventas">Ordenar por Cantidad</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Cliente</th>
                                     <th>Vendedor</th>
+                                    <th>Ventas</th>
                                     <th>Total</th>
-                                    <th>Estado</th>
+                                    <th>Promedio</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${ventas.slice(0, 5).map(venta => {
-                                    const cliente = database.clientes.find(c => c.id === venta.cliente_id);
-                                    const vendedor = database.empleados.find(e => e.id === venta.vendedor_id);
-                                    return `
-                                        <tr>
-                                            <td>${venta.fecha}</td>
-                                            <td>${cliente ? cliente.nombre : 'N/A'}</td>
-                                            <td>${vendedor ? vendedor.nombre : 'N/A'}</td>
-                                            <td>$${venta.total.toLocaleString()}</td>
-                                            <td>
-                                                <span class="status-badge status-active">
-                                                    ${venta.estado}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('')}
+                            <tbody id="vendedoresTable">
+                                ${vendedoresHoy.map(vendedor => `
+                                    <tr>
+                                        <td><strong>${vendedor.nombre}</strong></td>
+                                        <td>${vendedor.ventas}</td>
+                                        <td>$${vendedor.total.toLocaleString()}</td>
+                                        <td>$${(vendedor.total / vendedor.ventas).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    </tr>
+                                `).join('')}
+                                ${vendedoresHoy.length === 0 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay ventas hoy
+                                        </td>
+                                    </tr>
+                                ` : ''}
                             </tbody>
                         </table>
-                    </div>
-                </div>
-            `;
-            
-            initializeJefeCharts();
-        }
-
-        // DIRECCIÓN COMERCIAL
-        function loadComercialDashboard() {
-            const empresaId = currentUser.empresa_id;
-            const ventas = database.ventas.filter(v => v.empresa_id === empresaId);
-            const totalVentas = ventas.reduce((sum, v) => sum + v.total, 0);
-            const clientes = database.clientes.filter(c => c.empresa_id === empresaId);
-            const productos = database.productos.filter(p => p.empresa_id === empresaId);
-            const zonas = database.zonas.filter(z => z.empresa_id === empresaId);
-            const distribuidores = database.distribuidores.filter(d => d.empresa_id === empresaId);
-            
-            document.getElementById('viewComercial').innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Ventas del Mes</div>
-                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-                        </div>
-                        <div class="stat-value">$${totalVentas.toLocaleString()}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> Total acumulado
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Clientes</div>
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        </div>
-                        <div class="stat-value">${clientes.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-user-plus"></i> En cartera
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Zonas Activas</div>
-                            <div class="stat-icon"><i class="fas fa-map-marker-alt"></i></div>
-                        </div>
-                        <div class="stat-value">${zonas.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-map"></i> Asignadas
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Distribuidores</div>
-                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
-                        </div>
-                        <div class="stat-value">${distribuidores.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-shipping-fast"></i> Activos
-                        </div>
-                    </div>
-                </div>
-
-                <div class="map-container">
-                    <div class="map-placeholder">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <h3>Mapa de Zonas y Vendedores</h3>
-                        <p>Visualización de zonas asignadas a vendedores</p>
-                        <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-                            ${zonas.map(zona => {
-                                const vendedor = database.empleados.find(e => e.id === zona.vendedor_id);
-                                return `
-                                    <div style="background: rgba(124,58,237,0.1); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--primary);">
-                                        <strong>${zona.nombre}</strong><br>
-                                        <small>Vendedor: ${vendedor ? vendedor.nombre : 'Sin asignar'}</small>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
                     </div>
                 </div>
 
                 <div class="table-card">
                     <div class="table-header">
-                        <h3 class="table-title">Distribuidores Activos</h3>
+                        <h3 class="table-title">Productos Más Vendidos (Hoy)</h3>
                         <div class="table-actions">
-                            <button class="quick-btn" onclick="showNuevoDistribuidorModal()">
-                                <i class="fas fa-plus"></i> Nuevo Distribuidor
-                            </button>
+                            <select id="sortProductos" onchange="sortProductos()" style="background: rgba(255,255,255,0.05); color: white; padding: 0.5rem; border-radius: 6px; border: 1px solid rgba(124,58,237,0.3);">
+                                <option value="cantidad">Ordenar por Cantidad</option>
+                                <option value="total">Ordenar por Valor</option>
+                            </select>
                         </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productosTable">
+                                ${productosVendidosHoy.map(producto => `
+                                    <tr>
+                                        <td><strong>${producto.nombre}</strong></td>
+                                        <td>${producto.cantidad}</td>
+                                        <td>$${producto.precio.toLocaleString()}</td>
+                                        <td>$${producto.total.toLocaleString()}</td>
+                                    </tr>
+                                `).join('')}
+                                ${productosVendidosHoy.length === 0 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-box" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay productos vendidos hoy
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Distribución y Entregas</h3>
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Distribuidor</th>
-                                    <th>Vehículo</th>
-                                    <th>Capacidad</th>
-                                    <th>Contacto</th>
+                                    <th>Entregas Hoy</th>
+                                    <th>Total Entregado</th>
                                     <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${distribuidores.map(dist => `
+                                ${distribucionesHoy.map(dist => `
                                     <tr>
-                                        <td>${dist.nombre}</td>
-                                        <td>${dist.vehiculo}</td>
-                                        <td>${dist.capacidad_peso}kg / ${dist.capacidad_volumen}m³</td>
-                                        <td>${dist.contacto}<br><small>${dist.telefono}</small></td>
+                                        <td><strong>${dist.nombre}</strong><br><small>${dist.vehiculo || ''}</small></td>
+                                        <td>${dist.entregas_hoy || 0}</td>
+                                        <td>$${(dist.total_entregado || 0).toLocaleString()}</td>
                                         <td>
                                             <span class="status-badge status-active">
-                                                Activo
+                                                <i class="fas fa-check-circle"></i> Activo
                                             </span>
                                         </td>
                                     </tr>
                                 `).join('')}
+                                ${distribucionesHoy.length === 0 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-truck" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay entregas hoy
+                                        </td>
+                                    </tr>
+                                ` : ''}
                             </tbody>
                         </table>
                     </div>
@@ -2033,183 +1938,495 @@
 
                 <div class="table-card">
                     <div class="table-header">
-                        <h3 class="table-title">Solicitudes Pendientes</h3>
-                        <div class="table-actions">
-                            <button class="quick-btn" onclick="loadAprobacionesComercial()">
-                                <i class="fas fa-check-circle"></i> Ver Todas
-                            </button>
+                        <h3 class="table-title">Ventas por Período</h3>
+                    </div>
+                    
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('semana')">Semana</button>
+                        <button class="tab" onclick="switchTab('mes')">Mes</button>
+                        <button class="tab" onclick="switchTab('año')">Año</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="tabSemana">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Ventas</th>
+                                        <th>Total</th>
+                                        <th>Vendedor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${getVentasPorPeriodo('semana').map(venta => `
+                                        <tr>
+                                            <td>${venta.fecha}</td>
+                                            <td>${venta.cantidad}</td>
+                                            <td>$${venta.total.toLocaleString()}</td>
+                                            <td>${venta.vendedor}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
+                    
+                    <div class="tab-content" id="tabMes">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Semana</th>
+                                        <th>Ventas</th>
+                                        <th>Total</th>
+                                        <th>Promedio Diario</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${getVentasPorPeriodo('mes').map(venta => `
+                                        <tr>
+                                            <td>${venta.semana}</td>
+                                            <td>${venta.cantidad}</td>
+                                            <td>$${venta.total.toLocaleString()}</td>
+                                            <td>$${venta.promedio.toLocaleString()}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="tabAño">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mes</th>
+                                        <th>Ventas</th>
+                                        <th>Total</th>
+                                        <th>Crecimiento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${getVentasPorPeriodo('año').map(venta => `
+                                        <tr>
+                                            <td>${venta.mes}</td>
+                                            <td>${venta.cantidad}</td>
+                                            <td>$${venta.total.toLocaleString()}</td>
+                                            <td class="${venta.crecimiento >= 0 ? 'stat-change positive' : 'stat-change negative'}">
+                                                <i class="fas fa-arrow-${venta.crecimiento >= 0 ? 'up' : 'down'}"></i>
+                                                ${Math.abs(venta.crecimiento)}%
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // DIRECCIÓN COMERCIAL
+        function loadComercialDashboard() {
+            const empresaId = currentUser.empresa_id;
+            
+            // Obtener fecha actual
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Ventas del día
+            const ventasHoy = database.ventas.filter(v => 
+                v.empresa_id === empresaId && v.fecha === today
+            );
+            const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0);
+            
+            // Vendedores del día ordenados por ventas
+            const vendedoresHoy = [];
+            ventasHoy.forEach(venta => {
+                const vendedor = database.empleados.find(e => e.id === venta.vendedor_id);
+                if (vendedor) {
+                    const existing = vendedoresHoy.find(v => v.id === vendedor.id);
+                    if (existing) {
+                        existing.ventas += 1;
+                        existing.total += venta.total || 0;
+                    } else {
+                        vendedoresHoy.push({
+                            id: vendedor.id,
+                            nombre: vendedor.nombre,
+                            ventas: 1,
+                            total: venta.total || 0
+                        });
+                    }
+                }
+            });
+            
+            // Ordenar vendedores por total vendido (de mayor a menor)
+            vendedoresHoy.sort((a, b) => b.total - a.total);
+            
+            // Entregas realizadas hoy por distribuidores
+            const entregasHoy = database.distribuidores.filter(d => 
+                d.empresa_id === empresaId && d.ultima_entrega === today
+            );
+            
+            // Detalle de entregas
+            const detalleEntregas = [];
+            entregasHoy.forEach(dist => {
+                if (dist.entregas_detalle) {
+                    dist.entregas_detalle.forEach(entrega => {
+                        detalleEntregas.push({
+                            distribuidor: dist.nombre,
+                            cliente: entrega.cliente,
+                            producto: entrega.producto,
+                            cantidad: entrega.cantidad,
+                            hora: entrega.hora,
+                            estado: entrega.estado
+                        });
+                    });
+                }
+            });
+            
+            document.getElementById('viewComercial').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Ventas del Día</div>
+                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        </div>
+                        <div class="stat-value">$${totalVentasHoy.toLocaleString()}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-chart-line"></i> Hoy
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Vendedores Activos</div>
+                            <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                        </div>
+                        <div class="stat-value">${vendedoresHoy.length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-users"></i> Hoy
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Entregas Realizadas</div>
+                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                        </div>
+                        <div class="stat-value">${entregasHoy.length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-check-circle"></i> Hoy
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Productos Vendidos</div>
+                            <div class="stat-icon"><i class="fas fa-box"></i></div>
+                        </div>
+                        <div class="stat-value">${ventasHoy.reduce((sum, v) => sum + (v.productos ? v.productos.length : 0), 0)}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-shopping-cart"></i> Hoy
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Ranking de Vendedores (Hoy)</h3>
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Tipo</th>
-                                    <th>Solicitante</th>
-                                    <th>Fecha</th>
-                                    <th>Detalles</th>
-                                    <th>Acciones</th>
+                                    <th>Posición</th>
+                                    <th>Vendedor</th>
+                                    <th>Ventas</th>
+                                    <th>Total</th>
+                                    <th>Promedio</th>
                                 </tr>
                             </thead>
-                            <tbody id="solicitudesComercialTable">
-                                <!-- Se cargarán dinámicamente -->
+                            <tbody>
+                                ${vendedoresHoy.map((vendedor, index) => `
+                                    <tr>
+                                        <td>
+                                            <span style="display: inline-block; width: 30px; height: 30px; background: ${getRankColor(index)}; border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold;">
+                                                ${index + 1}
+                                            </span>
+                                        </td>
+                                        <td><strong>${vendedor.nombre}</strong></td>
+                                        <td>${vendedor.ventas}</td>
+                                        <td>$${vendedor.total.toLocaleString()}</td>
+                                        <td>$${(vendedor.total / vendedor.ventas).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    </tr>
+                                `).join('')}
+                                ${vendedoresHoy.length === 0 ? `
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay ventas hoy
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Detalle de Entregas por Distribuidor</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Distribuidor</th>
+                                    <th>Cliente</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Hora</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${detalleEntregas.map(entrega => `
+                                    <tr>
+                                        <td><strong>${entrega.distribuidor}</strong></td>
+                                        <td>${entrega.cliente}</td>
+                                        <td>${entrega.producto}</td>
+                                        <td>${entrega.cantidad}</td>
+                                        <td>${entrega.hora}</td>
+                                        <td>
+                                            <span class="status-badge ${entrega.estado === 'Entregado' ? 'status-active' : 'status-pending'}">
+                                                ${entrega.estado}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${detalleEntregas.length === 0 ? `
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-truck-loading" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay entregas detalladas hoy
+                                        </td>
+                                    </tr>
+                                ` : ''}
                             </tbody>
                         </table>
                     </div>
                 </div>
             `;
-            
-            loadSolicitudesComercial();
         }
 
         // ADMINISTRACIÓN Y FINANZAS
         function loadAdminDashboard() {
             const empresaId = currentUser.empresa_id;
-            const empleados = database.empleados.filter(e => e.empresa_id === empresaId);
-            const proveedores = database.proveedores.filter(p => p.empresa_id === empresaId);
+            
+            // Obtener facturas
             const facturas = database.facturas.filter(f => f.empresa_id === empresaId);
-            const totalFacturado = facturas.reduce((sum, f) => sum + f.total, 0);
-            const gastos = database.gastos ? database.gastos.filter(g => g.empresa_id === empresaId) : [];
-            const totalGastos = gastos.reduce((sum, g) => sum + g.monto, 0);
+            const totalFacturado = facturas.reduce((sum, f) => sum + (f.total || 0), 0);
+            
+            // Obtener comisiones por vendedor
+            const comisionesVendedores = [];
+            database.ventas.forEach(venta => {
+                if (venta.empresa_id === empresaId) {
+                    const vendedor = database.empleados.find(e => e.id === venta.vendedor_id);
+                    if (vendedor) {
+                        const comision = (venta.total || 0) * 0.10; // 10% de comisión
+                        const existing = comisionesVendedores.find(c => c.id === vendedor.id);
+                        if (existing) {
+                            existing.ventas += 1;
+                            existing.total += venta.total || 0;
+                            existing.comision += comision;
+                        } else {
+                            comisionesVendedores.push({
+                                id: vendedor.id,
+                                nombre: vendedor.nombre,
+                                area: vendedor.area || 'Ventas',
+                                ventas: 1,
+                                total: venta.total || 0,
+                                comision: comision
+                            });
+                        }
+                    }
+                }
+            });
+            
+            // Obtener comisiones por distribuidor
+            const comisionesDistribuidores = [];
+            database.distribuidores.forEach(dist => {
+                if (dist.empresa_id === empresaId && dist.total_entregado) {
+                    const comision = (dist.total_entregado || 0) * 0.05; // 5% de comisión
+                    comisionesDistribuidores.push({
+                        id: dist.id,
+                        nombre: dist.nombre,
+                        entregas: dist.entregas_hoy || 0,
+                        total: dist.total_entregado || 0,
+                        comision: comision
+                    });
+                }
+            });
+            
+            // Empleados por área
+            const empleadosPorArea = {};
+            database.empleados.forEach(emp => {
+                if (emp.empresa_id === empresaId) {
+                    const area = emp.area || 'Sin Área';
+                    if (!empleadosPorArea[area]) {
+                        empleadosPorArea[area] = [];
+                    }
+                    empleadosPorArea[area].push(emp);
+                }
+            });
             
             document.getElementById('viewAdmin').innerHTML = `
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Empleados</div>
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        </div>
-                        <div class="stat-value">${empleados.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-id-card"></i> En sistema
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Facturación</div>
+                            <div class="stat-title">Facturación Total</div>
                             <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
                         </div>
                         <div class="stat-value">$${totalFacturado.toLocaleString()}</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-dollar-sign"></i> Total
+                            <i class="fas fa-chart-line"></i> Total acumulado
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Proveedores</div>
-                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
-                        </div>
-                        <div class="stat-value">${proveedores.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-handshake"></i> Activos
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Gastos</div>
+                            <div class="stat-title">Comisiones Vendedores</div>
                             <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
                         </div>
-                        <div class="stat-value">$${totalGastos.toLocaleString()}</div>
+                        <div class="stat-value">$${comisionesVendedores.reduce((sum, c) => sum + c.comision, 0).toLocaleString()}</div>
                         <div class="stat-change negative">
-                            <i class="fas fa-arrow-down"></i> Egresos
+                            <i class="fas fa-arrow-down"></i> Por pagar
                         </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Comisiones Distribuidores</div>
+                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
+                        </div>
+                        <div class="stat-value">$${comisionesDistribuidores.reduce((sum, c) => sum + c.comision, 0).toLocaleString()}</div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i> Por pagar
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Empleados Activos</div>
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="stat-value">${database.empleados.filter(e => e.empresa_id === empresaId).length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-user-plus"></i> En sistema
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Comisiones por Vendedor</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Vendedor</th>
+                                    <th>Área</th>
+                                    <th>Ventas</th>
+                                    <th>Total Ventas</th>
+                                    <th>Comisión (10%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${comisionesVendedores.map(comision => `
+                                    <tr>
+                                        <td><strong>${comision.nombre}</strong></td>
+                                        <td>${comision.area}</td>
+                                        <td>${comision.ventas}</td>
+                                        <td>$${comision.total.toLocaleString()}</td>
+                                        <td><strong style="color: var(--accent);">$${comision.comision.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></td>
+                                    </tr>
+                                `).join('')}
+                                ${comisionesVendedores.length === 0 ? `
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay comisiones calculadas
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Comisiones por Distribuidor</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Distribuidor</th>
+                                    <th>Entregas</th>
+                                    <th>Total Entregado</th>
+                                    <th>Comisión (5%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${comisionesDistribuidores.map(comision => `
+                                    <tr>
+                                        <td><strong>${comision.nombre}</strong></td>
+                                        <td>${comision.entregas}</td>
+                                        <td>$${comision.total.toLocaleString()}</td>
+                                        <td><strong style="color: var(--accent);">$${comision.comision.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></td>
+                                    </tr>
+                                `).join('')}
+                                ${comisionesDistribuidores.length === 0 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-truck" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay comisiones de distribuidores
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 <div class="table-card">
                     <div class="table-header">
                         <h3 class="table-title">Empleados por Área</h3>
-                        <div class="table-actions">
-                            <button class="quick-btn" onclick="showNuevoEmpleadoModal()">
-                                <i class="fas fa-user-plus"></i> Nuevo Empleado
-                            </button>
-                        </div>
                     </div>
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Nombre</th>
-                                    <th>DNI</th>
-                                    <th>Cargo</th>
                                     <th>Área</th>
-                                    <th>Sueldo</th>
-                                    <th>Acciones</th>
+                                    <th>Empleados</th>
+                                    <th>Total Sueldos</th>
+                                    <th>Promedio por Empleado</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${empleados.map(empleado => `
-                                    <tr>
-                                        <td>${empleado.nombre}</td>
-                                        <td>${empleado.dni}</td>
-                                        <td>${empleado.cargo}</td>
-                                        <td>${empleado.area || 'N/A'}</td>
-                                        <td>$${empleado.sueldo ? empleado.sueldo.toLocaleString() : 'N/A'}</td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="action-btn edit" onclick="editEmpleado(${empleado.id})" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="action-btn delete" onclick="deleteEmpleado(${empleado.id})" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Facturas Recientes</h3>
-                        <div class="table-actions">
-                            <button class="quick-btn" onclick="showGenerarFacturaModal()">
-                                <i class="fas fa-plus"></i> Nueva Factura
-                            </button>
-                        </div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>N° Factura</th>
-                                    <th>Cliente</th>
-                                    <th>Fecha</th>
-                                    <th>Total</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${facturas.slice(0, 5).map(factura => {
-                                    const cliente = database.clientes.find(c => c.id === factura.cliente_id);
+                                ${Object.keys(empleadosPorArea).map(area => {
+                                    const empleados = empleadosPorArea[area];
+                                    const totalSueldos = empleados.reduce((sum, emp) => sum + (emp.sueldo || 0), 0);
                                     return `
                                         <tr>
-                                            <td>${factura.numero}</td>
-                                            <td>${cliente ? cliente.nombre : 'N/A'}</td>
-                                            <td>${factura.fecha}</td>
-                                            <td>$${factura.total.toLocaleString()}</td>
-                                            <td>
-                                                <span class="status-badge ${factura.estado === 'Pagada' ? 'status-active' : 'status-pending'}">
-                                                    ${factura.estado}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <button class="action-btn view" onclick="viewFactura(${factura.id})" title="Ver">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button class="action-btn edit" onclick="editFactura(${factura.id})" title="Editar">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
+                                            <td><strong>${area}</strong></td>
+                                            <td>${empleados.length}</td>
+                                            <td>$${totalSueldos.toLocaleString()}</td>
+                                            <td>$${(totalSueldos / empleados.length).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                         </tr>
                                     `;
                                 }).join('')}
@@ -2222,22 +2439,6 @@
 
         // VENDEDOR APP
         function loadVendedorDashboard() {
-            const empresaId = currentUser.empresa_id;
-            const vendedorId = database.empleados.find(e => 
-                e.empresa_id === empresaId && e.email === currentUser.username
-            )?.id;
-            
-            const clientes = database.clientes.filter(c => 
-                c.empresa_id === empresaId && c.vendedor_id === vendedorId
-            );
-            
-            const ventas = database.ventas.filter(v => 
-                v.empresa_id === empresaId && v.vendedor_id === vendedorId
-            );
-            
-            const totalVentas = ventas.reduce((sum, v) => sum + v.total, 0);
-            const productosAsignados = database.productos.filter(p => p.empresa_id === empresaId);
-            
             document.getElementById('viewVendedor').innerHTML = `
                 <div style="max-width: 800px; margin: 0 auto;">
                     <div style="text-align: center; margin-bottom: 2rem;">
@@ -2253,9 +2454,9 @@
                                 <div class="stat-title">Mis Ventas</div>
                                 <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                             </div>
-                            <div class="stat-value">$${totalVentas.toLocaleString()}</div>
+                            <div class="stat-value">$0</div>
                             <div class="stat-change positive">
-                                <i class="fas fa-chart-line"></i> Total
+                                <i class="fas fa-chart-line"></i> Hoy
                             </div>
                         </div>
                         
@@ -2264,9 +2465,9 @@
                                 <div class="stat-title">Mis Clientes</div>
                                 <div class="stat-icon"><i class="fas fa-users"></i></div>
                             </div>
-                            <div class="stat-value">${clientes.length}</div>
+                            <div class="stat-value">0</div>
                             <div class="stat-change positive">
-                                <i class="fas fa-user-plus"></i> Asignados
+                                <i class="fas fa-user-plus"></i> Activos
                             </div>
                         </div>
                         
@@ -2275,65 +2476,41 @@
                                 <div class="stat-title">Productos</div>
                                 <div class="stat-icon"><i class="fas fa-boxes"></i></div>
                             </div>
-                            <div class="stat-value">${productosAsignados.length}</div>
+                            <div class="stat-value">0</div>
                             <div class="stat-change positive">
                                 <i class="fas fa-box"></i> Disponibles
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Comisión</div>
+                                <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                            </div>
+                            <div class="stat-value">$0</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-coins"></i> Acumulado
                             </div>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
-                        <button class="quick-btn" onclick="showNuevoPedidoModal()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-plus" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="showNuevoPedidoModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-plus" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Nuevo Pedido</span>
                         </button>
-                        <button class="quick-btn" onclick="showSolicitudClienteModal()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-user-plus" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="showSolicitudClienteModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-plus" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Solicitar Cliente</span>
                         </button>
-                        <button class="quick-btn" onclick="loadClientesVendedor()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-users" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="loadClientesVendedor()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-users" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Mis Clientes</span>
                         </button>
-                        <button class="quick-btn" onclick="loadProductosVendedor()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-boxes" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="loadProductosVendedor()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-boxes" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Productos</span>
                         </button>
-                    </div>
-
-                    <div class="table-card">
-                        <div class="table-header">
-                            <h3 class="table-title">Mis Ventas Recientes</h3>
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Cliente</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${ventas.slice(0, 5).map(venta => {
-                                        const cliente = database.clientes.find(c => c.id === venta.cliente_id);
-                                        return `
-                                            <tr>
-                                                <td>${venta.fecha}</td>
-                                                <td>${cliente ? cliente.nombre : 'N/A'}</td>
-                                                <td>$${venta.total.toLocaleString()}</td>
-                                                <td>
-                                                    <span class="status-badge status-active">
-                                                        ${venta.estado}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             `;
@@ -2341,12 +2518,6 @@
 
         // ALMACÉN APP
         function loadAlmacenDashboard() {
-            const empresaId = currentUser.empresa_id;
-            const productos = database.productos.filter(p => p.empresa_id === empresaId);
-            const totalStock = productos.reduce((sum, p) => sum + p.stock, 0);
-            const valorInventario = productos.reduce((sum, p) => sum + (p.stock * p.precio), 0);
-            const almacenes = database.almacenes.filter(a => a.empresa_id === empresaId);
-            
             document.getElementById('viewAlmacen').innerHTML = `
                 <div style="max-width: 800px; margin: 0 auto;">
                     <div style="text-align: center; margin-bottom: 2rem;">
@@ -2362,8 +2533,8 @@
                                 <div class="stat-title">Productos</div>
                                 <div class="stat-icon"><i class="fas fa-boxes"></i></div>
                             </div>
-                            <div class="stat-value">${productos.length}</div>
-                            <div class="stat-change positive">
+                            <div class="stat-value">0</div>
+                            <div class"stat-change positive">
                                 <i class="fas fa-box"></i> En inventario
                             </div>
                         </div>
@@ -2373,7 +2544,7 @@
                                 <div class="stat-title">Stock Total</div>
                                 <div class="stat-icon"><i class="fas fa-cubes"></i></div>
                             </div>
-                            <div class="stat-value">${totalStock}</div>
+                            <div class="stat-value">0</div>
                             <div class="stat-change positive">
                                 <i class="fas fa-warehouse"></i> Unidades
                             </div>
@@ -2384,7 +2555,7 @@
                                 <div class="stat-title">Valor Inventario</div>
                                 <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                             </div>
-                            <div class="stat-value">$${valorInventario.toLocaleString()}</div>
+                            <div class="stat-value">$0</div>
                             <div class="stat-change positive">
                                 <i class="fas fa-money-bill-wave"></i> Valorado
                             </div>
@@ -2395,7 +2566,7 @@
                                 <div class="stat-title">Almacenes</div>
                                 <div class="stat-icon"><i class="fas fa-warehouse"></i></div>
                             </div>
-                            <div class="stat-value">${almacenes.length}</div>
+                            <div class="stat-value">0</div>
                             <div class="stat-change positive">
                                 <i class="fas fa-building"></i> Activos
                             </div>
@@ -2403,56 +2574,22 @@
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
-                        <button class="quick-btn" onclick="showNuevoIngresoModal()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-plus" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="showNuevoIngresoModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-plus" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Nuevo Ingreso</span>
                         </button>
-                        <button class="quick-btn" onclick="showNuevoDespachoModal()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-truck" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="showNuevoDespachoModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-truck" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Nuevo Despacho</span>
                         </button>
-                        <button class="quick-btn" onclick="loadInventario()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-boxes" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="loadInventario()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-boxes" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Inventario</span>
                         </button>
-                        <button class="quick-btn" onclick="loadDespachos()" style="height: 100px; flex-direction: column;">
-                            <i class="fas fa-shipping-fast" style="font-size: 1.5rem;"></i>
+                        <button class="btn btn-primary" onclick="loadDespachos()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-shipping-fast" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                             <span>Despachos</span>
                         </button>
-                    </div>
-
-                    <div class="table-card">
-                        <div class="table-header">
-                            <h3 class="table-title">Productos con Stock Bajo</h3>
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Código</th>
-                                        <th>Stock</th>
-                                        <th>Mínimo</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${productos.filter(p => p.stock < 20).map(producto => `
-                                        <tr>
-                                            <td>${producto.nombre}</td>
-                                            <td>${producto.codigo}</td>
-                                            <td>${producto.stock}</td>
-                                            <td>20</td>
-                                            <td>
-                                                <span class="status-badge status-pending">
-                                                    <i class="fas fa-exclamation-triangle"></i> Bajo Stock
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             `;
@@ -2461,170 +2598,71 @@
         // =============================================
         // FUNCIONES AUXILIARES
         // =============================================
-        function initializeJefeCharts() {
-            // Gráfico de ventas
-            const ventasCtx = document.getElementById('ventasChart')?.getContext('2d');
-            if (ventasCtx) {
-                new Chart(ventasCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-                        datasets: [{
-                            label: 'Ventas',
-                            data: [1200, 1900, 1500, 2200, 1800, 2450],
-                            borderColor: '#7c3aed',
-                            backgroundColor: 'rgba(124, 58, 237, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#fff' }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#fff' } },
-                            y: { ticks: { color: '#fff' } }
-                        }
-                    }
-                });
+        function getRankColor(position) {
+            switch(position) {
+                case 0: return '#FFD700'; // Oro
+                case 1: return '#C0C0C0'; // Plata
+                case 2: return '#CD7F32'; // Bronce
+                default: return 'var(--primary)';
             }
+        }
+
+        function getVentasPorPeriodo(periodo) {
+            // Datos de ejemplo para las pestañas
+            switch(periodo) {
+                case 'semana':
+                    return [
+                        { fecha: 'Lunes', cantidad: 15, total: 15000, vendedor: 'Juan Pérez' },
+                        { fecha: 'Martes', cantidad: 12, total: 12000, vendedor: 'María López' },
+                        { fecha: 'Miércoles', cantidad: 18, total: 18000, vendedor: 'Carlos Rodríguez' },
+                        { fecha: 'Jueves', cantidad: 10, total: 10000, vendedor: 'Ana García' },
+                        { fecha: 'Viernes', cantidad: 20, total: 20000, vendedor: 'Roberto Silva' }
+                    ];
+                case 'mes':
+                    return [
+                        { semana: 'Semana 1', cantidad: 65, total: 65000, promedio: 13000 },
+                        { semana: 'Semana 2', cantidad: 72, total: 72000, promedio: 14400 },
+                        { semana: 'Semana 3', cantidad: 85, total: 85000, promedio: 17000 },
+                        { semana: 'Semana 4', cantidad: 78, total: 78000, promedio: 15600 }
+                    ];
+                case 'año':
+                    return [
+                        { mes: 'Enero', cantidad: 280, total: 280000, crecimiento: 5 },
+                        { mes: 'Febrero', cantidad: 310, total: 310000, crecimiento: 10 },
+                        { mes: 'Marzo', cantidad: 350, total: 350000, crecimiento: 15 },
+                        { mes: 'Abril', cantidad: 380, total: 380000, crecimiento: 8 },
+                        { mes: 'Mayo', cantidad: 400, total: 400000, crecimiento: 12 }
+                    ];
+                default:
+                    return [];
+            }
+        }
+
+        function switchTab(tabName) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
             
-            // Gráfico de áreas
-            const areasCtx = document.getElementById('areasChart')?.getContext('2d');
-            if (areasCtx) {
-                new Chart(areasCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Ventas', 'Administración', 'Almacén'],
-                        datasets: [{
-                            data: [60, 25, 15],
-                            backgroundColor: [
-                                '#7c3aed',
-                                '#00f5ff',
-                                '#ffd700'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: { color: '#fff' }
-                            }
-                        }
-                    }
-                });
-            }
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar pestaña seleccionada
+            document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+            
+            // Activar botón de pestaña
+            event.target.classList.add('active');
         }
 
-        function loadSolicitudesComercial() {
-            const solicitudes = database.solicitudes.filter(s => s.empresa_id === currentUser.empresa_id && s.estado === 'Pendiente');
-            const table = document.getElementById('solicitudesComercialTable');
-            if (table) {
-                table.innerHTML = solicitudes.map(solicitud => `
-                    <tr>
-                        <td>${solicitud.tipo}</td>
-                        <td>${solicitud.solicitante}</td>
-                        <td>${solicitud.fecha}</td>
-                        <td>${solicitud.detalles}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn edit" onclick="aprobarSolicitud(${solicitud.id})" title="Aprobar">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="action-btn delete" onclick="rechazarSolicitud(${solicitud.id})" title="Rechazar">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-            }
+        function sortVendedores() {
+            const sortBy = document.getElementById('sortVendedores').value;
+            // Implementar lógica de ordenamiento aquí
         }
 
-        // =============================================
-        // FUNCIONES DE ACCESO ENTRE ÁREAS
-        // =============================================
-        function accessAsJefe() {
-            // Acceder como jefe de la primera empresa
-            const primeraEmpresa = database.empresas[0];
-            if (primeraEmpresa) {
-                currentUser.role = 'jefe';
-                currentUser.empresa_id = primeraEmpresa.id;
-                currentCompany = primeraEmpresa;
-                configureInterface();
-            }
-        }
-
-        function accessAsJefeEmpresa(empresaId) {
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            if (empresa) {
-                // Guardar rol original
-                const originalRole = currentUser.role;
-                const originalEmpresaId = currentUser.empresa_id;
-                
-                // Cambiar a rol jefe temporalmente
-                currentUser.role = 'jefe';
-                currentUser.empresa_id = empresaId;
-                currentUser.empresa = empresa.nombre;
-                currentCompany = empresa;
-                
-                // Configurar interfaz
-                configureInterface();
-                
-                // Agregar botón para volver
-                document.getElementById('quickActions').innerHTML += `
-                    <button class="quick-btn" onclick="volverASuperUsuario('${originalRole}', ${originalEmpresaId})">
-                        <i class="fas fa-arrow-left"></i> Volver a Super Usuario
-                    </button>
-                `;
-            }
-        }
-
-        function volverASuperUsuario(originalRole, originalEmpresaId) {
-            currentUser.role = originalRole;
-            currentUser.empresa_id = originalEmpresaId;
-            currentUser.empresa = 'NEXIAL SUITE';
-            currentCompany = null;
-            configureInterface();
-        }
-
-        function accessComercial() {
-            if (currentUser.role === 'jefe' || currentUser.role === 'super') {
-                const originalRole = currentUser.role;
-                currentUser.role = 'comercial';
-                configureInterface();
-                
-                document.getElementById('quickActions').innerHTML += `
-                    <button class="quick-btn" onclick="volverAJefe('${originalRole}')">
-                        <i class="fas fa-arrow-left"></i> Volver a Jefe
-                    </button>
-                `;
-            }
-        }
-
-        function accessAdmin() {
-            if (currentUser.role === 'jefe' || currentUser.role === 'super') {
-                const originalRole = currentUser.role;
-                currentUser.role = 'admin';
-                configureInterface();
-                
-                document.getElementById('quickActions').innerHTML += `
-                    <button class="quick-btn" onclick="volverAJefe('${originalRole}')">
-                        <i class="fas fa-arrow-left"></i> Volver a Jefe
-                    </button>
-                `;
-            }
-        }
-
-        function volverAJefe(originalRole) {
-            currentUser.role = originalRole;
-            configureInterface();
+        function sortProductos() {
+            const sortBy = document.getElementById('sortProductos').value;
+            // Implementar lógica de ordenamiento aquí
         }
 
         // =============================================
@@ -2640,203 +2678,32 @@
             document.getElementById('modalOverlay').style.display = 'none';
         }
 
-        // Modal para nueva empresa (Super Usuario)
-        function showNuevaEmpresaModal() {
-            showModal('Registrar Nueva Empresa', `
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Razón Social *</label>
-                        <input type="text" id="empresaNombre" placeholder="Nombre de la empresa" required style="width: 100%; padding: 0.8rem;">
-                    </div>
-                    <div class="form-group">
-                        <label>RUC *</label>
-                        <input type="text" id="empresaRuc" placeholder="Número de RUC" required style="width: 100%; padding: 0.8rem;">
-                    </div>
-                    <div class="form-group">
-                        <label>Industria *</label>
-                        <select id="empresaIndustria" style="width: 100%; padding: 0.8rem;">
-                            <option value="">Seleccionar industria</option>
-                            <option value="Tecnología">Tecnología</option>
-                            <option value="Comercio">Comercio</option>
-                            <option value="Manufactura">Manufactura</option>
-                            <option value="Servicios">Servicios</option>
-                            <option value="Alimentos">Alimentos</option>
-                            <option value="Construcción">Construcción</option>
-                            <option value="Otros">Otros</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Contacto Principal *</label>
-                        <input type="text" id="empresaContacto" placeholder="Nombre del contacto" required style="width: 100%; padding: 0.8rem;">
-                    </div>
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="empresaEmail" placeholder="email@empresa.com" required style="width: 100%; padding: 0.8rem;">
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono *</label>
-                        <input type="tel" id="empresaTelefono" placeholder="987654321" required style="width: 100%; padding: 0.8rem;">
-                    </div>
-                    <div class="form-group">
-                        <label>Dirección</label>
-                        <input type="text" id="empresaDireccion" placeholder="Dirección completa" style="width: 100%; padding: 0.8rem;">
-                    </div>
-                    <div class="form-group">
-                        <label>Ciudad</label>
-                        <input type="text" id="empresaCiudad" placeholder="Ciudad" style="width: 100%; padding: 0.8rem;">
-                    </div>
-                </div>
-                
-                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <h4 style="color: var(--secondary); margin-bottom: 0.5rem;">Usuario Jefe Principal</h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nombre del Jefe *</label>
-                            <input type="text" id="jefeNombre" placeholder="Nombre completo" required style="width: 100%; padding: 0.8rem;">
-                        </div>
-                        <div class="form-group">
-                            <label>Email del Jefe *</label>
-                            <input type="email" id="jefeEmail" placeholder="jefe@empresa.com" required style="width: 100%; padding: 0.8rem;">
-                        </div>
-                        <div class="form-group">
-                            <label>Contraseña Temporal *</label>
-                            <input type="text" id="jefePassword" value="123" readonly style="width: 100%; padding: 0.8rem; background: rgba(255,255,255,0.1);">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-                    <button class="btn" onclick="closeModal()" style="background: rgba(255,255,255,0.05); color: white;">
-                        Cancelar
-                    </button>
-                    <button class="btn btn-primary" onclick="guardarNuevaEmpresa()">
-                        <i class="fas fa-save"></i> Registrar Empresa
-                    </button>
-                </div>
-            `);
+        // =============================================
+        // FUNCIONES DE CONFIRMACIÓN
+        // =============================================
+        function showConfirmation(title, message, onConfirm) {
+            document.getElementById('confirmationTitle').textContent = title;
+            document.getElementById('confirmationMessage').textContent = message;
+            document.getElementById('confirmationDialog').style.display = 'flex';
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            const oldHandler = confirmBtn.onclick;
+            confirmBtn.onclick = function() {
+                hideConfirmation();
+                onConfirm();
+            };
         }
 
-        function guardarNuevaEmpresa() {
-            const nuevaEmpresa = {
-                id: database.empresas.length > 0 ? Math.max(...database.empresas.map(e => e.id)) + 1 : 1,
-                nombre: document.getElementById('empresaNombre').value,
-                ruc: document.getElementById('empresaRuc').value,
-                industria: document.getElementById('empresaIndustria').value,
-                contacto: document.getElementById('empresaContacto').value,
-                email: document.getElementById('empresaEmail').value,
-                telefono: document.getElementById('empresaTelefono').value,
-                direccion: document.getElementById('empresaDireccion').value,
-                ciudad: document.getElementById('empresaCiudad').value,
-                estado: 'Activa',
-                tarjetaRegistrada: false,
-                fechaRegistro: new Date().toISOString().split('T')[0],
-                usuarios: 1
-            };
-
-            const jefeNombre = document.getElementById('jefeNombre').value;
-            const jefeEmail = document.getElementById('jefeEmail').value;
-            
-            // Validar campos requeridos
-            if (!nuevaEmpresa.nombre || !nuevaEmpresa.ruc || !nuevaEmpresa.contacto || !nuevaEmpresa.email || !jefeNombre || !jefeEmail) {
-                alert('Por favor complete todos los campos requeridos');
-                return;
-            }
-
-            // Guardar empresa
-            database.empresas.push(nuevaEmpresa);
-            localStorage.setItem('nexial_empresas', JSON.stringify(database.empresas));
-
-            // Crear usuario jefe
-            const nuevoUsuario = {
-                id: `USR_${Date.now()}`,
-                username: jefeEmail,
-                password: '123',
-                role: 'jefe',
-                nombre: jefeNombre,
-                empresa: nuevaEmpresa.nombre,
-                empresa_id: nuevaEmpresa.id
-            };
-
-            database.usuarios.push(nuevoUsuario);
-            localStorage.setItem('nexial_usuarios', JSON.stringify(database.usuarios));
-
-            // Crear empleado jefe
-            const nuevoEmpleado = {
-                id: database.empleados.length > 0 ? Math.max(...database.empleados.map(e => e.id)) + 1 : 1,
-                nombre: jefeNombre,
-                dni: '00000000',
-                cargo: 'Jefe Principal',
-                email: jefeEmail,
-                telefono: nuevaEmpresa.telefono,
-                empresa_id: nuevaEmpresa.id,
-                area: 'Dirección',
-                sueldo: 0
-            };
-
-            database.empleados.push(nuevoEmpleado);
-            localStorage.setItem('nexial_empleados', JSON.stringify(database.empleados));
-
-            showNotification('success', 'Empresa registrada', `La empresa ${nuevaEmpresa.nombre} ha sido registrada exitosamente`);
-            closeModal();
-            loadSuperDashboard();
+        function hideConfirmation() {
+            document.getElementById('confirmationDialog').style.display = 'none';
         }
 
-        // Modal para ver empresa completa (Super Usuario)
-        function viewEmpresaCompleta(empresaId) {
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            const empleados = database.empleados.filter(e => e.empresa_id === empresaId);
-            const ventas = database.ventas.filter(v => v.empresa_id === empresaId);
-            const facturas = database.facturas.filter(f => f.empresa_id === empresaId);
-            const clientes = database.clientes.filter(c => c.empresa_id === empresaId);
-            const productos = database.productos.filter(p => p.empresa_id === empresaId);
-            
-            let content = `
-                <div style="margin-bottom: 2rem;">
-                    <h4 style="color: var(--secondary); margin-bottom: 1rem;">${empresa.nombre}</h4>
-                    <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
-                        <div class="form-grid">
-                            <div>
-                                <p><strong>RUC:</strong> ${empresa.ruc}</p>
-                                <p><strong>Industria:</strong> ${empresa.industria}</p>
-                                <p><strong>Contacto:</strong> ${empresa.contacto}</p>
-                            </div>
-                            <div>
-                                <p><strong>Email:</strong> ${empresa.email}</p>
-                                <p><strong>Teléfono:</strong> ${empresa.telefono}</p>
-                                <p><strong>Estado:</strong> <span style="color: ${empresa.estado === 'Activa' ? 'var(--success)' : 'var(--danger)'};">${empresa.estado}</span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px;">
-                        <h5 style="color: var(--secondary); margin-bottom: 0.5rem;">Empleados: ${empleados.length}</h5>
-                        ${empleados.slice(0, 3).map(e => `<p style="font-size: 0.9rem;">${e.nombre} - ${e.cargo}</p>`).join('')}
-                    </div>
-                    <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px;">
-                        <h5 style="color: var(--secondary); margin-bottom: 0.5rem;">Ventas: ${ventas.length}</h5>
-                        <p style="font-size: 0.9rem;">Total: $${ventas.reduce((s, v) => s + v.total, 0).toLocaleString()}</p>
-                    </div>
-                    <div style="background: rgba(0,255,65,0.1); padding: 1rem; border-radius: 8px;">
-                        <h5 style="color: var(--secondary); margin-bottom: 0.5rem;">Clientes: ${clientes.length}</h5>
-                    </div>
-                    <div style="background: rgba(255,170,0,0.1); padding: 1rem; border-radius: 8px;">
-                        <h5 style="color: var(--secondary); margin-bottom: 0.5rem;">Productos: ${productos.length}</h5>
-                    </div>
-                </div>
-                
-                <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button class="btn" onclick="closeModal()" style="background: rgba(255,255,255,0.05); color: white;">
-                        Cerrar
-                    </button>
-                    <button class="btn btn-primary" onclick="accessAsJefeEmpresa(${empresaId})">
-                        <i class="fas fa-sign-in-alt"></i> Acceder como Jefe
-                    </button>
-                </div>
-            `;
-            
-            showModal(`Detalles Completos - ${empresa.nombre}`, content);
+        function showLogoutConfirmation() {
+            showConfirmation(
+                'Cerrar Sesión',
+                '¿Estás seguro de que deseas cerrar sesión?',
+                logout
+            );
         }
 
         // =============================================
@@ -2926,7 +2793,7 @@
                 </div>
                 
                 ${notifications.length > 0 ? `
-                    <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
                         <button class="btn" onclick="markAllAsRead()" style="background: rgba(255,255,255,0.05); color: white;">
                             <i class="fas fa-check-double"></i> Marcar todas como leídas
                         </button>
@@ -2948,7 +2815,7 @@
         // FUNCIONES DE INICIALIZACIÓN Y SESIÓN
         // =============================================
         function startSession() {
-            // Ocultar login, mostrar dashboard
+            // Ocultar login, mostrar panel de control
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'block';
             
@@ -2960,22 +2827,20 @@
         }
 
         function logout() {
-            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                // Resetear estado
-                currentUser = null;
-                currentRole = '';
-                currentCompany = null;
-                
-                // Mostrar login, ocultar dashboard
-                document.getElementById('dashboardScreen').style.display = 'none';
-                document.getElementById('loginScreen').style.display = 'flex';
-                
-                // Resetear formulario
-                document.getElementById('loginForm').reset();
-                document.getElementById('username').focus();
-                
-                showNotification('info', 'Sesión cerrada', 'Has cerrado sesión exitosamente');
-            }
+            // Resetear estado
+            currentUser = null;
+            currentRole = '';
+            currentCompany = null;
+            
+            // Mostrar login, ocultar panel de control
+            document.getElementById('dashboardScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            
+            // Resetear formulario
+            document.getElementById('loginForm').reset();
+            document.getElementById('username').focus();
+            
+            showNotification('info', 'Sesión cerrada', 'Has cerrado sesión exitosamente');
         }
 
         // =============================================
@@ -3007,6 +2872,12 @@
                 }
             });
             
+            document.getElementById('confirmationDialog').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideConfirmation();
+                }
+            });
+            
             // Permitir login con Enter
             document.getElementById('password').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
@@ -3020,14 +2891,11 @@
                 }
             });
             
-            // Inicializar base de datos
-            initializeDatabase();
-            
             // Auto-focus en el campo de usuario
             document.getElementById('username').focus();
             
-            console.log('🚀 Nexial Suite Dashboard inicializado');
-            console.log('📊 Sistema Corporativo Multiempresa v2.0');
+            console.log('🚀 Nexial Suite Panel de Control inicializado');
+            console.log('📊 Sistema Corporativo Multiempresa v3.0');
         });
     </script>
 </body>
