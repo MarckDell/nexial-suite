@@ -27,9 +27,10 @@
             background-image: 
                 radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 90% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 20%);
+            overflow-x: hidden;
         }
         
-        /* Header Cyberpunk */
+        /* Header Cyberpunk con animación */
         .cyber-header {
             background: rgba(15, 15, 35, 0.95);
             backdrop-filter: blur(10px);
@@ -42,6 +43,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            animation: slideDown 0.8s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
         
         .cyber-logo {
@@ -53,6 +66,19 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(124, 58, 237, 0.5),
+                             0 0 20px rgba(124, 58, 237, 0.3);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(124, 58, 237, 0.8),
+                             0 0 30px rgba(124, 58, 237, 0.6),
+                             0 0 40px rgba(124, 58, 237, 0.4);
+            }
         }
         
         .cyber-nav { display: flex; gap: 2rem; }
@@ -62,10 +88,26 @@
             padding: 0.5rem 1rem;
             border-radius: 20px;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .cyber-nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .cyber-nav a:hover::before {
+            left: 100%;
         }
         .cyber-nav a:hover {
             background: rgba(124, 58, 237, 0.2);
             color: var(--secondary);
+            transform: translateY(-2px);
         }
         
         .cyber-btn {
@@ -77,17 +119,56 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .cyber-btn:hover::before {
+            left: 100%;
         }
         .cyber-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--neon-shadow) rgba(124, 58, 237, 0.5);
         }
         
-        /* Hero Cyberpunk */
+        /* Hero Cyberpunk con animaciones */
         .cyber-hero {
             padding: 12rem 2rem 6rem;
             text-align: center;
             position: relative;
+            overflow: hidden;
+        }
+        
+        .cyber-hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
         }
         
         .cyber-hero h1 {
@@ -97,6 +178,16 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
         
         .cyber-subtitle {
@@ -104,9 +195,21 @@
             max-width: 700px;
             margin: 0 auto 2rem;
             opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.5s both;
         }
         
-        /* Features Cyberpunk */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Features Cyberpunk con animaciones escalonadas */
         .cyber-features {
             padding: 6rem 2rem;
             max-width: 1200px;
@@ -127,7 +230,15 @@
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease-out forwards;
         }
+        
+        .cyber-card:nth-child(1) { animation-delay: 0.1s; }
+        .cyber-card:nth-child(2) { animation-delay: 0.2s; }
+        .cyber-card:nth-child(3) { animation-delay: 0.3s; }
+        .cyber-card:nth-child(4) { animation-delay: 0.4s; }
         
         .cyber-card::before {
             content: '';
@@ -144,7 +255,8 @@
         .cyber-card:hover {
             transform: translateY(-10px);
             border-color: var(--primary);
-            box-shadow: 0 15px 30px rgba(124, 58, 237, 0.2);
+            box-shadow: 0 15px 30px rgba(124, 58, 237, 0.2),
+                        0 0 50px rgba(124, 58, 237, 0.1);
         }
         
         .cyber-card h3 {
@@ -166,6 +278,18 @@
             border: 1px solid rgba(0, 245, 255, 0.3);
             max-width: 500px;
             margin: 0 auto;
+            animation: scaleIn 0.6s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
         
         .form-group {
@@ -187,12 +311,14 @@
             border-radius: 8px;
             color: white;
             font-size: 1rem;
+            transition: all 0.3s;
         }
         
         .form-group input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3),
+                        0 0 20px rgba(124, 58, 237, 0.1);
         }
         
         .password-wrapper {
@@ -208,6 +334,12 @@
             border: none;
             color: var(--secondary);
             cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-password:hover {
+            color: var(--primary);
+            transform: translateY(-50%) scale(1.1);
         }
         
         .warning-box {
@@ -217,6 +349,18 @@
             border-radius: 8px;
             margin: 1.5rem 0;
             text-align: center;
+            animation: pulseWarning 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseWarning {
+            0%, 100% {
+                border-color: var(--accent);
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+            }
+            50% {
+                border-color: #ffed4e;
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            }
         }
         
         /* Footer Cyberpunk */
@@ -225,6 +369,28 @@
             padding: 4rem 2rem 2rem;
             border-top: 1px solid rgba(124, 58, 237, 0.3);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cyber-footer::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scanline 3s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
         }
         
         /* Modal Cyberpunk (FULL SCREEN) */
@@ -242,6 +408,18 @@
             z-index: 2000;
             padding: 2rem;
             overflow-y: auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0);
+            }
+            to {
+                opacity: 1;
+                backdrop-filter: blur(10px);
+            }
         }
         
         .modal-content {
@@ -254,18 +432,19 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            animation: modalSlideIn 0.3s ease-out;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+                        0 0 100px rgba(124, 58, 237, 0.1);
+            animation: modalSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(-50px);
+                transform: translateY(-50px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
         
@@ -280,14 +459,36 @@
             cursor: pointer;
             opacity: 0.7;
             z-index: 10;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .close-modal:hover { opacity: 1; }
+        .close-modal:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
         
         .modal-header {
             text-align: center;
             margin-bottom: 2rem;
             padding-bottom: 1.5rem;
             border-bottom: 1px solid rgba(124, 58, 237, 0.3);
+            position: relative;
+        }
+        
+        .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
         }
         
         .modal-header h2 {
@@ -312,6 +513,18 @@
             border-radius: 12px;
             margin-bottom: 2rem;
             text-align: center;
+            animation: neonGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes neonGlow {
+            from {
+                box-shadow: 0 0 10px rgba(0, 245, 255, 0.3),
+                            inset 0 0 10px rgba(0, 245, 255, 0.1);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.6),
+                            inset 0 0 20px rgba(0, 245, 255, 0.2);
+            }
         }
         
         .info-banner h3 {
@@ -327,6 +540,18 @@
             border-radius: 12px;
             margin: 1.5rem 0;
             text-align: center;
+            animation: successPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes successPulse {
+            0%, 100% {
+                border-color: var(--success);
+                box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            }
+            50% {
+                border-color: #00ffaa;
+                box-shadow: 0 0 25px rgba(0, 255, 65, 0.4);
+            }
         }
         
         .protection-banner h3 {
@@ -334,9 +559,62 @@
             margin-bottom: 1rem;
             font-size: 1.5rem;
         }
+        
+        /* Efectos de partículas para fondo */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(124, 58, 237, 0.2);
+            border-radius: 50%;
+            animation: floatParticle 20s infinite linear;
+        }
+        
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cyber-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cyber-nav {
+                display: none;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Partículas de fondo -->
+    <div class="particles" id="particles"></div>
+    
     <!-- Header -->
     <header class="cyber-header">
         <div class="cyber-logo">
@@ -369,14 +647,14 @@
     <!-- Features -->
     <section class="cyber-features" id="caracteristicas">
         <div style="text-align: center; margin-bottom: 3rem;">
-            <h2 style="color: var(--secondary); font-size: 2.5rem;">SISTEMA POR ÁREAS ESPECIALIZADAS</h2>
+            <h2 style="color: var(--secondary); font-size: 2.5rem; animation: fadeInUp 1s ease-out;">SISTEMA POR ÁREAS ESPECIALIZADAS</h2>
             <p style="opacity: 0.8;">Cada área con funciones específicas y control total</p>
         </div>
         
         <div class="features-grid">
             <div class="cyber-card">
                 <h3><i class="fas fa-crown"></i> DIRECCIÓN EJECUTIVA</h3>
-                <p>Control total de su empresa. Dashboard ejecutivo completo con visibilidad de todas las áreas.</p>
+                <p>Control total de su empresa. Panel ejecutivo completo con visibilidad de todas las áreas.</p>
                 <ul style="margin-top: 1rem; padding-left: 1.5rem;">
                     <li>Supervisión todas las áreas</li>
                     <li>Reportes consolidados en tiempo real</li>
@@ -463,7 +741,7 @@
                 <h3><i class="fas fa-chart-bar"></i> REPORTES AVANZADOS</h3>
                 <p>Análisis detallado de cada aspecto del negocio. Toma decisiones basadas en datos reales.</p>
                 <ul style="margin-top: 1rem; padding-left: 1.5rem;">
-                    <li>Dashboard ejecutivo personalizable</li>
+                    <li>Panel ejecutivo personalizable</li>
                     <li>Reportes financieros automáticos</li>
                     <li>Análisis de ventas por zona</li>
                     <li>Proyecciones y tendencias</li>
@@ -545,8 +823,6 @@
                 <p style="color: rgba(255,255,255,0.6); margin-bottom: 0.5rem;">Usuarios Demo (Presiona ENTER para acceder)</p>
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
                     <span style="background: rgba(124,58,237,0.2); padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem;">admin / 123</span>
-                    <span style="background: rgba(0,255,65,0.2); padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem;">jefe@empresa1.com / 123</span>
-                    <span style="background: rgba(255,170,0,0.2); padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem;">comercial@empresa1.com / 123</span>
                 </div>
             </div>
         </div>
@@ -732,6 +1008,21 @@
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQp_rQ1rkoH5QGIjnE_smqq_CAbCozc8OdiO5yTg2v7T5SRid9u6OMCD_5viXu6HVp/exec';
         let registeredCompanyData = null;
+        
+        // Crear partículas de fondo
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.width = Math.random() * 4 + 1 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = Math.random() * 20 + 10 + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
         
         // =============================================
         // MANEJO DE MODALES
@@ -1030,12 +1321,7 @@
             try {
                 // Simular login
                 const demoUsers = {
-                    'admin': { role: 'super', nombre: 'Administrador Corporativo', empresa: 'NEXIAL SUITE' },
-                    'jefe@empresa1.com': { role: 'jefe', nombre: 'Juan Pérez', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
-                    'comercial@empresa1.com': { role: 'comercial', nombre: 'María López', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
-                    'admin@empresa1.com': { role: 'admin', nombre: 'Carlos Rodríguez', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
-                    'vendedor1': { role: 'vendedor', nombre: 'Roberto Silva', empresa: 'TecnoSoluciones SAC', empresa_id: 1 },
-                    'almacen1': { role: 'almacen', nombre: 'Ana García', empresa: 'TecnoSoluciones SAC', empresa_id: 1 }
+                    'admin': { role: 'super', nombre: 'Administrador Corporativo', empresa: 'NEXIAL SUITE' }
                 };
                 
                 // Verificar usuario demo
@@ -1047,7 +1333,7 @@
                         ...demoUser
                     }));
                     
-                    // Redirigir a dashboard
+                    // Redirigir a panel de control
                     window.location.href = 'dashboard.html';
                     return;
                 }
@@ -1110,6 +1396,7 @@
         
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
             console.log('🚀 Nexial Suite - Página de Inicio cargada');
         });
     </script>
