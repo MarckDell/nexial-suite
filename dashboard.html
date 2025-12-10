@@ -836,6 +836,34 @@
             justify-content: center;
         }
         
+        /* ===== LOADING SPINNER ===== */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(7, 7, 16, 0.95);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(124, 58, 237, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .charts-container {
@@ -962,7 +990,7 @@
                 
                 <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
                     <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
-                    <p><strong>Demo:</strong> admin | Contraseña: 123 (Enter para acceder)</p>
+                    <p><strong>Demo:</strong> admin | Contraseña: 123</p>
                 </div>
             </form>
         </div>
@@ -1044,6 +1072,11 @@
         </div>
     </div>
 
+    <!-- ===== LOADING SPINNER ===== -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+
     <!-- ===== MODALES ===== -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
@@ -1075,47 +1108,133 @@
 
     <script>
         // =============================================
+        // CONFIGURACIÓN DE API
+        // =============================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwrFOz0gKxzixORDHZZFi36ryjRSJKRRKqqZA26de3mzr3AHZwQv4IWdr3Z2iOyqLPZ0A/exec';
+        
+        // =============================================
         // VARIABLES GLOBALES Y CONFIGURACIÓN
         // =============================================
         let currentUser = null;
         let currentRole = '';
         let currentCompany = null;
         let notifications = [];
+        let empresasData = [];
+        let usuariosData = [];
+        let empleadosData = [];
         
-        // Base de datos inicial (se carga del localStorage)
+        // Base de datos local (para cache)
         const database = {
-            empresas: JSON.parse(localStorage.getItem('nexial_empresas')) || [],
-            usuarios: JSON.parse(localStorage.getItem('nexial_usuarios')) || [],
-            productos: JSON.parse(localStorage.getItem('nexial_productos')) || [],
-            clientes: JSON.parse(localStorage.getItem('nexial_clientes')) || [],
-            ventas: JSON.parse(localStorage.getItem('nexial_ventas')) || [],
-            facturas: JSON.parse(localStorage.getItem('nexial_facturas')) || [],
-            solicitudes: JSON.parse(localStorage.getItem('nexial_solicitudes')) || [],
-            comisiones: JSON.parse(localStorage.getItem('nexial_comisiones')) || [],
-            empleados: JSON.parse(localStorage.getItem('nexial_empleados')) || [],
-            proveedores: JSON.parse(localStorage.getItem('nexial_proveedores')) || [],
-            zonas: JSON.parse(localStorage.getItem('nexial_zonas')) || [],
-            rutas: JSON.parse(localStorage.getItem('nexial_rutas')) || [],
-            distribuidores: JSON.parse(localStorage.getItem('nexial_distribuidores')) || [],
-            almacenes: JSON.parse(localStorage.getItem('nexial_almacenes')) || []
+            empresas: [],
+            usuarios: [],
+            empleados: []
         };
 
-        // Usuarios del sistema (incluyendo tu usuario)
-        const systemUsers = {
-            'marcelodanielcc@gmail.com': { 
-                password: '789', 
-                role: 'super', 
-                nombre: 'Administrador Corporativo', 
-                empresa: 'NEXIAL SUITE' 
-            },
-            'admin': { 
-                password: '123', 
-                role: 'super', 
-                nombre: 'Administrador Demo', 
-                empresa: 'NEXIAL SUITE' 
+        // =============================================
+        // FUNCIONES DE LOADING
+        // =============================================
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+        
+        // =============================================
+        // FUNCIONES DE API
+        // =============================================
+        async function fetchFromAPI(action, params = {}) {
+            try {
+                const urlParams = new URLSearchParams({
+                    action: action,
+                    ...params
+                });
+                
+                const response = await fetch(`${API_URL}?${urlParams.toString()}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data;
+                } else {
+                    throw new Error(data.error || 'Error en la API');
+                }
+            } catch (error) {
+                console.error('Error en API:', error);
+                showNotification('error', 'Error de API', error.message);
+                return null;
             }
-        };
-
+        }
+        
+        async function postToAPI(action, data = {}) {
+            try {
+                const formData = new FormData();
+                formData.append('action', action);
+                
+                // Agregar todos los datos al formData
+                Object.keys(data).forEach(key => {
+                    formData.append(key, data[key]);
+                });
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    return result;
+                } else {
+                    throw new Error(result.error || 'Error en la API');
+                }
+            } catch (error) {
+                console.error('Error en API POST:', error);
+                showNotification('error', 'Error de API', error.message);
+                return null;
+            }
+        }
+        
+        // =============================================
+        // CARGAR DATOS DESDE API
+        // =============================================
+        async function loadEmpresasFromAPI() {
+            showLoading();
+            try {
+                const result = await fetchFromAPI('getEmpresas');
+                if (result && result.empresas) {
+                    database.empresas = result.empresas;
+                    empresasData = result.empresas;
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error cargando empresas:', error);
+                return false;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function loadUsuariosFromAPI(empresaId = null) {
+            showLoading();
+            try {
+                const params = empresaId ? { empresa_id: empresaId } : {};
+                const result = await fetchFromAPI('getUsuarios', params);
+                if (result && result.usuarios) {
+                    database.usuarios = result.usuarios;
+                    usuariosData = result.usuarios;
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Error cargando usuarios:', error);
+                return false;
+            } finally {
+                hideLoading();
+            }
+        }
+        
         // =============================================
         // SISTEMA DE AUTENTICACIÓN
         // =============================================
@@ -1196,7 +1315,7 @@
                 
                 <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
                     <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
-                    <p><strong>Demo:</strong> admin | Contraseña: 123 (Enter para acceder)</p>
+                    <p><strong>Demo:</strong> admin | Contraseña: 123</p>
                 </div>
             `;
         }
@@ -1226,21 +1345,7 @@
             `;
         }
 
-        function authenticateUser(username, password) {
-            // Primero verificar usuarios del sistema
-            if (systemUsers[username] && systemUsers[username].password === password) {
-                return systemUsers[username];
-            }
-            
-            // Luego verificar en la base de datos local
-            let user = database.usuarios.find(u => 
-                (u.username === username || u.email === username) && u.password === password
-            );
-            
-            return user;
-        }
-
-        function login(event) {
+        async function login(event) {
             event.preventDefault();
             
             const username = document.getElementById('username').value;
@@ -1251,29 +1356,66 @@
                 return;
             }
             
-            const user = authenticateUser(username, password);
+            showLoading();
             
-            if (user) {
-                currentUser = {
-                    id: user.id || `USR_${Date.now()}`,
-                    username: username,
-                    role: user.role,
-                    nombre: user.nombre,
-                    empresa: user.empresa,
-                    empresa_id: user.empresa_id || (user.role === 'super' ? null : 1)
-                };
+            try {
+                // Intentar login con API
+                const result = await fetchFromAPI('login', {
+                    email: username,
+                    password: password
+                });
                 
-                // Si es jefe, obtener datos de su empresa
-                if (currentUser.role === 'jefe' && currentUser.empresa_id) {
-                    currentCompany = database.empresas.find(e => e.id === currentUser.empresa_id);
+                if (result && result.success) {
+                    currentUser = result.user;
+                    currentUser.token = result.token;
+                    
+                    // Guardar en localStorage
+                    localStorage.setItem('nexial_user', JSON.stringify(currentUser));
+                    localStorage.setItem('nexial_token', result.token);
+                    
+                    // Cargar datos iniciales
+                    await loadEmpresasFromAPI();
+                    await loadUsuariosFromAPI();
+                    
+                    startSession();
+                } else {
+                    // Si no funciona con API, probar usuarios demo
+                    const demoUsers = {
+                        'marcelodanielcc@gmail.com': { 
+                            password: '789', 
+                            role: 'super', 
+                            nombre: 'Administrador Corporativo', 
+                            empresa: 'NEXIAL SUITE' 
+                        },
+                        'admin': { 
+                            password: '123', 
+                            role: 'super', 
+                            nombre: 'Administrador Demo', 
+                            empresa: 'NEXIAL SUITE' 
+                        }
+                    };
+                    
+                    if (demoUsers[username] && demoUsers[username].password === password) {
+                        currentUser = {
+                            id: 'SUPER-ADMIN-001',
+                            username: username,
+                            role: 'super',
+                            nombre: demoUsers[username].nombre,
+                            empresa: demoUsers[username].empresa,
+                            email: username
+                        };
+                        
+                        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
+                        startSession();
+                    } else {
+                        alert('Usuario o contraseña incorrectos\n\nUsa: marcelodanielcc@gmail.com / 789');
+                    }
                 }
-                
-                // Guardar en localStorage
-                localStorage.setItem('nexial_user', JSON.stringify(currentUser));
-                
-                startSession();
-            } else {
-                alert('Usuario o contraseña incorrectos\n\nUsa: marcelodanielcc@gmail.com / 789');
+            } catch (error) {
+                console.error('Error en login:', error);
+                alert('Error de conexión. Intenta con: marcelodanielcc@gmail.com / 789');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -1395,7 +1537,6 @@
         function loadSuperDashboard() {
             const empresasCount = database.empresas.length;
             const usuariosCount = database.usuarios.length;
-            const empleadosCount = database.empleados.length;
             
             document.getElementById('viewSuper').innerHTML = `
                 <div class="stats-grid">
@@ -1426,7 +1567,7 @@
                             <div class="stat-title">Empleados</div>
                             <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
                         </div>
-                        <div class="stat-value">${empleadosCount}</div>
+                        <div class="stat-value">${database.empleados.length}</div>
                         <div class="stat-change positive">
                             <i class="fas fa-user-plus"></i> Registrados
                         </div>
@@ -1434,12 +1575,12 @@
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Ventas Totales</div>
-                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                            <div class="stat-title">Sistema Activo</div>
+                            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         </div>
-                        <div class="stat-value">$${database.ventas.reduce((sum, v) => sum + (v.total || 0), 0).toLocaleString()}</div>
+                        <div class="stat-value">100%</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-chart-line"></i> Todas las empresas
+                            <i class="fas fa-chart-line"></i> Operativo
                         </div>
                     </div>
                 </div>
@@ -1451,8 +1592,8 @@
                             <button class="btn btn-primary" onclick="showNuevaEmpresaModal()">
                                 <i class="fas fa-plus"></i> Nueva Empresa
                             </button>
-                            <button class="btn" onclick="showNuevoEmpleadoModal()">
-                                <i class="fas fa-user-plus"></i> Nuevo Empleado
+                            <button class="btn" onclick="showNuevoUsuarioModal()">
+                                <i class="fas fa-user-plus"></i> Nuevo Usuario
                             </button>
                         </div>
                     </div>
@@ -1657,13 +1798,22 @@
         function loadGestionPersonal() {
             document.getElementById('pageTitle').textContent = 'Gestión de Personal - Super Admin';
             
+            // Obtener usuarios
+            const usuariosPorEmpresa = {};
+            database.usuarios.forEach(usuario => {
+                if (!usuariosPorEmpresa[usuario.empresa_id]) {
+                    usuariosPorEmpresa[usuario.empresa_id] = [];
+                }
+                usuariosPorEmpresa[usuario.empresa_id].push(usuario);
+            });
+            
             document.getElementById('viewSuper').innerHTML = `
                 <div class="table-card">
                     <div class="table-header">
-                        <h3 class="table-title">Empleados del Sistema</h3>
+                        <h3 class="table-title">Usuarios del Sistema</h3>
                         <div class="table-actions">
-                            <button class="btn btn-primary" onclick="showNuevoEmpleadoModal()">
-                                <i class="fas fa-user-plus"></i> Nuevo Empleado
+                            <button class="btn btn-primary" onclick="showNuevoUsuarioModal()">
+                                <i class="fas fa-user-plus"></i> Nuevo Usuario
                             </button>
                             <button class="btn" onclick="loadSuperDashboard()">
                                 <i class="fas fa-arrow-left"></i> Volver al Dashboard
@@ -1675,49 +1825,47 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Nombre</th>
-                                    <th>DNI</th>
-                                    <th>Cargo</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
                                     <th>Empresa</th>
-                                    <th>Área</th>
-                                    <th>Sueldo</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${database.empleados.map(empleado => {
-                                    const empresa = database.empresas.find(e => e.id === empleado.empresa_id);
+                                ${database.usuarios.map(usuario => {
+                                    const empresa = database.empresas.find(e => e.id === usuario.empresa_id);
                                     return `
                                         <tr>
-                                            <td><code>${empleado.id || 'N/A'}</code></td>
+                                            <td><strong>${usuario.nombre}</strong></td>
+                                            <td>${usuario.email}</td>
                                             <td>
-                                                <strong>${empleado.nombre}</strong><br>
-                                                <small style="color: rgba(255,255,255,0.5);">${empleado.email || ''}</small>
+                                                <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.role)}; font-size: 0.8rem;">
+                                                    ${usuario.role}
+                                                </span>
                                             </td>
-                                            <td>${empleado.dni || ''}</td>
-                                            <td>${empleado.cargo || ''}</td>
                                             <td>${empresa ? empresa.nombre : 'Sin empresa'}</td>
-                                            <td>${empleado.area || ''}</td>
-                                            <td>$${(empleado.sueldo || 0).toLocaleString()}</td>
+                                            <td>
+                                                <span class="status-badge ${usuario.activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                    ${usuario.activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button class="action-btn edit" onclick="editEmpleado('${empleado.id}')" title="Editar">
+                                                    <button class="action-btn edit" onclick="editUsuario('${usuario.id}')" title="Editar">
                                                         <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="action-btn delete" onclick="eliminarEmpleado('${empleado.id}')" title="Eliminar">
-                                                        <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
                                     `;
                                 }).join('')}
-                                ${database.empleados.length === 0 ? `
+                                ${database.usuarios.length === 0 ? `
                                     <tr>
-                                        <td colspan="8" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                        <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                                             <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay empleados registrados
+                                            No hay usuarios registrados
                                         </td>
                                     </tr>
                                 ` : ''}
@@ -1726,6 +1874,17 @@
                     </div>
                 </div>
             `;
+        }
+
+        function getRoleColor(role) {
+            switch(role) {
+                case 'super': return 'rgba(255,0,85,0.2)';
+                case 'jefe': return 'rgba(0,255,65,0.2)';
+                case 'comercial': return 'rgba(255,170,0,0.2)';
+                case 'admin': return 'rgba(0,170,255,0.2)';
+                case 'vendedor': return 'rgba(124,58,237,0.2)';
+                default: return 'rgba(255,255,255,0.1)';
+            }
         }
 
         // =============================================
@@ -1773,7 +1932,7 @@
                     
                     <div class="form-group">
                         <label>Contraseña Jefe *</label>
-                        <input type="password" id="nuevaEmpresaPassword" value="123">
+                        <input type="password" id="nuevaEmpresaPassword" value="12345678">
                     </div>
                     
                     <div class="form-group">
@@ -1797,53 +1956,56 @@
             `);
         }
 
-        function crearNuevaEmpresa() {
+        async function crearNuevaEmpresa() {
+            showLoading();
+            
             const empresaData = {
-                id: 'EMP-' + Date.now(),
                 nombre: document.getElementById('nuevaEmpresaNombre').value,
                 ruc: document.getElementById('nuevaEmpresaRUC').value,
                 industria: document.getElementById('nuevaEmpresaIndustria').value,
                 contacto: document.getElementById('nuevaEmpresaContacto').value,
                 email: document.getElementById('nuevaEmpresaEmail').value,
                 telefono: document.getElementById('nuevaEmpresaTelefono').value,
-                estado: document.getElementById('nuevaEmpresaEstado').value,
-                fecharegistro: new Date().toISOString().split('T')[0]
+                password: document.getElementById('nuevaEmpresaPassword').value,
+                estado: document.getElementById('nuevaEmpresaEstado').value
             };
             
+            // Agregar datos de contacto separados
+            const nombreParts = empresaData.contacto.split(' ');
+            empresaData.primer_nombre = nombreParts[0] || '';
+            empresaData.primer_apellido = nombreParts[1] || '';
+            
             // Validar campos requeridos
-            const required = ['nombre', 'ruc', 'email', 'telefono'];
+            const required = ['nombre', 'ruc', 'email', 'telefono', 'password'];
             for (const field of required) {
                 if (!empresaData[field]) {
                     showNotification('error', 'Error', `Complete el campo: ${field}`);
+                    hideLoading();
                     return;
                 }
             }
             
-            // Agregar a la base de datos
-            database.empresas.push(empresaData);
-            
-            // Crear usuario jefe para la empresa
-            const nombreCompleto = empresaData.contacto.split(' ');
-            const usuarioJefe = {
-                id: 'USR-' + Date.now(),
-                empresa_id: empresaData.id,
-                nombre: empresaData.contacto,
-                email: empresaData.email,
-                username: empresaData.email.split('@')[0],
-                password: document.getElementById('nuevaEmpresaPassword').value || '123',
-                role: 'jefe',
-                activo: 'Sí'
-            };
-            
-            database.usuarios.push(usuarioJefe);
-            
-            // Guardar en localStorage
-            localStorage.setItem('nexial_empresas', JSON.stringify(database.empresas));
-            localStorage.setItem('nexial_usuarios', JSON.stringify(database.usuarios));
-            
-            showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
-            closeModal();
-            loadSuperDashboard();
+            try {
+                // Llamar a la API para crear empresa
+                const result = await postToAPI('registerCompany', empresaData);
+                
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
+                    
+                    // Recargar datos
+                    await loadEmpresasFromAPI();
+                    await loadUsuariosFromAPI();
+                    
+                    closeModal();
+                    loadSuperDashboard();
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al crear empresa');
+                }
+            } catch (error) {
+                showNotification('error', 'Error', 'Error de conexión con la API');
+            } finally {
+                hideLoading();
+            }
         }
 
         function viewEmpresaCompleta(empresaId) {
@@ -1851,7 +2013,6 @@
             if (!empresa) return;
             
             const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
-            const empleadosEmpresa = database.empleados.filter(e => e.empresa_id === empresaId);
             
             showModal(`Empresa: ${empresa.nombre}`, `
                 <div style="max-width: 800px;">
@@ -1864,14 +2025,12 @@
                             <p><strong>Email:</strong> ${empresa.email || 'No registrado'}</p>
                             <p><strong>Teléfono:</strong> ${empresa.telefono || 'No registrado'}</p>
                             <p><strong>Estado:</strong> ${empresa.estado || 'Inactiva'}</p>
-                            <p><strong>Fecha Registro:</strong> ${empresa.fecharegistro || 'No disponible'}</p>
                         </div>
                         
                         <div>
                             <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
                             <p><strong>Usuarios:</strong> ${usuariosEmpresa.length}</p>
-                            <p><strong>Empleados:</strong> ${empleadosEmpresa.length}</p>
-                            <p><strong>Ventas:</strong> $${database.ventas.filter(v => v.empresa_id === empresaId).reduce((sum, v) => sum + (v.total || 0), 0).toLocaleString()}</p>
+                            <p><strong>Fecha Registro:</strong> ${empresa.fecharegistro || 'No disponible'}</p>
                         </div>
                     </div>
                     
@@ -1951,12 +2110,11 @@
             `);
         }
 
-        function guardarEdicionEmpresa(empresaId) {
-            const empresaIndex = database.empresas.findIndex(e => e.id === empresaId);
-            if (empresaIndex === -1) return;
+        async function guardarEdicionEmpresa(empresaId) {
+            showLoading();
             
-            database.empresas[empresaIndex] = {
-                ...database.empresas[empresaIndex],
+            const empresaData = {
+                id: empresaId,
                 nombre: document.getElementById('editEmpresaNombre').value,
                 ruc: document.getElementById('editEmpresaRUC').value,
                 contacto: document.getElementById('editEmpresaContacto').value,
@@ -1965,11 +2123,25 @@
                 estado: document.getElementById('editEmpresaEstado').value
             };
             
-            localStorage.setItem('nexial_empresas', JSON.stringify(database.empresas));
-            
-            showNotification('success', 'Éxito', 'Empresa actualizada');
-            closeModal();
-            loadSuperDashboard();
+            try {
+                const result = await postToAPI('updateEmpresa', empresaData);
+                
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', 'Empresa actualizada');
+                    
+                    // Recargar datos
+                    await loadEmpresasFromAPI();
+                    
+                    closeModal();
+                    loadSuperDashboard();
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al actualizar');
+                }
+            } catch (error) {
+                showNotification('error', 'Error', 'Error de conexión');
+            } finally {
+                hideLoading();
+            }
         }
 
         function accessAsJefeEmpresa(empresaId) {
@@ -1998,10 +2170,12 @@
             const empresa = database.empresas.find(e => e.id === empresaId);
             if (!empresa) return;
             
+            const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
+            
             showModal(`Usuarios de ${empresa.nombre}`, `
                 <div style="max-width: 800px;">
                     <div style="margin-bottom: 1.5rem;">
-                        <button class="btn btn-primary" onclick="showNuevoUsuarioModal('${empresaId}')">
+                        <button class="btn btn-primary" onclick="showNuevoUsuarioModalEmpresa('${empresaId}')">
                             <i class="fas fa-user-plus"></i> Agregar Usuario
                         </button>
                     </div>
@@ -2017,7 +2191,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${database.usuarios.filter(u => u.empresa_id === empresaId).map(usuario => `
+                                ${usuariosEmpresa.map(usuario => `
                                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
                                         <td style="padding: 0.5rem;">${usuario.nombre}</td>
                                         <td style="padding: 0.5rem;">${usuario.email}</td>
@@ -2033,7 +2207,7 @@
                                         </td>
                                     </tr>
                                 `).join('')}
-                                ${database.usuarios.filter(u => u.empresa_id === empresaId).length === 0 ? `
+                                ${usuariosEmpresa.length === 0 ? `
                                     <tr>
                                         <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                                             No hay usuarios para esta empresa
@@ -2047,21 +2221,19 @@
             `);
         }
 
-        function getRoleColor(role) {
-            switch(role) {
-                case 'super': return 'rgba(255,0,85,0.2)';
-                case 'jefe': return 'rgba(0,255,65,0.2)';
-                case 'comercial': return 'rgba(255,170,0,0.2)';
-                case 'admin': return 'rgba(0,170,255,0.2)';
-                case 'vendedor': return 'rgba(124,58,237,0.2)';
-                default: return 'rgba(255,255,255,0.1)';
-            }
-        }
-
-        function showNuevoUsuarioModal(empresaId) {
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            showModal(`Nuevo Usuario - ${empresa.nombre}`, `
+        function showNuevoUsuarioModal() {
+            showModal('Nuevo Usuario Global', `
                 <div style="max-width: 500px;">
+                    <div class="form-group">
+                        <label>Empresa *</label>
+                        <select id="nuevoUsuarioEmpresa">
+                            <option value="">Seleccionar empresa</option>
+                            ${database.empresas.map(empresa => `
+                                <option value="${empresa.id}">${empresa.nombre}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Nombre Completo *</label>
                         <input type="text" id="nuevoUsuarioNombre" placeholder="Juan Pérez">
@@ -2085,14 +2257,14 @@
                     
                     <div class="form-group">
                         <label>Contraseña *</label>
-                        <input type="text" id="nuevoUsuarioPassword" value="123">
+                        <input type="password" id="nuevoUsuarioPassword" value="12345678">
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                         <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
                             Cancelar
                         </button>
-                        <button class="btn btn-primary" onclick="crearNuevoUsuario('${empresaId}')" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="crearNuevoUsuario()" style="flex: 1;">
                             <i class="fas fa-user-plus"></i> Crear Usuario
                         </button>
                     </div>
@@ -2100,246 +2272,170 @@
             `);
         }
 
-        function crearNuevoUsuario(empresaId) {
-            const usuarioData = {
-                id: 'USR-' + Date.now(),
-                empresa_id: empresaId,
-                nombre: document.getElementById('nuevoUsuarioNombre').value,
-                email: document.getElementById('nuevoUsuarioEmail').value,
-                username: document.getElementById('nuevoUsuarioEmail').value.split('@')[0],
-                password: document.getElementById('nuevoUsuarioPassword').value || '123',
-                role: document.getElementById('nuevoUsuarioRol').value,
-                activo: 'Sí'
-            };
-            
-            // Validar campos
-            if (!usuarioData.nombre || !usuarioData.email) {
-                showNotification('error', 'Error', 'Complete nombre y email');
-                return;
-            }
-            
-            database.usuarios.push(usuarioData);
-            localStorage.setItem('nexial_usuarios', JSON.stringify(database.usuarios));
-            
-            showNotification('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado`);
-            closeModal();
-            loadEmpresasManagement();
-        }
-
-        // =============================================
-        // MODALES PARA EMPLEADOS
-        // =============================================
-        function showNuevoEmpleadoModal() {
-            showModal('Nuevo Empleado', `
-                <div style="max-width: 600px;">
+        function showNuevoUsuarioModalEmpresa(empresaId) {
+            const empresa = database.empresas.find(e => e.id === empresaId);
+            showModal(`Nuevo Usuario - ${empresa.nombre}`, `
+                <div style="max-width: 500px;">
                     <div class="form-group">
                         <label>Nombre Completo *</label>
-                        <input type="text" id="nuevoEmpleadoNombre" placeholder="Juan Pérez">
+                        <input type="text" id="nuevoUsuarioNombreEmp" placeholder="Juan Pérez">
                     </div>
                     
                     <div class="form-group">
-                        <label>DNI *</label>
-                        <input type="text" id="nuevoEmpleadoDNI" placeholder="12345678">
+                        <label>Email *</label>
+                        <input type="email" id="nuevoUsuarioEmailEmp" placeholder="usuario@empresa.com">
                     </div>
                     
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="nuevoEmpleadoEmail" placeholder="empleado@empresa.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Teléfono</label>
-                        <input type="text" id="nuevoEmpleadoTelefono" placeholder="987654321">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Cargo *</label>
-                        <input type="text" id="nuevoEmpleadoCargo" placeholder="Gerente de Ventas">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Área *</label>
-                        <select id="nuevoEmpleadoArea">
-                            <option value="Dirección">Dirección</option>
-                            <option value="Ventas">Ventas</option>
-                            <option value="Administración">Administración</option>
-                            <option value="Finanzas">Finanzas</option>
-                            <option value="Almacén">Almacén</option>
-                            <option value="Distribución">Distribución</option>
+                        <label>Rol *</label>
+                        <select id="nuevoUsuarioRolEmp">
+                            <option value="comercial">Dirección Comercial</option>
+                            <option value="admin">Administración y Finanzas</option>
+                            <option value="vendedor">Vendedor App</option>
+                            <option value="almacen">Almacén App</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label>Empresa *</label>
-                        <select id="nuevoEmpleadoEmpresa">
-                            <option value="">Seleccionar empresa</option>
-                            ${database.empresas.map(empresa => `
-                                <option value="${empresa.id}">${empresa.nombre}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Sueldo ($)</label>
-                        <input type="number" id="nuevoEmpleadoSueldo" placeholder="2000" value="2000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Fecha de Ingreso</label>
-                        <input type="date" id="nuevoEmpleadoFechaIngreso" value="${new Date().toISOString().split('T')[0]}">
+                        <label>Contraseña *</label>
+                        <input type="password" id="nuevoUsuarioPasswordEmp" value="12345678">
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                         <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
                             Cancelar
                         </button>
-                        <button class="btn btn-primary" onclick="crearNuevoEmpleado()" style="flex: 1;">
-                            <i class="fas fa-user-plus"></i> Crear Empleado
+                        <button class="btn btn-primary" onclick="crearNuevoUsuarioEmpresa('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-user-plus"></i> Crear Usuario
                         </button>
                     </div>
                 </div>
             `);
         }
 
-        function crearNuevoEmpleado() {
-            const empleadoData = {
-                id: 'EMP-' + Date.now(),
-                nombre: document.getElementById('nuevoEmpleadoNombre').value,
-                dni: document.getElementById('nuevoEmpleadoDNI').value,
-                email: document.getElementById('nuevoEmpleadoEmail').value,
-                telefono: document.getElementById('nuevoEmpleadoTelefono').value,
-                cargo: document.getElementById('nuevoEmpleadoCargo').value,
-                area: document.getElementById('nuevoEmpleadoArea').value,
-                empresa_id: document.getElementById('nuevoEmpleadoEmpresa').value,
-                sueldo: parseFloat(document.getElementById('nuevoEmpleadoSueldo').value) || 0,
-                fechaingreso: document.getElementById('nuevoEmpleadoFechaIngreso').value || new Date().toISOString().split('T')[0]
+        async function crearNuevoUsuario() {
+            showLoading();
+            
+            const usuarioData = {
+                nombre: document.getElementById('nuevoUsuarioNombre').value,
+                email: document.getElementById('nuevoUsuarioEmail').value,
+                role: document.getElementById('nuevoUsuarioRol').value,
+                password: document.getElementById('nuevoUsuarioPassword').value,
+                empresa_id: document.getElementById('nuevoUsuarioEmpresa').value
             };
             
-            // Validar campos requeridos
-            const required = ['nombre', 'dni', 'cargo', 'empresa_id'];
-            for (const field of required) {
-                if (!empleadoData[field]) {
-                    showNotification('error', 'Error', `Complete el campo: ${field}`);
-                    return;
-                }
+            // Validar campos
+            if (!usuarioData.nombre || !usuarioData.email || !usuarioData.empresa_id) {
+                showNotification('error', 'Error', 'Complete todos los campos');
+                hideLoading();
+                return;
             }
             
-            // Agregar a la base de datos
-            database.empleados.push(empleadoData);
-            localStorage.setItem('nexial_empleados', JSON.stringify(database.empleados));
-            
-            showNotification('success', 'Éxito', `Empleado "${empleadoData.nombre}" creado`);
-            closeModal();
-            loadGestionPersonal();
+            try {
+                const result = await postToAPI('addUsuario', usuarioData);
+                
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado`);
+                    
+                    // Recargar datos
+                    await loadUsuariosFromAPI();
+                    
+                    closeModal();
+                    loadGestionPersonal();
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
+                }
+            } catch (error) {
+                showNotification('error', 'Error', 'Error de conexión');
+            } finally {
+                hideLoading();
+            }
         }
 
-        function editEmpleado(empleadoId) {
-            const empleado = database.empleados.find(e => e.id === empleadoId);
-            if (!empleado) return;
+        async function crearNuevoUsuarioEmpresa(empresaId) {
+            showLoading();
             
-            showModal(`Editar Empleado: ${empleado.nombre}`, `
-                <div style="max-width: 600px;">
+            const usuarioData = {
+                nombre: document.getElementById('nuevoUsuarioNombreEmp').value,
+                email: document.getElementById('nuevoUsuarioEmailEmp').value,
+                role: document.getElementById('nuevoUsuarioRolEmp').value,
+                password: document.getElementById('nuevoUsuarioPasswordEmp').value,
+                empresa_id: empresaId
+            };
+            
+            // Validar campos
+            if (!usuarioData.nombre || !usuarioData.email) {
+                showNotification('error', 'Error', 'Complete todos los campos');
+                hideLoading();
+                return;
+            }
+            
+            try {
+                const result = await postToAPI('addUsuario', usuarioData);
+                
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado`);
+                    
+                    // Recargar datos
+                    await loadUsuariosFromAPI(empresaId);
+                    
+                    closeModal();
+                    manageUsuariosEmpresa(empresaId);
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
+                }
+            } catch (error) {
+                showNotification('error', 'Error', 'Error de conexión');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function editUsuario(usuarioId) {
+            const usuario = database.usuarios.find(u => u.id === usuarioId);
+            if (!usuario) return;
+            
+            showModal(`Editar Usuario: ${usuario.nombre}`, `
+                <div style="max-width: 500px;">
                     <div class="form-group">
                         <label>Nombre Completo</label>
-                        <input type="text" id="editEmpleadoNombre" value="${empleado.nombre || ''}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>DNI</label>
-                        <input type="text" id="editEmpleadoDNI" value="${empleado.dni || ''}">
+                        <input type="text" id="editUsuarioNombre" value="${usuario.nombre || ''}">
                     </div>
                     
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" id="editEmpleadoEmail" value="${empleado.email || ''}">
+                        <input type="email" id="editUsuarioEmail" value="${usuario.email || ''}">
                     </div>
                     
                     <div class="form-group">
-                        <label>Teléfono</label>
-                        <input type="text" id="editEmpleadoTelefono" value="${empleado.telefono || ''}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Cargo</label>
-                        <input type="text" id="editEmpleadoCargo" value="${empleado.cargo || ''}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Área</label>
-                        <select id="editEmpleadoArea">
-                            <option value="Dirección" ${empleado.area === 'Dirección' ? 'selected' : ''}>Dirección</option>
-                            <option value="Ventas" ${empleado.area === 'Ventas' ? 'selected' : ''}>Ventas</option>
-                            <option value="Administración" ${empleado.area === 'Administración' ? 'selected' : ''}>Administración</option>
-                            <option value="Finanzas" ${empleado.area === 'Finanzas' ? 'selected' : ''}>Finanzas</option>
-                            <option value="Almacén" ${empleado.area === 'Almacén' ? 'selected' : ''}>Almacén</option>
-                            <option value="Distribución" ${empleado.area === 'Distribución' ? 'selected' : ''}>Distribución</option>
+                        <label>Rol</label>
+                        <select id="editUsuarioRol">
+                            <option value="jefe" ${usuario.role === 'jefe' ? 'selected' : ''}>Jefe Empresa</option>
+                            <option value="comercial" ${usuario.role === 'comercial' ? 'selected' : ''}>Dirección Comercial</option>
+                            <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''}>Administración y Finanzas</option>
+                            <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''}>Vendedor App</option>
+                            <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''}>Almacén App</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label>Empresa</label>
-                        <select id="editEmpleadoEmpresa">
-                            <option value="">Seleccionar empresa</option>
-                            ${database.empresas.map(empresa => `
-                                <option value="${empresa.id}" ${empleado.empresa_id === empresa.id ? 'selected' : ''}>${empresa.nombre}</option>
-                            `).join('')}
+                        <label>Estado</label>
+                        <select id="editUsuarioActivo">
+                            <option value="Sí" ${usuario.activo === 'Sí' ? 'selected' : ''}>Activo</option>
+                            <option value="No" ${usuario.activo === 'No' ? 'selected' : ''}>Inactivo</option>
                         </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Sueldo ($)</label>
-                        <input type="number" id="editEmpleadoSueldo" value="${empleado.sueldo || 0}">
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                         <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
                             Cancelar
                         </button>
-                        <button class="btn btn-primary" onclick="guardarEdicionEmpleado('${empleadoId}')" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="actualizarUsuario('${usuarioId}')" style="flex: 1;">
                             <i class="fas fa-save"></i> Guardar Cambios
                         </button>
                     </div>
                 </div>
             `);
-        }
-
-        function guardarEdicionEmpleado(empleadoId) {
-            const empleadoIndex = database.empleados.findIndex(e => e.id === empleadoId);
-            if (empleadoIndex === -1) return;
-            
-            database.empleados[empleadoIndex] = {
-                ...database.empleados[empleadoIndex],
-                nombre: document.getElementById('editEmpleadoNombre').value,
-                dni: document.getElementById('editEmpleadoDNI').value,
-                email: document.getElementById('editEmpleadoEmail').value,
-                telefono: document.getElementById('editEmpleadoTelefono').value,
-                cargo: document.getElementById('editEmpleadoCargo').value,
-                area: document.getElementById('editEmpleadoArea').value,
-                empresa_id: document.getElementById('editEmpleadoEmpresa').value,
-                sueldo: parseFloat(document.getElementById('editEmpleadoSueldo').value) || 0
-            };
-            
-            localStorage.setItem('nexial_empleados', JSON.stringify(database.empleados));
-            
-            showNotification('success', 'Éxito', 'Empleado actualizado');
-            closeModal();
-            loadGestionPersonal();
-        }
-
-        function eliminarEmpleado(empleadoId) {
-            showConfirmation(
-                'Eliminar Empleado',
-                '¿Estás seguro de eliminar este empleado? Esta acción no se puede deshacer.',
-                function() {
-                    const empleadoIndex = database.empleados.findIndex(e => e.id === empleadoId);
-                    if (empleadoIndex !== -1) {
-                        database.empleados.splice(empleadoIndex, 1);
-                        localStorage.setItem('nexial_empleados', JSON.stringify(database.empleados));
-                        showNotification('success', 'Éxito', 'Empleado eliminado');
-                        loadGestionPersonal();
-                    }
-                }
-            );
         }
 
         // =============================================
@@ -2484,21 +2580,21 @@
         // =============================================
         // FUNCIONES DE INICIALIZACIÓN Y SESIÓN
         // =============================================
-        function startSession() {
-            // Verificar si hay sesión guardada
-            const savedUser = localStorage.getItem('nexial_user');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-            }
-            
-            if (!currentUser) {
-                console.log('No hay usuario autenticado');
-                return;
-            }
-            
+        async function startSession() {
             // Ocultar login, mostrar panel de control
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'block';
+            
+            // Cargar datos iniciales
+            showLoading();
+            try {
+                await loadEmpresasFromAPI();
+                await loadUsuariosFromAPI();
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+            } finally {
+                hideLoading();
+            }
             
             // Configurar interfaz según rol
             configureInterface();
@@ -2514,9 +2610,16 @@
             currentUser = null;
             currentRole = '';
             currentCompany = null;
+            empresasData = [];
+            usuariosData = [];
+            empleadosData = [];
+            database.empresas = [];
+            database.usuarios = [];
+            database.empleados = [];
             
             // Limpiar localStorage
             localStorage.removeItem('nexial_user');
+            localStorage.removeItem('nexial_token');
             
             // Mostrar login, ocultar panel de control
             document.getElementById('dashboardScreen').style.display = 'none';
@@ -2601,6 +2704,7 @@
             
             console.log('🚀 Nexial Suite Panel de Control inicializado');
             console.log('📊 Sistema Corporativo Multiempresa v3.0');
+            console.log('🌐 API URL:', API_URL);
             console.log('👑 Usuario: marcelodanielcc@gmail.com / 789');
         });
     </script>
