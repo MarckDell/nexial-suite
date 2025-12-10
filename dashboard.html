@@ -961,7 +961,8 @@
                 </div>
                 
                 <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
-                    <p><strong>Demo:</strong> Usuario: admin | Contraseña: 123 (Enter para acceder)</p>
+                    <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
+                    <p><strong>Demo:</strong> admin | Contraseña: 123 (Enter para acceder)</p>
                 </div>
             </form>
         </div>
@@ -1081,7 +1082,7 @@
         let currentCompany = null;
         let notifications = [];
         
-        // Base de datos local (limpia, solo admin)
+        // Base de datos inicial (se carga del localStorage)
         const database = {
             empresas: JSON.parse(localStorage.getItem('nexial_empresas')) || [],
             usuarios: JSON.parse(localStorage.getItem('nexial_usuarios')) || [],
@@ -1099,10 +1100,21 @@
             almacenes: JSON.parse(localStorage.getItem('nexial_almacenes')) || []
         };
 
-        // Solo usuario admin
-        const demoUsers = [
-            { username: 'admin', password: '123', role: 'super', nombre: 'Administrador Corporativo', empresa: 'NEXIAL SUITE' }
-        ];
+        // Usuarios del sistema (incluyendo tu usuario)
+        const systemUsers = {
+            'marcelodanielcc@gmail.com': { 
+                password: '789', 
+                role: 'super', 
+                nombre: 'Administrador Corporativo', 
+                empresa: 'NEXIAL SUITE' 
+            },
+            'admin': { 
+                password: '123', 
+                role: 'super', 
+                nombre: 'Administrador Demo', 
+                empresa: 'NEXIAL SUITE' 
+            }
+        };
 
         // =============================================
         // SISTEMA DE AUTENTICACIÓN
@@ -1183,7 +1195,8 @@
                 </div>
                 
                 <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
-                    <p><strong>Demo:</strong> Usuario: admin | Contraseña: 123 (Enter para acceder)</p>
+                    <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
+                    <p><strong>Demo:</strong> admin | Contraseña: 123 (Enter para acceder)</p>
                 </div>
             `;
         }
@@ -1214,17 +1227,15 @@
         }
 
         function authenticateUser(username, password) {
-            // Buscar usuario en la base de datos
+            // Primero verificar usuarios del sistema
+            if (systemUsers[username] && systemUsers[username].password === password) {
+                return systemUsers[username];
+            }
+            
+            // Luego verificar en la base de datos local
             let user = database.usuarios.find(u => 
                 (u.username === username || u.email === username) && u.password === password
             );
-            
-            // Si no está en la base de datos, verificar usuarios demo
-            if (!user) {
-                user = demoUsers.find(u => 
-                    (u.username === username) && u.password === password
-                );
-            }
             
             return user;
         }
@@ -1245,7 +1256,7 @@
             if (user) {
                 currentUser = {
                     id: user.id || `USR_${Date.now()}`,
-                    username: user.username,
+                    username: username,
                     role: user.role,
                     nombre: user.nombre,
                     empresa: user.empresa,
@@ -1257,9 +1268,12 @@
                     currentCompany = database.empresas.find(e => e.id === currentUser.empresa_id);
                 }
                 
+                // Guardar en localStorage
+                localStorage.setItem('nexial_user', JSON.stringify(currentUser));
+                
                 startSession();
             } else {
-                alert('Usuario o contraseña incorrectos');
+                alert('Usuario o contraseña incorrectos\n\nUsa: marcelodanielcc@gmail.com / 789');
             }
         }
 
@@ -1288,6 +1302,12 @@
                                     <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
                                         <i class="fas fa-building"></i>
                                         <span>Gestión de Empresas</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link" onclick="loadGestionPersonal()">
+                                        <i class="fas fa-users-cog"></i>
+                                        <span>Gestión de Personal</span>
                                     </a>
                                 </li>
                             </ul>
@@ -1333,193 +1353,6 @@
                         </div>
                     `,
                     pageTitle: `Panel de Control Ejecutivo - ${currentCompany ? currentCompany.nombre : currentUser.empresa}`
-                },
-                'comercial': {
-                    badgeClass: 'comercial',
-                    badgeText: 'DIRECCIÓN COMERCIAL',
-                    userName: currentUser.nombre,
-                    userRole: `Empresa: ${currentUser.empresa}`,
-                    viewId: 'viewComercial',
-                    navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">DISTRIBUCIÓN</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" onclick="loadComercialDashboard()">
-                                        <i class="fas fa-tachometer-alt"></i>
-                                        <span>Panel de Control Comercial</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadZonasVendedores()">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>Zonas y Vendedores</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadRutasTransporte()">
-                                        <i class="fas fa-truck"></i>
-                                        <span>Rutas de Transporte</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadGestionAlmacenes()">
-                                        <i class="fas fa-warehouse"></i>
-                                        <span>Gestión de Almacenes</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="nav-title">PRODUCTOS</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadCatalogoProductos()">
-                                        <i class="fas fa-boxes"></i>
-                                        <span>Catálogo de Productos</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadAsignacionProductos()">
-                                        <i class="fas fa-truck-loading"></i>
-                                        <span>Asignación a Vendedores</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="nav-title">APROBACIONES</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadAprobacionesComercial()">
-                                        <i class="fas fa-check-circle"></i>
-                                        <span>Aprobar Solicitudes</span>
-                                        <span class="notification-badge" style="margin-left: auto;">${database.solicitudes.filter(s => s.empresa_id === currentUser.empresa_id && s.estado === 'Pendiente').length}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    pageTitle: `Dirección Comercial - ${currentUser.empresa}`
-                },
-                'admin': {
-                    badgeClass: 'admin',
-                    badgeText: 'ADMINISTRACIÓN Y FINANZAS',
-                    userName: currentUser.nombre,
-                    userRole: `Empresa: ${currentUser.empresa}`,
-                    viewId: 'viewAdmin',
-                    navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">ADMINISTRACIÓN</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" onclick="loadAdminDashboard()">
-                                        <i class="fas fa-tachometer-alt"></i>
-                                        <span>Panel de Control Administrativo</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadFacturacion()">
-                                        <i class="fas fa-file-invoice-dollar"></i>
-                                        <span>Facturación</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="nav-title">REPORTES</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadReportesFinancieros()">
-                                        <i class="fas fa-chart-pie"></i>
-                                        <span>Reportes Financieros</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    pageTitle: `Administración y Finanzas - ${currentUser.empresa}`
-                },
-                'vendedor': {
-                    badgeClass: 'vendedor',
-                    badgeText: 'VENDEDOR',
-                    userName: currentUser.nombre,
-                    userRole: `Empresa: ${currentUser.empresa}`,
-                    viewId: 'viewVendedor',
-                    navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">APP VENDEDOR</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" onclick="loadVendedorDashboard()">
-                                        <i class="fas fa-tachometer-alt"></i>
-                                        <span>Panel de Control Vendedor</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadClientesVendedor()">
-                                        <i class="fas fa-users"></i>
-                                        <span>Mis Clientes</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadProductosVendedor()">
-                                        <i class="fas fa-boxes"></i>
-                                        <span>Mis Productos</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadPedidosVendedor()">
-                                        <i class="fas fa-shopping-cart"></i>
-                                        <span>Mis Pedidos</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    pageTitle: `App Vendedor - ${currentUser.empresa}`
-                },
-                'almacen': {
-                    badgeClass: 'almacen',
-                    badgeText: 'ALMACÉN',
-                    userName: currentUser.nombre,
-                    userRole: `Empresa: ${currentUser.empresa}`,
-                    viewId: 'viewAlmacen',
-                    navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">APP ALMACÉN</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" onclick="loadAlmacenDashboard()">
-                                        <i class="fas fa-tachometer-alt"></i>
-                                        <span>Panel de Control Almacén</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadInventario()">
-                                        <i class="fas fa-boxes"></i>
-                                        <span>Inventario</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadRecepcionMercaderia()">
-                                        <i class="fas fa-truck-loading"></i>
-                                        <span>Recepción Mercadería</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadDespachos()">
-                                        <i class="fas fa-truck"></i>
-                                        <span>Despachos</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    pageTitle: `App Almacén - ${currentUser.empresa}`
                 }
             };
             
@@ -1551,18 +1384,6 @@
                 case 'jefe':
                     loadJefeDashboard();
                     break;
-                case 'comercial':
-                    loadComercialDashboard();
-                    break;
-                case 'admin':
-                    loadAdminDashboard();
-                    break;
-                case 'vendedor':
-                    loadVendedorDashboard();
-                    break;
-                case 'almacen':
-                    loadAlmacenDashboard();
-                    break;
             }
         }
 
@@ -1570,10 +1391,11 @@
         // FUNCIONES DE CARGA DE CONTENIDO
         // =============================================
 
-        // SUPER USUARIO
+        // SUPER USUARIO - DASHBOARD
         function loadSuperDashboard() {
             const empresasCount = database.empresas.length;
             const usuariosCount = database.usuarios.length;
+            const empleadosCount = database.empleados.length;
             
             document.getElementById('viewSuper').innerHTML = `
                 <div class="stats-grid">
@@ -1601,23 +1423,23 @@
                     
                     <div class="stat-card">
                         <div class="stat-header">
+                            <div class="stat-title">Empleados</div>
+                            <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                        </div>
+                        <div class="stat-value">${empleadosCount}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-user-plus"></i> Registrados
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
                             <div class="stat-title">Ventas Totales</div>
                             <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                         </div>
                         <div class="stat-value">$${database.ventas.reduce((sum, v) => sum + (v.total || 0), 0).toLocaleString()}</div>
                         <div class="stat-change positive">
                             <i class="fas fa-chart-line"></i> Todas las empresas
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Facturación</div>
-                            <div class="stat-icon"><i class="fas fa-file-invoice"></i></div>
-                        </div>
-                        <div class="stat-value">$${database.facturas.reduce((sum, f) => sum + (f.total || 0), 0).toLocaleString()}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-receipt"></i> Total facturado
                         </div>
                     </div>
                 </div>
@@ -1628,6 +1450,9 @@
                         <div class="table-actions">
                             <button class="btn btn-primary" onclick="showNuevaEmpresaModal()">
                                 <i class="fas fa-plus"></i> Nueva Empresa
+                            </button>
+                            <button class="btn" onclick="showNuevoEmpleadoModal()">
+                                <i class="fas fa-user-plus"></i> Nuevo Empleado
                             </button>
                         </div>
                     </div>
@@ -1669,7 +1494,7 @@
                                                     <button class="action-btn edit" onclick="editEmpresa('${empresa.id}')" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="action-btn view" onclick="accessAsJefeEmpresa(${empresa.id})" title="Acceder como Jefe">
+                                                    <button class="action-btn view" onclick="accessAsJefeEmpresa('${empresa.id}')" title="Acceder como Jefe">
                                                         <i class="fas fa-sign-in-alt"></i>
                                                     </button>
                                                 </div>
@@ -1692,741 +1517,130 @@
             `;
         }
 
-        // JEFE EMPRESA
+        // JEFE EMPRESA - DASHBOARD
         function loadJefeDashboard() {
-            const empresaId = currentUser.empresa_id;
-            
-            // Obtener fecha actual
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Filtrar ventas del día
-            const ventasHoy = database.ventas.filter(v => 
-                v.empresa_id === empresaId && v.fecha === today
-            );
-            
-            const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0);
-            
-            // Facturación del día
-            const facturasHoy = database.facturas.filter(f => 
-                f.empresa_id === empresaId && f.fecha === today
-            );
-            const totalFacturadoHoy = facturasHoy.reduce((sum, f) => sum + (f.total || 0), 0);
-            
-            // Obtener productos vendidos hoy
-            const productosVendidosHoy = [];
-            ventasHoy.forEach(venta => {
-                if (venta.productos) {
-                    venta.productos.forEach(producto => {
-                        const existing = productosVendidosHoy.find(p => p.id === producto.id);
-                        if (existing) {
-                            existing.cantidad += producto.cantidad || 1;
-                            existing.total += producto.precio * (producto.cantidad || 1);
-                        } else {
-                            productosVendidosHoy.push({
-                                id: producto.id,
-                                nombre: producto.nombre,
-                                cantidad: producto.cantidad || 1,
-                                precio: producto.precio,
-                                total: producto.precio * (producto.cantidad || 1)
-                            });
-                        }
-                    });
-                }
-            });
-            
-            // Ordenar productos por cantidad vendida
-            productosVendidosHoy.sort((a, b) => b.cantidad - a.cantidad);
-            
-            // Obtener vendedores del día
-            const vendedoresHoy = [];
-            ventasHoy.forEach(venta => {
-                const vendedor = database.empleados.find(e => e.id === venta.vendedor_id);
-                if (vendedor) {
-                    const existing = vendedoresHoy.find(v => v.id === vendedor.id);
-                    if (existing) {
-                        existing.ventas += 1;
-                        existing.total += venta.total || 0;
-                    } else {
-                        vendedoresHoy.push({
-                            id: vendedor.id,
-                            nombre: vendedor.nombre,
-                            ventas: 1,
-                            total: venta.total || 0
-                        });
-                    }
-                }
-            });
-            
-            // Ordenar vendedores por total vendido
-            vendedoresHoy.sort((a, b) => b.total - a.total);
-            
-            // Obtener distribuciones del día
-            const distribucionesHoy = database.distribuidores.filter(d => 
-                d.empresa_id === empresaId && d.ultima_entrega === today
-            );
-            
             document.getElementById('viewJefe').innerHTML = `
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Ventas del Día</div>
+                            <div class="stat-title">Ventas del Mes</div>
                             <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                         </div>
-                        <div class="stat-value">$${totalVentasHoy.toLocaleString()}</div>
+                        <div class="stat-value">$0</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> Hoy
+                            <i class="fas fa-arrow-up"></i> Sin datos
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Facturación del Día</div>
-                            <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                        </div>
-                        <div class="stat-value">$${totalFacturadoHoy.toLocaleString()}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-receipt"></i> Hoy
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Vendedores Activos</div>
+                            <div class="stat-title">Empleados</div>
                             <div class="stat-icon"><i class="fas fa-users"></i></div>
                         </div>
-                        <div class="stat-value">${vendedoresHoy.length}</div>
+                        <div class="stat-value">0</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-user-check"></i> Hoy
+                            <i class="fas fa-user-check"></i> Activos
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Distribuciones</div>
-                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
-                        </div>
-                        <div class="stat-value">${distribucionesHoy.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-shipping-fast"></i> Hoy
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Ventas por Vendedor (Hoy)</h3>
-                        <div class="table-actions">
-                            <select id="sortVendedores" onchange="sortVendedores()" style="background: rgba(255,255,255,0.05); color: white; padding: 0.5rem; border-radius: 6px; border: 1px solid rgba(124,58,237,0.3);">
-                                <option value="total">Ordenar por Monto</option>
-                                <option value="ventas">Ordenar por Cantidad</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Vendedor</th>
-                                    <th>Ventas</th>
-                                    <th>Total</th>
-                                    <th>Promedio</th>
-                                </tr>
-                            </thead>
-                            <tbody id="vendedoresTable">
-                                ${vendedoresHoy.map(vendedor => `
-                                    <tr>
-                                        <td><strong>${vendedor.nombre}</strong></td>
-                                        <td>${vendedor.ventas}</td>
-                                        <td>$${vendedor.total.toLocaleString()}</td>
-                                        <td>$${(vendedor.total / vendedor.ventas).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                    </tr>
-                                `).join('')}
-                                ${vendedoresHoy.length === 0 ? `
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay ventas hoy
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Productos Más Vendidos (Hoy)</h3>
-                        <div class="table-actions">
-                            <select id="sortProductos" onchange="sortProductos()" style="background: rgba(255,255,255,0.05); color: white; padding: 0.5rem; border-radius: 6px; border: 1px solid rgba(124,58,237,0.3);">
-                                <option value="cantidad">Ordenar por Cantidad</option>
-                                <option value="total">Ordenar por Valor</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio Unitario</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productosTable">
-                                ${productosVendidosHoy.map(producto => `
-                                    <tr>
-                                        <td><strong>${producto.nombre}</strong></td>
-                                        <td>${producto.cantidad}</td>
-                                        <td>$${producto.precio.toLocaleString()}</td>
-                                        <td>$${producto.total.toLocaleString()}</td>
-                                    </tr>
-                                `).join('')}
-                                ${productosVendidosHoy.length === 0 ? `
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-box" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay productos vendidos hoy
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Distribución y Entregas</h3>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Distribuidor</th>
-                                    <th>Entregas Hoy</th>
-                                    <th>Total Entregado</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${distribucionesHoy.map(dist => `
-                                    <tr>
-                                        <td><strong>${dist.nombre}</strong><br><small>${dist.vehiculo || ''}</small></td>
-                                        <td>${dist.entregas_hoy || 0}</td>
-                                        <td>$${(dist.total_entregado || 0).toLocaleString()}</td>
-                                        <td>
-                                            <span class="status-badge status-active">
-                                                <i class="fas fa-check-circle"></i> Activo
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                                ${distribucionesHoy.length === 0 ? `
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-truck" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay entregas hoy
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Ventas por Período</h3>
-                    </div>
-                    
-                    <div class="tabs">
-                        <button class="tab active" onclick="switchTab('semana')">Semana</button>
-                        <button class="tab" onclick="switchTab('mes')">Mes</button>
-                        <button class="tab" onclick="switchTab('año')">Año</button>
-                    </div>
-                    
-                    <div class="tab-content active" id="tabSemana">
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Ventas</th>
-                                        <th>Total</th>
-                                        <th>Vendedor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${getVentasPorPeriodo('semana').map(venta => `
-                                        <tr>
-                                            <td>${venta.fecha}</td>
-                                            <td>${venta.cantidad}</td>
-                                            <td>$${venta.total.toLocaleString()}</td>
-                                            <td>${venta.vendedor}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="tabMes">
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Semana</th>
-                                        <th>Ventas</th>
-                                        <th>Total</th>
-                                        <th>Promedio Diario</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${getVentasPorPeriodo('mes').map(venta => `
-                                        <tr>
-                                            <td>${venta.semana}</td>
-                                            <td>${venta.cantidad}</td>
-                                            <td>$${venta.total.toLocaleString()}</td>
-                                            <td>$${venta.promedio.toLocaleString()}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="tabAño">
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mes</th>
-                                        <th>Ventas</th>
-                                        <th>Total</th>
-                                        <th>Crecimiento</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${getVentasPorPeriodo('año').map(venta => `
-                                        <tr>
-                                            <td>${venta.mes}</td>
-                                            <td>${venta.cantidad}</td>
-                                            <td>$${venta.total.toLocaleString()}</td>
-                                            <td class="${venta.crecimiento >= 0 ? 'stat-change positive' : 'stat-change negative'}">
-                                                <i class="fas fa-arrow-${venta.crecimiento >= 0 ? 'up' : 'down'}"></i>
-                                                ${Math.abs(venta.crecimiento)}%
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // DIRECCIÓN COMERCIAL
-        function loadComercialDashboard() {
-            const empresaId = currentUser.empresa_id;
-            
-            // Obtener fecha actual
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Ventas del día
-            const ventasHoy = database.ventas.filter(v => 
-                v.empresa_id === empresaId && v.fecha === today
-            );
-            const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0);
-            
-            // Vendedores del día ordenados por ventas
-            const vendedoresHoy = [];
-            ventasHoy.forEach(venta => {
-                const vendedor = database.empleados.find(e => e.id === venta.vendedor_id);
-                if (vendedor) {
-                    const existing = vendedoresHoy.find(v => v.id === vendedor.id);
-                    if (existing) {
-                        existing.ventas += 1;
-                        existing.total += venta.total || 0;
-                    } else {
-                        vendedoresHoy.push({
-                            id: vendedor.id,
-                            nombre: vendedor.nombre,
-                            ventas: 1,
-                            total: venta.total || 0
-                        });
-                    }
-                }
-            });
-            
-            // Ordenar vendedores por total vendido (de mayor a menor)
-            vendedoresHoy.sort((a, b) => b.total - a.total);
-            
-            // Entregas realizadas hoy por distribuidores
-            const entregasHoy = database.distribuidores.filter(d => 
-                d.empresa_id === empresaId && d.ultima_entrega === today
-            );
-            
-            // Detalle de entregas
-            const detalleEntregas = [];
-            entregasHoy.forEach(dist => {
-                if (dist.entregas_detalle) {
-                    dist.entregas_detalle.forEach(entrega => {
-                        detalleEntregas.push({
-                            distribuidor: dist.nombre,
-                            cliente: entrega.cliente,
-                            producto: entrega.producto,
-                            cantidad: entrega.cantidad,
-                            hora: entrega.hora,
-                            estado: entrega.estado
-                        });
-                    });
-                }
-            });
-            
-            document.getElementById('viewComercial').innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Ventas del Día</div>
-                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-                        </div>
-                        <div class="stat-value">$${totalVentasHoy.toLocaleString()}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-chart-line"></i> Hoy
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Vendedores Activos</div>
+                            <div class="stat-title">Clientes</div>
                             <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
                         </div>
-                        <div class="stat-value">${vendedoresHoy.length}</div>
+                        <div class="stat-value">0</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-users"></i> Hoy
+                            <i class="fas fa-user-plus"></i> Registrados
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Entregas Realizadas</div>
-                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
-                        </div>
-                        <div class="stat-value">${entregasHoy.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-check-circle"></i> Hoy
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Productos Vendidos</div>
+                            <div class="stat-title">Productos</div>
                             <div class="stat-icon"><i class="fas fa-box"></i></div>
                         </div>
-                        <div class="stat-value">${ventasHoy.reduce((sum, v) => sum + (v.productos ? v.productos.length : 0), 0)}</div>
+                        <div class="stat-value">0</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-shopping-cart"></i> Hoy
+                            <i class="fas fa-cube"></i> En stock
                         </div>
                     </div>
                 </div>
 
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Ranking de Vendedores (Hoy)</h3>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Posición</th>
-                                    <th>Vendedor</th>
-                                    <th>Ventas</th>
-                                    <th>Total</th>
-                                    <th>Promedio</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${vendedoresHoy.map((vendedor, index) => `
-                                    <tr>
-                                        <td>
-                                            <span style="display: inline-block; width: 30px; height: 30px; background: ${getRankColor(index)}; border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold;">
-                                                ${index + 1}
-                                            </span>
-                                        </td>
-                                        <td><strong>${vendedor.nombre}</strong></td>
-                                        <td>${vendedor.ventas}</td>
-                                        <td>$${vendedor.total.toLocaleString()}</td>
-                                        <td>$${(vendedor.total / vendedor.ventas).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                    </tr>
-                                `).join('')}
-                                ${vendedoresHoy.length === 0 ? `
-                                    <tr>
-                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay ventas hoy
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Detalle de Entregas por Distribuidor</h3>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Distribuidor</th>
-                                    <th>Cliente</th>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Hora</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${detalleEntregas.map(entrega => `
-                                    <tr>
-                                        <td><strong>${entrega.distribuidor}</strong></td>
-                                        <td>${entrega.cliente}</td>
-                                        <td>${entrega.producto}</td>
-                                        <td>${entrega.cantidad}</td>
-                                        <td>${entrega.hora}</td>
-                                        <td>
-                                            <span class="status-badge ${entrega.estado === 'Entregado' ? 'status-active' : 'status-pending'}">
-                                                ${entrega.estado}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                                ${detalleEntregas.length === 0 ? `
-                                    <tr>
-                                        <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-truck-loading" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay entregas detalladas hoy
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
+                <div style="text-align: center; margin: 3rem 0; color: rgba(255,255,255,0.7);">
+                    <i class="fas fa-chart-line" style="font-size: 4rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                    <h3>Panel de Control Ejecutivo</h3>
+                    <p>Vista de jefe de empresa - Aquí verías todas las métricas de tu empresa</p>
+                    <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 1.5rem;">
+                        <i class="fas fa-arrow-left"></i> Volver al Inicio
+                    </button>
                 </div>
             `;
         }
 
-        // ADMINISTRACIÓN Y FINANZAS
-        function loadAdminDashboard() {
-            const empresaId = currentUser.empresa_id;
+        // =============================================
+        // GESTIÓN DE EMPRESAS (SUPER ADMIN)
+        // =============================================
+        function loadEmpresasManagement() {
+            document.getElementById('pageTitle').textContent = 'Gestión de Empresas - Super Admin';
             
-            // Obtener facturas
-            const facturas = database.facturas.filter(f => f.empresa_id === empresaId);
-            const totalFacturado = facturas.reduce((sum, f) => sum + (f.total || 0), 0);
-            
-            // Obtener comisiones por vendedor
-            const comisionesVendedores = [];
-            database.ventas.forEach(venta => {
-                if (venta.empresa_id === empresaId) {
-                    const vendedor = database.empleados.find(e => e.id === venta.vendedor_id);
-                    if (vendedor) {
-                        const comision = (venta.total || 0) * 0.10; // 10% de comisión
-                        const existing = comisionesVendedores.find(c => c.id === vendedor.id);
-                        if (existing) {
-                            existing.ventas += 1;
-                            existing.total += venta.total || 0;
-                            existing.comision += comision;
-                        } else {
-                            comisionesVendedores.push({
-                                id: vendedor.id,
-                                nombre: vendedor.nombre,
-                                area: vendedor.area || 'Ventas',
-                                ventas: 1,
-                                total: venta.total || 0,
-                                comision: comision
-                            });
-                        }
-                    }
-                }
-            });
-            
-            // Obtener comisiones por distribuidor
-            const comisionesDistribuidores = [];
-            database.distribuidores.forEach(dist => {
-                if (dist.empresa_id === empresaId && dist.total_entregado) {
-                    const comision = (dist.total_entregado || 0) * 0.05; // 5% de comisión
-                    comisionesDistribuidores.push({
-                        id: dist.id,
-                        nombre: dist.nombre,
-                        entregas: dist.entregas_hoy || 0,
-                        total: dist.total_entregado || 0,
-                        comision: comision
-                    });
-                }
-            });
-            
-            // Empleados por área
-            const empleadosPorArea = {};
-            database.empleados.forEach(emp => {
-                if (emp.empresa_id === empresaId) {
-                    const area = emp.area || 'Sin Área';
-                    if (!empleadosPorArea[area]) {
-                        empleadosPorArea[area] = [];
-                    }
-                    empleadosPorArea[area].push(emp);
-                }
-            });
-            
-            document.getElementById('viewAdmin').innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Facturación Total</div>
-                            <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                        </div>
-                        <div class="stat-value">$${totalFacturado.toLocaleString()}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-chart-line"></i> Total acumulado
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Comisiones Vendedores</div>
-                            <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
-                        </div>
-                        <div class="stat-value">$${comisionesVendedores.reduce((sum, c) => sum + c.comision, 0).toLocaleString()}</div>
-                        <div class="stat-change negative">
-                            <i class="fas fa-arrow-down"></i> Por pagar
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Comisiones Distribuidores</div>
-                            <div class="stat-icon"><i class="fas fa-truck"></i></div>
-                        </div>
-                        <div class="stat-value">$${comisionesDistribuidores.reduce((sum, c) => sum + c.comision, 0).toLocaleString()}</div>
-                        <div class="stat-change negative">
-                            <i class="fas fa-arrow-down"></i> Por pagar
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Empleados Activos</div>
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        </div>
-                        <div class="stat-value">${database.empleados.filter(e => e.empresa_id === empresaId).length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-user-plus"></i> En sistema
-                        </div>
-                    </div>
-                </div>
-
+            document.getElementById('viewSuper').innerHTML = `
                 <div class="table-card">
                     <div class="table-header">
-                        <h3 class="table-title">Comisiones por Vendedor</h3>
+                        <h3 class="table-title">Empresas del Sistema</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="showNuevaEmpresaModal()">
+                                <i class="fas fa-plus"></i> Nueva Empresa
+                            </button>
+                            <button class="btn" onclick="loadSuperDashboard()">
+                                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                            </button>
+                        </div>
                     </div>
+                    
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Vendedor</th>
-                                    <th>Área</th>
-                                    <th>Ventas</th>
-                                    <th>Total Ventas</th>
-                                    <th>Comisión (10%)</th>
+                                    <th>ID</th>
+                                    <th>Empresa</th>
+                                    <th>RUC</th>
+                                    <th>Contacto</th>
+                                    <th>Estado</th>
+                                    <th>Usuarios</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${comisionesVendedores.map(comision => `
-                                    <tr>
-                                        <td><strong>${comision.nombre}</strong></td>
-                                        <td>${comision.area}</td>
-                                        <td>${comision.ventas}</td>
-                                        <td>$${comision.total.toLocaleString()}</td>
-                                        <td><strong style="color: var(--accent);">$${comision.comision.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></td>
-                                    </tr>
-                                `).join('')}
-                                ${comisionesVendedores.length === 0 ? `
-                                    <tr>
-                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay comisiones calculadas
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Comisiones por Distribuidor</h3>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Distribuidor</th>
-                                    <th>Entregas</th>
-                                    <th>Total Entregado</th>
-                                    <th>Comisión (5%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${comisionesDistribuidores.map(comision => `
-                                    <tr>
-                                        <td><strong>${comision.nombre}</strong></td>
-                                        <td>${comision.entregas}</td>
-                                        <td>$${comision.total.toLocaleString()}</td>
-                                        <td><strong style="color: var(--accent);">$${comision.comision.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></td>
-                                    </tr>
-                                `).join('')}
-                                ${comisionesDistribuidores.length === 0 ? `
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-truck" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay comisiones de distribuidores
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Empleados por Área</h3>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Área</th>
-                                    <th>Empleados</th>
-                                    <th>Total Sueldos</th>
-                                    <th>Promedio por Empleado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${Object.keys(empleadosPorArea).map(area => {
-                                    const empleados = empleadosPorArea[area];
-                                    const totalSueldos = empleados.reduce((sum, emp) => sum + (emp.sueldo || 0), 0);
+                                ${database.empresas.map(empresa => {
+                                    const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresa.id);
                                     return `
                                         <tr>
-                                            <td><strong>${area}</strong></td>
-                                            <td>${empleados.length}</td>
-                                            <td>$${totalSueldos.toLocaleString()}</td>
-                                            <td>$${(totalSueldos / empleados.length).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                            <td><code>${empresa.id || 'N/A'}</code></td>
+                                            <td>
+                                                <strong>${empresa.nombre}</strong><br>
+                                                <small style="color: rgba(255,255,255,0.5);">${empresa.email || ''}</small>
+                                            </td>
+                                            <td>${empresa.ruc || ''}</td>
+                                            <td>${empresa.contacto || ''}</td>
+                                            <td>
+                                                <span class="status-badge ${empresa.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
+                                                    ${empresa.estado || 'Inactiva'}
+                                                </span>
+                                            </td>
+                                            <td>${usuariosEmpresa.length}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.id}')" title="Ver Detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="action-btn edit" onclick="editEmpresa('${empresa.id}')" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="action-btn view" onclick="manageUsuariosEmpresa('${empresa.id}')" title="Usuarios">
+                                                        <i class="fas fa-users"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
                                     `;
                                 }).join('')}
@@ -2437,236 +1651,699 @@
             `;
         }
 
-        // VENDEDOR APP
-        function loadVendedorDashboard() {
-            document.getElementById('viewVendedor').innerHTML = `
-                <div style="max-width: 800px; margin: 0 auto;">
-                    <div style="text-align: center; margin-bottom: 2rem;">
-                        <h2 style="color: var(--secondary);">
-                            <i class="fas fa-mobile-alt"></i> App Vendedor
-                        </h2>
-                        <p style="color: rgba(255,255,255,0.7);">Bienvenido ${currentUser.nombre}</p>
+        // =============================================
+        // GESTIÓN DE PERSONAL (SUPER ADMIN)
+        // =============================================
+        function loadGestionPersonal() {
+            document.getElementById('pageTitle').textContent = 'Gestión de Personal - Super Admin';
+            
+            document.getElementById('viewSuper').innerHTML = `
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Empleados del Sistema</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="showNuevoEmpleadoModal()">
+                                <i class="fas fa-user-plus"></i> Nuevo Empleado
+                            </button>
+                            <button class="btn" onclick="loadSuperDashboard()">
+                                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Mis Ventas</div>
-                                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-                            </div>
-                            <div class="stat-value">$0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-chart-line"></i> Hoy
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Mis Clientes</div>
-                                <div class="stat-icon"><i class="fas fa-users"></i></div>
-                            </div>
-                            <div class="stat-value">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-user-plus"></i> Activos
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Productos</div>
-                                <div class="stat-icon"><i class="fas fa-boxes"></i></div>
-                            </div>
-                            <div class="stat-value">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-box"></i> Disponibles
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Comisión</div>
-                                <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
-                            </div>
-                            <div class="stat-value">$0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-coins"></i> Acumulado
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
-                        <button class="btn btn-primary" onclick="showNuevoPedidoModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-plus" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Nuevo Pedido</span>
-                        </button>
-                        <button class="btn btn-primary" onclick="showSolicitudClienteModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-user-plus" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Solicitar Cliente</span>
-                        </button>
-                        <button class="btn btn-primary" onclick="loadClientesVendedor()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-users" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Mis Clientes</span>
-                        </button>
-                        <button class="btn btn-primary" onclick="loadProductosVendedor()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-boxes" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Productos</span>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ALMACÉN APP
-        function loadAlmacenDashboard() {
-            document.getElementById('viewAlmacen').innerHTML = `
-                <div style="max-width: 800px; margin: 0 auto;">
-                    <div style="text-align: center; margin-bottom: 2rem;">
-                        <h2 style="color: var(--secondary);">
-                            <i class="fas fa-warehouse"></i> App Almacén
-                        </h2>
-                        <p style="color: rgba(255,255,255,0.7);">Bienvenido ${currentUser.nombre}</p>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Productos</div>
-                                <div class="stat-icon"><i class="fas fa-boxes"></i></div>
-                            </div>
-                            <div class="stat-value">0</div>
-                            <div class"stat-change positive">
-                                <i class="fas fa-box"></i> En inventario
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Stock Total</div>
-                                <div class="stat-icon"><i class="fas fa-cubes"></i></div>
-                            </div>
-                            <div class="stat-value">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-warehouse"></i> Unidades
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Valor Inventario</div>
-                                <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-                            </div>
-                            <div class="stat-value">$0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-money-bill-wave"></i> Valorado
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-title">Almacenes</div>
-                                <div class="stat-icon"><i class="fas fa-warehouse"></i></div>
-                            </div>
-                            <div class="stat-value">0</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-building"></i> Activos
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
-                        <button class="btn btn-primary" onclick="showNuevoIngresoModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-plus" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Nuevo Ingreso</span>
-                        </button>
-                        <button class="btn btn-primary" onclick="showNuevoDespachoModal()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-truck" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Nuevo Despacho</span>
-                        </button>
-                        <button class="btn btn-primary" onclick="loadInventario()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-boxes" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Inventario</span>
-                        </button>
-                        <button class="btn btn-primary" onclick="loadDespachos()" style="height: 100px; flex-direction: column; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-shipping-fast" style="font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
-                            <span>Despachos</span>
-                        </button>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>DNI</th>
+                                    <th>Cargo</th>
+                                    <th>Empresa</th>
+                                    <th>Área</th>
+                                    <th>Sueldo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${database.empleados.map(empleado => {
+                                    const empresa = database.empresas.find(e => e.id === empleado.empresa_id);
+                                    return `
+                                        <tr>
+                                            <td><code>${empleado.id || 'N/A'}</code></td>
+                                            <td>
+                                                <strong>${empleado.nombre}</strong><br>
+                                                <small style="color: rgba(255,255,255,0.5);">${empleado.email || ''}</small>
+                                            </td>
+                                            <td>${empleado.dni || ''}</td>
+                                            <td>${empleado.cargo || ''}</td>
+                                            <td>${empresa ? empresa.nombre : 'Sin empresa'}</td>
+                                            <td>${empleado.area || ''}</td>
+                                            <td>$${(empleado.sueldo || 0).toLocaleString()}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="action-btn edit" onclick="editEmpleado('${empleado.id}')" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="action-btn delete" onclick="eliminarEmpleado('${empleado.id}')" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                                ${database.empleados.length === 0 ? `
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay empleados registrados
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             `;
         }
 
         // =============================================
-        // FUNCIONES AUXILIARES
+        // MODALES PARA EMPRESAS
         // =============================================
-        function getRankColor(position) {
-            switch(position) {
-                case 0: return '#FFD700'; // Oro
-                case 1: return '#C0C0C0'; // Plata
-                case 2: return '#CD7F32'; // Bronce
-                default: return 'var(--primary)';
+        function showNuevaEmpresaModal() {
+            showModal('Nueva Empresa', `
+                <div style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>Razón Social *</label>
+                        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa SAC">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>RUC *</label>
+                        <input type="text" id="nuevaEmpresaRUC" placeholder="20123456789">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Industria</label>
+                        <select id="nuevaEmpresaIndustria">
+                            <option value="Tecnología">Tecnología</option>
+                            <option value="Comercio">Comercio</option>
+                            <option value="Manufactura">Manufactura</option>
+                            <option value="Servicios">Servicios</option>
+                            <option value="Alimentos">Alimentos</option>
+                            <option value="Construcción">Construcción</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contacto Principal *</label>
+                        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono *</label>
+                        <input type="text" id="nuevaEmpresaTelefono" placeholder="987654321">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contraseña Jefe *</label>
+                        <input type="password" id="nuevaEmpresaPassword" value="123">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="nuevaEmpresaEstado">
+                            <option value="Activa">Activa</option>
+                            <option value="Inactiva">Inactiva</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="crearNuevaEmpresa()" style="flex: 1;">
+                            <i class="fas fa-plus"></i> Crear Empresa
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function crearNuevaEmpresa() {
+            const empresaData = {
+                id: 'EMP-' + Date.now(),
+                nombre: document.getElementById('nuevaEmpresaNombre').value,
+                ruc: document.getElementById('nuevaEmpresaRUC').value,
+                industria: document.getElementById('nuevaEmpresaIndustria').value,
+                contacto: document.getElementById('nuevaEmpresaContacto').value,
+                email: document.getElementById('nuevaEmpresaEmail').value,
+                telefono: document.getElementById('nuevaEmpresaTelefono').value,
+                estado: document.getElementById('nuevaEmpresaEstado').value,
+                fecharegistro: new Date().toISOString().split('T')[0]
+            };
+            
+            // Validar campos requeridos
+            const required = ['nombre', 'ruc', 'email', 'telefono'];
+            for (const field of required) {
+                if (!empresaData[field]) {
+                    showNotification('error', 'Error', `Complete el campo: ${field}`);
+                    return;
+                }
+            }
+            
+            // Agregar a la base de datos
+            database.empresas.push(empresaData);
+            
+            // Crear usuario jefe para la empresa
+            const nombreCompleto = empresaData.contacto.split(' ');
+            const usuarioJefe = {
+                id: 'USR-' + Date.now(),
+                empresa_id: empresaData.id,
+                nombre: empresaData.contacto,
+                email: empresaData.email,
+                username: empresaData.email.split('@')[0],
+                password: document.getElementById('nuevaEmpresaPassword').value || '123',
+                role: 'jefe',
+                activo: 'Sí'
+            };
+            
+            database.usuarios.push(usuarioJefe);
+            
+            // Guardar en localStorage
+            localStorage.setItem('nexial_empresas', JSON.stringify(database.empresas));
+            localStorage.setItem('nexial_usuarios', JSON.stringify(database.usuarios));
+            
+            showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
+            closeModal();
+            loadSuperDashboard();
+        }
+
+        function viewEmpresaCompleta(empresaId) {
+            const empresa = database.empresas.find(e => e.id === empresaId);
+            if (!empresa) return;
+            
+            const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
+            const empleadosEmpresa = database.empleados.filter(e => e.empresa_id === empresaId);
+            
+            showModal(`Empresa: ${empresa.nombre}`, `
+                <div style="max-width: 800px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
+                            <p><strong>RUC:</strong> ${empresa.ruc || 'No registrado'}</p>
+                            <p><strong>Industria:</strong> ${empresa.industria || 'No especificada'}</p>
+                            <p><strong>Contacto:</strong> ${empresa.contacto || 'No registrado'}</p>
+                            <p><strong>Email:</strong> ${empresa.email || 'No registrado'}</p>
+                            <p><strong>Teléfono:</strong> ${empresa.telefono || 'No registrado'}</p>
+                            <p><strong>Estado:</strong> ${empresa.estado || 'Inactiva'}</p>
+                            <p><strong>Fecha Registro:</strong> ${empresa.fecharegistro || 'No disponible'}</p>
+                        </div>
+                        
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
+                            <p><strong>Usuarios:</strong> ${usuariosEmpresa.length}</p>
+                            <p><strong>Empleados:</strong> ${empleadosEmpresa.length}</p>
+                            <p><strong>Ventas:</strong> $${database.ventas.filter(v => v.empresa_id === empresaId).reduce((sum, v) => sum + (v.total || 0), 0).toLocaleString()}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h4 style="color: var(--secondary); margin-bottom: 1rem;">Usuarios</h4>
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            ${usuariosEmpresa.map(usuario => `
+                                <div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                    <strong>${usuario.nombre}</strong> (${usuario.email}) - ${usuario.role}
+                                </div>
+                            `).join('')}
+                            ${usuariosEmpresa.length === 0 ? '<p style="text-align: center; color: rgba(255,255,255,0.5);">No hay usuarios</p>' : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn" onclick="editEmpresa('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-primary" onclick="accessAsJefeEmpresa('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-sign-in-alt"></i> Acceder como Jefe
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function editEmpresa(empresaId) {
+            const empresa = database.empresas.find(e => e.id === empresaId);
+            if (!empresa) return;
+            
+            showModal(`Editar Empresa: ${empresa.nombre}`, `
+                <div style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>Razón Social</label>
+                        <input type="text" id="editEmpresaNombre" value="${empresa.nombre || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>RUC</label>
+                        <input type="text" id="editEmpresaRUC" value="${empresa.ruc || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contacto</label>
+                        <input type="text" id="editEmpresaContacto" value="${empresa.contacto || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="editEmpresaEmail" value="${empresa.email || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" id="editEmpresaTelefono" value="${empresa.telefono || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="editEmpresaEstado">
+                            <option value="Activa" ${empresa.estado === 'Activa' ? 'selected' : ''}>Activa</option>
+                            <option value="Inactiva" ${empresa.estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
+                            <option value="Pendiente" ${empresa.estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="guardarEdicionEmpresa('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function guardarEdicionEmpresa(empresaId) {
+            const empresaIndex = database.empresas.findIndex(e => e.id === empresaId);
+            if (empresaIndex === -1) return;
+            
+            database.empresas[empresaIndex] = {
+                ...database.empresas[empresaIndex],
+                nombre: document.getElementById('editEmpresaNombre').value,
+                ruc: document.getElementById('editEmpresaRUC').value,
+                contacto: document.getElementById('editEmpresaContacto').value,
+                email: document.getElementById('editEmpresaEmail').value,
+                telefono: document.getElementById('editEmpresaTelefono').value,
+                estado: document.getElementById('editEmpresaEstado').value
+            };
+            
+            localStorage.setItem('nexial_empresas', JSON.stringify(database.empresas));
+            
+            showNotification('success', 'Éxito', 'Empresa actualizada');
+            closeModal();
+            loadSuperDashboard();
+        }
+
+        function accessAsJefeEmpresa(empresaId) {
+            const empresa = database.empresas.find(e => e.id === empresaId);
+            if (!empresa) return;
+            
+            showConfirmation(
+                'Acceder como Jefe',
+                `¿Acceder a la empresa "${empresa.nombre}" como jefe?`,
+                function() {
+                    // Cambiar temporalmente el rol del usuario actual
+                    currentUser.role = 'jefe';
+                    currentUser.empresa = empresa.nombre;
+                    currentUser.empresa_id = empresaId;
+                    currentCompany = empresa;
+                    
+                    // Reconfigurar interfaz
+                    configureInterface();
+                    
+                    showNotification('success', 'Modo Jefe', `Ahora eres jefe de ${empresa.nombre}`);
+                }
+            );
+        }
+
+        function manageUsuariosEmpresa(empresaId) {
+            const empresa = database.empresas.find(e => e.id === empresaId);
+            if (!empresa) return;
+            
+            showModal(`Usuarios de ${empresa.nombre}`, `
+                <div style="max-width: 800px;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <button class="btn btn-primary" onclick="showNuevoUsuarioModal('${empresaId}')">
+                            <i class="fas fa-user-plus"></i> Agregar Usuario
+                        </button>
+                    </div>
+                    
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(124,58,237,0.3);">
+                                    <th style="padding: 0.5rem; text-align: left;">Nombre</th>
+                                    <th style="padding: 0.5rem; text-align: left;">Email</th>
+                                    <th style="padding: 0.5rem; text-align: left;">Rol</th>
+                                    <th style="padding: 0.5rem; text-align: left;">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${database.usuarios.filter(u => u.empresa_id === empresaId).map(usuario => `
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                        <td style="padding: 0.5rem;">${usuario.nombre}</td>
+                                        <td style="padding: 0.5rem;">${usuario.email}</td>
+                                        <td style="padding: 0.5rem;">
+                                            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.role)}; font-size: 0.8rem;">
+                                                ${usuario.role}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 0.5rem;">
+                                            <span class="status-badge ${usuario.activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                ${usuario.activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${database.usuarios.filter(u => u.empresa_id === empresaId).length === 0 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            No hay usuarios para esta empresa
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `);
+        }
+
+        function getRoleColor(role) {
+            switch(role) {
+                case 'super': return 'rgba(255,0,85,0.2)';
+                case 'jefe': return 'rgba(0,255,65,0.2)';
+                case 'comercial': return 'rgba(255,170,0,0.2)';
+                case 'admin': return 'rgba(0,170,255,0.2)';
+                case 'vendedor': return 'rgba(124,58,237,0.2)';
+                default: return 'rgba(255,255,255,0.1)';
             }
         }
 
-        function getVentasPorPeriodo(periodo) {
-            // Datos de ejemplo para las pestañas
-            switch(periodo) {
-                case 'semana':
-                    return [
-                        { fecha: 'Lunes', cantidad: 15, total: 15000, vendedor: 'Juan Pérez' },
-                        { fecha: 'Martes', cantidad: 12, total: 12000, vendedor: 'María López' },
-                        { fecha: 'Miércoles', cantidad: 18, total: 18000, vendedor: 'Carlos Rodríguez' },
-                        { fecha: 'Jueves', cantidad: 10, total: 10000, vendedor: 'Ana García' },
-                        { fecha: 'Viernes', cantidad: 20, total: 20000, vendedor: 'Roberto Silva' }
-                    ];
-                case 'mes':
-                    return [
-                        { semana: 'Semana 1', cantidad: 65, total: 65000, promedio: 13000 },
-                        { semana: 'Semana 2', cantidad: 72, total: 72000, promedio: 14400 },
-                        { semana: 'Semana 3', cantidad: 85, total: 85000, promedio: 17000 },
-                        { semana: 'Semana 4', cantidad: 78, total: 78000, promedio: 15600 }
-                    ];
-                case 'año':
-                    return [
-                        { mes: 'Enero', cantidad: 280, total: 280000, crecimiento: 5 },
-                        { mes: 'Febrero', cantidad: 310, total: 310000, crecimiento: 10 },
-                        { mes: 'Marzo', cantidad: 350, total: 350000, crecimiento: 15 },
-                        { mes: 'Abril', cantidad: 380, total: 380000, crecimiento: 8 },
-                        { mes: 'Mayo', cantidad: 400, total: 400000, crecimiento: 12 }
-                    ];
-                default:
-                    return [];
+        function showNuevoUsuarioModal(empresaId) {
+            const empresa = database.empresas.find(e => e.id === empresaId);
+            showModal(`Nuevo Usuario - ${empresa.nombre}`, `
+                <div style="max-width: 500px;">
+                    <div class="form-group">
+                        <label>Nombre Completo *</label>
+                        <input type="text" id="nuevoUsuarioNombre" placeholder="Juan Pérez">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="nuevoUsuarioEmail" placeholder="usuario@empresa.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Rol *</label>
+                        <select id="nuevoUsuarioRol">
+                            <option value="jefe">Jefe Empresa</option>
+                            <option value="comercial">Dirección Comercial</option>
+                            <option value="admin">Administración y Finanzas</option>
+                            <option value="vendedor">Vendedor App</option>
+                            <option value="almacen">Almacén App</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contraseña *</label>
+                        <input type="text" id="nuevoUsuarioPassword" value="123">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="crearNuevoUsuario('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-user-plus"></i> Crear Usuario
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function crearNuevoUsuario(empresaId) {
+            const usuarioData = {
+                id: 'USR-' + Date.now(),
+                empresa_id: empresaId,
+                nombre: document.getElementById('nuevoUsuarioNombre').value,
+                email: document.getElementById('nuevoUsuarioEmail').value,
+                username: document.getElementById('nuevoUsuarioEmail').value.split('@')[0],
+                password: document.getElementById('nuevoUsuarioPassword').value || '123',
+                role: document.getElementById('nuevoUsuarioRol').value,
+                activo: 'Sí'
+            };
+            
+            // Validar campos
+            if (!usuarioData.nombre || !usuarioData.email) {
+                showNotification('error', 'Error', 'Complete nombre y email');
+                return;
             }
-        }
-
-        function switchTab(tabName) {
-            // Ocultar todas las pestañas
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
             
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+            database.usuarios.push(usuarioData);
+            localStorage.setItem('nexial_usuarios', JSON.stringify(database.usuarios));
             
-            // Mostrar pestaña seleccionada
-            document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
-            
-            // Activar botón de pestaña
-            event.target.classList.add('active');
-        }
-
-        function sortVendedores() {
-            const sortBy = document.getElementById('sortVendedores').value;
-            // Implementar lógica de ordenamiento aquí
-        }
-
-        function sortProductos() {
-            const sortBy = document.getElementById('sortProductos').value;
-            // Implementar lógica de ordenamiento aquí
+            showNotification('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado`);
+            closeModal();
+            loadEmpresasManagement();
         }
 
         // =============================================
-        // FUNCIONES DE MODALES
+        // MODALES PARA EMPLEADOS
+        // =============================================
+        function showNuevoEmpleadoModal() {
+            showModal('Nuevo Empleado', `
+                <div style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>Nombre Completo *</label>
+                        <input type="text" id="nuevoEmpleadoNombre" placeholder="Juan Pérez">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>DNI *</label>
+                        <input type="text" id="nuevoEmpleadoDNI" placeholder="12345678">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="nuevoEmpleadoEmail" placeholder="empleado@empresa.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" id="nuevoEmpleadoTelefono" placeholder="987654321">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Cargo *</label>
+                        <input type="text" id="nuevoEmpleadoCargo" placeholder="Gerente de Ventas">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Área *</label>
+                        <select id="nuevoEmpleadoArea">
+                            <option value="Dirección">Dirección</option>
+                            <option value="Ventas">Ventas</option>
+                            <option value="Administración">Administración</option>
+                            <option value="Finanzas">Finanzas</option>
+                            <option value="Almacén">Almacén</option>
+                            <option value="Distribución">Distribución</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Empresa *</label>
+                        <select id="nuevoEmpleadoEmpresa">
+                            <option value="">Seleccionar empresa</option>
+                            ${database.empresas.map(empresa => `
+                                <option value="${empresa.id}">${empresa.nombre}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sueldo ($)</label>
+                        <input type="number" id="nuevoEmpleadoSueldo" placeholder="2000" value="2000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Fecha de Ingreso</label>
+                        <input type="date" id="nuevoEmpleadoFechaIngreso" value="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="crearNuevoEmpleado()" style="flex: 1;">
+                            <i class="fas fa-user-plus"></i> Crear Empleado
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function crearNuevoEmpleado() {
+            const empleadoData = {
+                id: 'EMP-' + Date.now(),
+                nombre: document.getElementById('nuevoEmpleadoNombre').value,
+                dni: document.getElementById('nuevoEmpleadoDNI').value,
+                email: document.getElementById('nuevoEmpleadoEmail').value,
+                telefono: document.getElementById('nuevoEmpleadoTelefono').value,
+                cargo: document.getElementById('nuevoEmpleadoCargo').value,
+                area: document.getElementById('nuevoEmpleadoArea').value,
+                empresa_id: document.getElementById('nuevoEmpleadoEmpresa').value,
+                sueldo: parseFloat(document.getElementById('nuevoEmpleadoSueldo').value) || 0,
+                fechaingreso: document.getElementById('nuevoEmpleadoFechaIngreso').value || new Date().toISOString().split('T')[0]
+            };
+            
+            // Validar campos requeridos
+            const required = ['nombre', 'dni', 'cargo', 'empresa_id'];
+            for (const field of required) {
+                if (!empleadoData[field]) {
+                    showNotification('error', 'Error', `Complete el campo: ${field}`);
+                    return;
+                }
+            }
+            
+            // Agregar a la base de datos
+            database.empleados.push(empleadoData);
+            localStorage.setItem('nexial_empleados', JSON.stringify(database.empleados));
+            
+            showNotification('success', 'Éxito', `Empleado "${empleadoData.nombre}" creado`);
+            closeModal();
+            loadGestionPersonal();
+        }
+
+        function editEmpleado(empleadoId) {
+            const empleado = database.empleados.find(e => e.id === empleadoId);
+            if (!empleado) return;
+            
+            showModal(`Editar Empleado: ${empleado.nombre}`, `
+                <div style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="editEmpleadoNombre" value="${empleado.nombre || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <input type="text" id="editEmpleadoDNI" value="${empleado.dni || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="editEmpleadoEmail" value="${empleado.email || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="text" id="editEmpleadoTelefono" value="${empleado.telefono || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Cargo</label>
+                        <input type="text" id="editEmpleadoCargo" value="${empleado.cargo || ''}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Área</label>
+                        <select id="editEmpleadoArea">
+                            <option value="Dirección" ${empleado.area === 'Dirección' ? 'selected' : ''}>Dirección</option>
+                            <option value="Ventas" ${empleado.area === 'Ventas' ? 'selected' : ''}>Ventas</option>
+                            <option value="Administración" ${empleado.area === 'Administración' ? 'selected' : ''}>Administración</option>
+                            <option value="Finanzas" ${empleado.area === 'Finanzas' ? 'selected' : ''}>Finanzas</option>
+                            <option value="Almacén" ${empleado.area === 'Almacén' ? 'selected' : ''}>Almacén</option>
+                            <option value="Distribución" ${empleado.area === 'Distribución' ? 'selected' : ''}>Distribución</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select id="editEmpleadoEmpresa">
+                            <option value="">Seleccionar empresa</option>
+                            ${database.empresas.map(empresa => `
+                                <option value="${empresa.id}" ${empleado.empresa_id === empresa.id ? 'selected' : ''}>${empresa.nombre}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Sueldo ($)</label>
+                        <input type="number" id="editEmpleadoSueldo" value="${empleado.sueldo || 0}">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="guardarEdicionEmpleado('${empleadoId}')" style="flex: 1;">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function guardarEdicionEmpleado(empleadoId) {
+            const empleadoIndex = database.empleados.findIndex(e => e.id === empleadoId);
+            if (empleadoIndex === -1) return;
+            
+            database.empleados[empleadoIndex] = {
+                ...database.empleados[empleadoIndex],
+                nombre: document.getElementById('editEmpleadoNombre').value,
+                dni: document.getElementById('editEmpleadoDNI').value,
+                email: document.getElementById('editEmpleadoEmail').value,
+                telefono: document.getElementById('editEmpleadoTelefono').value,
+                cargo: document.getElementById('editEmpleadoCargo').value,
+                area: document.getElementById('editEmpleadoArea').value,
+                empresa_id: document.getElementById('editEmpleadoEmpresa').value,
+                sueldo: parseFloat(document.getElementById('editEmpleadoSueldo').value) || 0
+            };
+            
+            localStorage.setItem('nexial_empleados', JSON.stringify(database.empleados));
+            
+            showNotification('success', 'Éxito', 'Empleado actualizado');
+            closeModal();
+            loadGestionPersonal();
+        }
+
+        function eliminarEmpleado(empleadoId) {
+            showConfirmation(
+                'Eliminar Empleado',
+                '¿Estás seguro de eliminar este empleado? Esta acción no se puede deshacer.',
+                function() {
+                    const empleadoIndex = database.empleados.findIndex(e => e.id === empleadoId);
+                    if (empleadoIndex !== -1) {
+                        database.empleados.splice(empleadoIndex, 1);
+                        localStorage.setItem('nexial_empleados', JSON.stringify(database.empleados));
+                        showNotification('success', 'Éxito', 'Empleado eliminado');
+                        loadGestionPersonal();
+                    }
+                }
+            );
+        }
+
+        // =============================================
+        // FUNCIONES DE MODALES Y NOTIFICACIONES
         // =============================================
         function showModal(title, content) {
             document.getElementById('modalTitle').textContent = title;
@@ -2678,16 +2355,12 @@
             document.getElementById('modalOverlay').style.display = 'none';
         }
 
-        // =============================================
-        // FUNCIONES DE CONFIRMACIÓN
-        // =============================================
         function showConfirmation(title, message, onConfirm) {
             document.getElementById('confirmationTitle').textContent = title;
             document.getElementById('confirmationMessage').textContent = message;
             document.getElementById('confirmationDialog').style.display = 'flex';
             
             const confirmBtn = document.getElementById('confirmActionBtn');
-            const oldHandler = confirmBtn.onclick;
             confirmBtn.onclick = function() {
                 hideConfirmation();
                 onConfirm();
@@ -2706,9 +2379,6 @@
             );
         }
 
-        // =============================================
-        // FUNCIONES DE NOTIFICACIONES
-        // =============================================
         function showNotification(type, title, message) {
             const notification = {
                 id: Date.now(),
@@ -2805,456 +2475,27 @@
             `);
         }
 
-        function markAllAsRead() // =============================================
-// FUNCIONES DE SUPER ADMIN
-// =============================================
-
-function showNuevaEmpresaModal() {
-  showModal('Nueva Empresa', `
-    <div style="max-width: 600px;">
-      <div class="form-group">
-        <label>Razón Social *</label>
-        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa SAC">
-      </div>
-      
-      <div class="form-group">
-        <label>RUC *</label>
-        <input type="text" id="nuevaEmpresaRUC" placeholder="20123456789">
-      </div>
-      
-      <div class="form-group">
-        <label>Industria</label>
-        <select id="nuevaEmpresaIndustria">
-          <option value="Tecnología">Tecnología</option>
-          <option value="Comercio">Comercio</option>
-          <option value="Manufactura">Manufactura</option>
-          <option value="Servicios">Servicios</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label>Contacto Principal *</label>
-        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez">
-      </div>
-      
-      <div class="form-group">
-        <label>Email *</label>
-        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com">
-      </div>
-      
-      <div class="form-group">
-        <label>Teléfono *</label>
-        <input type="text" id="nuevaEmpresaTelefono" placeholder="987654321">
-      </div>
-      
-      <div class="form-group">
-        <label>Contraseña Jefe *</label>
-        <input type="password" id="nuevaEmpresaPassword" value="123">
-      </div>
-      
-      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
-          Cancelar
-        </button>
-        <button class="btn btn-primary" onclick="crearNuevaEmpresa()" style="flex: 1;">
-          <i class="fas fa-plus"></i> Crear Empresa
-        </button>
-      </div>
-    </div>
-  `);
-}
-
-function crearNuevaEmpresa() {
-  const empresaData = {
-    token: localStorage.getItem('nexial_token'),
-    nombre: document.getElementById('nuevaEmpresaNombre').value,
-    ruc: document.getElementById('nuevaEmpresaRUC').value,
-    industria: document.getElementById('nuevaEmpresaIndustria').value,
-    primer_nombre: document.getElementById('nuevaEmpresaContacto').value.split(' ')[0],
-    primer_apellido: document.getElementById('nuevaEmpresaContacto').value.split(' ')[1] || '',
-    email: document.getElementById('nuevaEmpresaEmail').value,
-    telefono: document.getElementById('nuevaEmpresaTelefono').value,
-    password: document.getElementById('nuevaEmpresaPassword').value,
-    tarjeta_numero: '4111111111111111',
-    tarjeta_vencimiento: '12/30',
-    tarjeta_cvv: '123',
-    tarjeta_nombre: document.getElementById('nuevaEmpresaContacto').value
-  };
-  
-  // Validar campos requeridos
-  const required = ['nombre', 'ruc', 'email', 'telefono'];
-  for (const field of required) {
-    if (!empresaData[field]) {
-      showNotification('error', 'Error', `Complete el campo: ${field}`);
-      return;
-    }
-  }
-  
-  fetch('https://script.google.com/macros/s/AKfycbwoPv3w2uikXap4YOI4V97iVQ3gpWPpcDqDnbQV2TBrfCwAL2gb1HoOMEGG6QbxRtKEOg/exec', {
-    method: 'POST',
-    body: JSON.stringify({
-      action: 'registerCompany',
-      ...empresaData
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.success) {
-      showNotification('success', 'Éxito', `Empresa creada: ${data.empresa_id}`);
-      closeModal();
-      loadSuperDashboard();
-    } else {
-      showNotification('error', 'Error', data.error || 'Error al crear empresa');
-    }
-  })
-  .catch(error => {
-    showNotification('error', 'Error', 'Error de conexión');
-  });
-}
-
-function viewEmpresaCompleta(empresaId) {
-  const empresa = database.empresas.find(e => e.id === empresaId);
-  if (!empresa) return;
-  
-  const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
-  const empleadosEmpresa = database.empleados.filter(e => e.empresa_id === empresaId);
-  
-  showModal(`Empresa: ${empresa.nombre}`, `
-    <div style="max-width: 800px;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-        <div>
-          <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
-          <p><strong>RUC:</strong> ${empresa.ruc || 'No registrado'}</p>
-          <p><strong>Industria:</strong> ${empresa.industria || 'No especificada'}</p>
-          <p><strong>Contacto:</strong> ${empresa.contacto || 'No registrado'}</p>
-          <p><strong>Email:</strong> ${empresa.email || 'No registrado'}</p>
-          <p><strong>Teléfono:</strong> ${empresa.telefono || 'No registrado'}</p>
-          <p><strong>Estado:</strong> ${empresa.estado || 'Inactiva'}</p>
-        </div>
-        
-        <div>
-          <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
-          <p><strong>Usuarios:</strong> ${usuariosEmpresa.length}</p>
-          <p><strong>Empleados:</strong> ${empleadosEmpresa.length}</p>
-          <p><strong>Fecha Registro:</strong> ${empresa.fecharegistro || 'No disponible'}</p>
-        </div>
-      </div>
-      
-      <div style="margin-top: 2rem;">
-        <h4 style="color: var(--secondary); margin-bottom: 1rem;">Usuarios</h4>
-        <div style="max-height: 200px; overflow-y: auto;">
-          ${usuariosEmpresa.map(usuario => `
-            <div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
-              <strong>${usuario.nombre}</strong> (${usuario.email}) - ${usuario.role}
-            </div>
-          `).join('')}
-          ${usuariosEmpresa.length === 0 ? '<p style="text-align: center; color: rgba(255,255,255,0.5);">No hay usuarios</p>' : ''}
-        </div>
-      </div>
-      
-      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-        <button class="btn" onclick="editEmpresa(${empresaId})" style="flex: 1;">
-          <i class="fas fa-edit"></i> Editar
-        </button>
-        <button class="btn btn-primary" onclick="accessAsJefeEmpresa(${empresaId})" style="flex: 1;">
-          <i class="fas fa-sign-in-alt"></i> Acceder como Jefe
-        </button>
-      </div>
-    </div>
-  `);
-}
-
-function editEmpresa(empresaId) {
-  const empresa = database.empresas.find(e => e.id === empresaId);
-  if (!empresa) return;
-  
-  showModal(`Editar Empresa: ${empresa.nombre}`, `
-    <div style="max-width: 600px;">
-      <div class="form-group">
-        <label>Razón Social</label>
-        <input type="text" id="editEmpresaNombre" value="${empresa.nombre || ''}">
-      </div>
-      
-      <div class="form-group">
-        <label>RUC</label>
-        <input type="text" id="editEmpresaRUC" value="${empresa.ruc || ''}">
-      </div>
-      
-      <div class="form-group">
-        <label>Contacto</label>
-        <input type="text" id="editEmpresaContacto" value="${empresa.contacto || ''}">
-      </div>
-      
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="editEmpresaEmail" value="${empresa.email || ''}">
-      </div>
-      
-      <div class="form-group">
-        <label>Teléfono</label>
-        <input type="text" id="editEmpresaTelefono" value="${empresa.telefono || ''}">
-      </div>
-      
-      <div class="form-group">
-        <label>Estado</label>
-        <select id="editEmpresaEstado">
-          <option value="Activa" ${empresa.estado === 'Activa' ? 'selected' : ''}>Activa</option>
-          <option value="Inactiva" ${empresa.estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
-          <option value="Pendiente">Pendiente</option>
-        </select>
-      </div>
-      
-      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
-          Cancelar
-        </button>
-        <button class="btn btn-primary" onclick="guardarEdicionEmpresa(${empresaId})" style="flex: 1;">
-          <i class="fas fa-save"></i> Guardar Cambios
-        </button>
-      </div>
-    </div>
-  `);
-}
-
-function guardarEdicionEmpresa(empresaId) {
-  const empresaData = {
-    token: localStorage.getItem('nexial_token'),
-    id: empresaId,
-    nombre: document.getElementById('editEmpresaNombre').value,
-    ruc: document.getElementById('editEmpresaRUC').value,
-    contacto: document.getElementById('editEmpresaContacto').value,
-    email: document.getElementById('editEmpresaEmail').value,
-    telefono: document.getElementById('editEmpresaTelefono').value,
-    estado: document.getElementById('editEmpresaEstado').value
-  };
-  
-  fetch('https://script.google.com/macros/s/AKfycbwoPv3w2uikXap4YOI4V97iVQ3gpWPpcDqDnbQV2TBrfCwAL2gb1HoOMEGG6QbxRtKEOg/exec', {
-    method: 'POST',
-    body: JSON.stringify({
-      action: 'updateEmpresa',
-      ...empresaData
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.success) {
-      showNotification('success', 'Éxito', 'Empresa actualizada');
-      closeModal();
-      loadSuperDashboard();
-    } else {
-      showNotification('error', 'Error', data.error);
-    }
-  });
-}
-
-function accessAsJefeEmpresa(empresaId) {
-  const empresa = database.empresas.find(e => e.id === empresaId);
-  if (!empresa) return;
-  
-  showConfirmation(
-    'Acceder como Jefe',
-    `¿Acceder a la empresa "${empresa.nombre}" como jefe?`,
-    function() {
-      // Cambiar temporalmente el rol del usuario actual
-      currentUser.role = 'jefe';
-      currentUser.empresa = empresa.nombre;
-      currentUser.empresa_id = empresaId;
-      currentCompany = empresa;
-      
-      // Reconfigurar interfaz
-      configureInterface();
-      
-      showNotification('success', 'Modo Jefe', `Ahora eres jefe de ${empresa.nombre}`);
-    }
-  );
-}
-
-function loadEmpresasManagement() {
-  document.getElementById('pageTitle').textContent = 'Gestión de Empresas - Super Admin';
-  
-  document.getElementById('viewSuper').innerHTML = `
-    <div class="table-card">
-      <div class="table-header">
-        <h3 class="table-title">Empresas del Sistema</h3>
-        <div class="table-actions">
-          <button class="btn btn-primary" onclick="showNuevaEmpresaModal()">
-            <i class="fas fa-plus"></i> Nueva Empresa
-          </button>
-          <button class="btn" onclick="loadSuperDashboard()">
-            <i class="fas fa-arrow-left"></i> Volver al Dashboard
-          </button>
-        </div>
-      </div>
-      
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Empresa</th>
-              <th>RUC</th>
-              <th>Contacto</th>
-              <th>Estado</th>
-              <th>Usuarios</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${database.empresas.map(empresa => {
-              const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresa.id);
-              return `
-                <tr>
-                  <td><code>${empresa.id}</code></td>
-                  <td>
-                    <strong>${empresa.nombre}</strong><br>
-                    <small style="color: rgba(255,255,255,0.5);">${empresa.email || ''}</small>
-                  </td>
-                  <td>${empresa.ruc || ''}</td>
-                  <td>${empresa.contacto || ''}</td>
-                  <td>
-                    <span class="status-badge ${empresa.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
-                      ${empresa.estado || 'Inactiva'}
-                    </span>
-                  </td>
-                  <td>${usuariosEmpresa.length}</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.id}')" title="Ver Detalles">
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button class="action-btn edit" onclick="editEmpresa('${empresa.id}')" title="Editar">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button class="action-btn view" onclick="manageUsuariosEmpresa('${empresa.id}')" title="Usuarios">
-                        <i class="fas fa-users"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
-
-function manageUsuariosEmpresa(empresaId) {
-  const empresa = database.empresas.find(e => e.id === empresaId);
-  if (!empresa) return;
-  
-  showModal(`Usuarios de ${empresa.nombre}`, `
-    <div style="max-width: 800px;">
-      <div style="margin-bottom: 1.5rem;">
-        <button class="btn btn-primary" onclick="showNuevoUsuarioModal('${empresaId}')">
-          <i class="fas fa-user-plus"></i> Agregar Usuario
-        </button>
-      </div>
-      
-      <div style="max-height: 400px; overflow-y: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="border-bottom: 1px solid rgba(124,58,237,0.3);">
-              <th style="padding: 0.5rem; text-align: left;">Nombre</th>
-              <th style="padding: 0.5rem; text-align: left;">Email</th>
-              <th style="padding: 0.5rem; text-align: left;">Rol</th>
-              <th style="padding: 0.5rem; text-align: left;">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${database.usuarios.filter(u => u.empresa_id === empresaId).map(usuario => `
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <td style="padding: 0.5rem;">${usuario.nombre}</td>
-                <td style="padding: 0.5rem;">${usuario.email}</td>
-                <td style="padding: 0.5rem;">
-                  <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.role)}; font-size: 0.8rem;">
-                    ${usuario.role}
-                  </span>
-                </td>
-                <td style="padding: 0.5rem;">
-                  <span class="status-badge ${usuario.activo === 'Sí' ? 'status-active' : 'status-inactive'}">
-                    ${usuario.activo === 'Sí' ? 'Activo' : 'Inactivo'}
-                  </span>
-                </td>
-              </tr>
-            `).join('')}
-            ${database.usuarios.filter(u => u.empresa_id === empresaId).length === 0 ? `
-              <tr>
-                <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                  No hay usuarios para esta empresa
-                </td>
-              </tr>
-            ` : ''}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `);
-}
-
-function getRoleColor(role) {
-  switch(role) {
-    case 'super': return 'rgba(255,0,85,0.2)';
-    case 'jefe': return 'rgba(0,255,65,0.2)';
-    case 'comercial': return 'rgba(255,170,0,0.2)';
-    case 'admin': return 'rgba(0,170,255,0.2)';
-    case 'vendedor': return 'rgba(124,58,237,0.2)';
-    default: return 'rgba(255,255,255,0.1)';
-  }
-}
-
-function showNuevoUsuarioModal(empresaId) {
-  const empresa = database.empresas.find(e => e.id === empresaId);
-  showModal(`Nuevo Usuario - ${empresa.nombre}`, `
-    <div style="max-width: 500px;">
-      <div class="form-group">
-        <label>Nombre Completo *</label>
-        <input type="text" id="nuevoUsuarioNombre" placeholder="Juan Pérez">
-      </div>
-      
-      <div class="form-group">
-        <label>Email *</label>
-        <input type="email" id="nuevoUsuarioEmail" placeholder="usuario@empresa.com">
-      </div>
-      
-      <div class="form-group">
-        <label>Rol *</label>
-        <select id="nuevoUsuarioRol">
-          <option value="jefe">Jefe Empresa</option>
-          <option value="comercial">Dirección Comercial</option>
-          <option value="admin">Administración y Finanzas</option>
-          <option value="vendedor">Vendedor App</option>
-          <option value="almacen">Almacén App</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label>Contraseña *</label>
-        <input type="text" id="nuevoUsuarioPassword" value="123">
-      </div>
-      
-      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-        <button class="btn" onclick="closeModal()" style="flex: 1; background: rgba(255,255,255,0.05);">
-          Cancelar
-        </button>
-        <button class="btn btn-primary" onclick="crearNuevoUsuario('${empresaId}')" style="flex: 1;">
-          <i class="fas fa-user-plus"></i> Crear Usuario
-        </button>
-      </div>
-    </div>
-  `);
-}
-
-function crearNuevoUsuario(empresaId) {
-  // Aquí implementarías la llamada a la API para crear usuario
-  showNotification('info', 'En desarrollo', 'Función de creación de usuarios en desarrollo');
-}
+        function markAllAsRead() {
+            notifications.forEach(n => n.read = true);
+            document.querySelector('.notification-badge').textContent = '0';
+            closeModal();
+        }
 
         // =============================================
         // FUNCIONES DE INICIALIZACIÓN Y SESIÓN
         // =============================================
         function startSession() {
+            // Verificar si hay sesión guardada
+            const savedUser = localStorage.getItem('nexial_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+            }
+            
+            if (!currentUser) {
+                console.log('No hay usuario autenticado');
+                return;
+            }
+            
             // Ocultar login, mostrar panel de control
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboardScreen').style.display = 'block';
@@ -3264,6 +2505,8 @@ function crearNuevoUsuario(empresaId) {
             
             // Mostrar notificación de bienvenida
             showNotification('success', 'Sesión iniciada', `Bienvenido ${currentUser.nombre}`);
+            
+            console.log('Usuario autenticado:', currentUser);
         }
 
         function logout() {
@@ -3271,6 +2514,9 @@ function crearNuevoUsuario(empresaId) {
             currentUser = null;
             currentRole = '';
             currentCompany = null;
+            
+            // Limpiar localStorage
+            localStorage.removeItem('nexial_user');
             
             // Mostrar login, ocultar panel de control
             document.getElementById('dashboardScreen').style.display = 'none';
@@ -3281,6 +2527,14 @@ function crearNuevoUsuario(empresaId) {
             document.getElementById('username').focus();
             
             showNotification('info', 'Sesión cerrada', 'Has cerrado sesión exitosamente');
+        }
+
+        function accessComercial() {
+            showNotification('info', 'En desarrollo', 'Función Dirección Comercial en desarrollo');
+        }
+
+        function accessAdmin() {
+            showNotification('info', 'En desarrollo', 'Función Administración y Finanzas en desarrollo');
         }
 
         // =============================================
@@ -3334,8 +2588,20 @@ function crearNuevoUsuario(empresaId) {
             // Auto-focus en el campo de usuario
             document.getElementById('username').focus();
             
+            // Verificar si hay sesión activa
+            const savedUser = localStorage.getItem('nexial_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    startSession();
+                } catch (e) {
+                    console.error('Error al cargar sesión:', e);
+                }
+            }
+            
             console.log('🚀 Nexial Suite Panel de Control inicializado');
             console.log('📊 Sistema Corporativo Multiempresa v3.0');
+            console.log('👑 Usuario: marcelodanielcc@gmail.com / 789');
         });
     </script>
 </body>
