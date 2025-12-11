@@ -987,11 +987,6 @@
                         <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
                     </button>
                 </div>
-                
-                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
-                    <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
-                    <p><strong>Demo:</strong> admin | Contraseña: 123</p>
-                </div>
             </form>
         </div>
     </div>
@@ -1380,41 +1375,30 @@
                     startSession();
                 } else {
                     // Si no funciona con API, probar usuarios demo
-                    const demoUsers = {
-                        'marcelodanielcc@gmail.com': { 
-                            password: '789', 
-                            role: 'super', 
-                            nombre: 'Administrador Corporativo', 
-                            empresa: 'NEXIAL SUITE' 
-                        },
-                        'admin': { 
-                            password: '123', 
-                            role: 'super', 
-                            nombre: 'Administrador Demo', 
-                            empresa: 'NEXIAL SUITE' 
-                        }
-                    };
-                    
-                    if (demoUsers[username] && demoUsers[username].password === password) {
-                        currentUser = {
-                            id: 'SUPER-ADMIN-001',
-                            username: username,
-                            role: 'super',
-                            nombre: demoUsers[username].nombre,
-                            empresa: demoUsers[username].empresa,
-                            email: username
-                        };
-                        
-                        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
-                        startSession();
-                    } else {
-                        alert('Usuario o contraseña incorrectos\n\nUsa: marcelodanielcc@gmail.com / 789');
-                    }
-                }
-            } catch (error) {
-                console.error('Error en login:', error);
-                alert('Error de conexión. Intenta con: marcelodanielcc@gmail.com / 789');
-            } finally {
+                    try {
+    const result = await fetchFromAPI('login', {
+        email: username,
+        password: password
+    });
+    
+    if (result && result.success) {
+        currentUser = result.user;
+        currentUser.token = result.token;
+        
+        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
+        localStorage.setItem('nexial_token', result.token);
+        
+        await loadEmpresasFromAPI();
+        await loadUsuariosFromAPI();
+        
+        startSession();
+    } else {
+        alert('Usuario o contraseña incorrectos');
+    }
+} catch (error) {
+    console.error('Error en login:', error);
+    alert('Error de conexión con el servidor');
+} finally {
                 hideLoading();
             }
         }
@@ -1957,18 +1941,77 @@
         }
 
         async function crearNuevaEmpresa() {
-            showLoading();
+    showLoading();
+    
+    const empresaData = {
+        nombre: document.getElementById('nuevaEmpresaNombre').value,
+        ruc: document.getElementById('nuevaEmpresaRUC').value,
+        industria: document.getElementById('nuevaEmpresaIndustria').value,
+        contacto: document.getElementById('nuevaEmpresaContacto').value,
+        email: document.getElementById('nuevaEmpresaEmail').value,
+        telefono: document.getElementById('nuevaEmpresaTelefono').value,
+        password: document.getElementById('nuevaEmpresaPassword').value,
+        estado: document.getElementById('nuevaEmpresaEstado').value
+    };
+    
+    // Validar campos requeridos
+    const required = ['nombre', 'ruc', 'contacto', 'email', 'telefono', 'password'];
+    for (const field of required) {
+        if (!empresaData[field]) {
+            showNotification('error', 'Error', `Complete el campo: ${field}`);
+            hideLoading();
+            return;
+        }
+    }
+    
+    // Validar formato de RUC (11 dígitos para Perú)
+    if (empresaData.ruc.length !== 11 || !/^\d+$/.test(empresaData.ruc)) {
+        showNotification('error', 'Error', 'RUC debe tener 11 dígitos numéricos');
+        hideLoading();
+        return;
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(empresaData.email)) {
+        showNotification('error', 'Error', 'Ingrese un email válido');
+        hideLoading();
+        return;
+    }
+    
+    try {
+        // Separar nombre del contacto
+        const nombreParts = empresaData.contacto.split(' ');
+        empresaData.primer_nombre = nombreParts[0] || '';
+        empresaData.primer_apellido = nombreParts.length > 1 ? nombreParts[1] : '';
+        
+        // Crear email para el jefe basado en el contacto
+        const contactoEmail = empresaData.contacto.toLowerCase().replace(/\s+/g, '.') + '@' + 
+                            empresaData.email.split('@')[1];
+        empresaData.email_jefe = contactoEmail;
+        
+        // Llamar a la API para crear empresa
+        const result = await postToAPI('registerCompany', empresaData);
+        
+        if (result && result.success) {
+            showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
             
-            const empresaData = {
-                nombre: document.getElementById('nuevaEmpresaNombre').value,
-                ruc: document.getElementById('nuevaEmpresaRUC').value,
-                industria: document.getElementById('nuevaEmpresaIndustria').value,
-                contacto: document.getElementById('nuevaEmpresaContacto').value,
-                email: document.getElementById('nuevaEmpresaEmail').value,
-                telefono: document.getElementById('nuevaEmpresaTelefono').value,
-                password: document.getElementById('nuevaEmpresaPassword').value,
-                estado: document.getElementById('nuevaEmpresaEstado').value
-            };
+            // Recargar datos
+            await loadEmpresasFromAPI();
+            await loadUsuariosFromAPI();
+            
+            closeModal();
+            loadSuperDashboard();
+        } else {
+            showNotification('error', 'Error', result?.error || 'Error al crear empresa');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('error', 'Error', 'Error de conexión con la API');
+    } finally {
+        hideLoading();
+    }
+};
             
             // Agregar datos de contacto separados
             const nombreParts = empresaData.contacto.split(' ');
@@ -2705,7 +2748,6 @@
             console.log('🚀 Nexial Suite Panel de Control inicializado');
             console.log('📊 Sistema Corporativo Multiempresa v3.0');
             console.log('🌐 API URL:', API_URL);
-            console.log('👑 Usuario: marcelodanielcc@gmail.com / 789');
         });
     </script>
 </body>
