@@ -1101,80 +1101,121 @@
         // LOGIN FUNCIONAL CON TU USUARIO
         // =============================================
 
-        async function login() {
-            const user = document.getElementById('loginUser').value;
-            const pass = document.getElementById('loginPass').value;
+        async function registerCompanyStep2(event) {
+            event.preventDefault();
             
-            if (!user || !pass) {
-                alert('Complete usuario y contraseña');
+            if (!registeredCompanyData) {
+                alert('Error: Datos de empresa no encontrados. Por favor comience de nuevo.');
+                closeCardModal();
+                openRegisterModal();
                 return;
             }
             
+            const cardData = {
+                tarjeta_numero: document.getElementById('cardNumber').value.replace(/\s/g, ''),
+                tarjeta_vencimiento: document.getElementById('cardExpiry').value,
+                tarjeta_cvv: document.getElementById('cardCVV').value,
+                tarjeta_nombre: document.getElementById('cardName').value
+            };
+            
+            // Validar datos de tarjeta
+            if (!cardData.tarjeta_numero || !cardData.tarjeta_vencimiento || 
+                !cardData.tarjeta_cvv || !cardData.tarjeta_nombre) {
+                alert('Complete todos los datos de la tarjeta');
+                return;
+            }
+            
+            // Mostrar loading
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
+            submitBtn.disabled = true;
+            
             try {
-                // Intentar login con API
-                const response = await fetch(`${API_URL}?action=login&email=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`);
-                const data = await response.json();
+                // Combinar datos
+                const fullData = {
+                    ...registeredCompanyData,
+                    ...cardData
+                };
                 
-                if (data.success) {
-                    // Guardar datos de sesión
-                    localStorage.setItem('nexial_user', JSON.stringify(data.user));
-                    localStorage.setItem('nexial_token', data.token || 'demo_token');
-                    
-                    // Redirigir al dashboard
-                    window.location.href = 'dashboard.html';
-                } else {
-                    // Si falla API, probar usuarios demo
-                    if (user === 'marcelodanielcc@gmail.com' && pass === '789') {
-                        // Usuario super admin
-                        const demoUser = {
-                            id: 'super_001',
-                            nombre: 'Marcelo Daniel Condori',
-                            email: 'marcelodanielcc@gmail.com',
-                            role: 'super',
-                            empresa: 'Nexial Suite',
-                            empresa_id: 'global'
-                        };
-                        
-                        localStorage.setItem('nexial_user', JSON.stringify(demoUser));
-                        localStorage.setItem('nexial_token', 'demo_super_token');
-                        window.location.href = 'dashboard.html';
-                    } else if (user === 'admin' && pass === '123') {
-                        // Usuario admin demo
-                        const demoUser = {
-                            id: 'admin_001',
-                            nombre: 'Administrador Demo',
-                            email: 'admin@demo.com',
-                            role: 'jefe',
-                            empresa: 'Empresa Demo',
-                            empresa_id: 'demo_001'
-                        };
-                        
-                        localStorage.setItem('nexial_user', JSON.stringify(demoUser));
-                        localStorage.setItem('nexial_token', 'demo_admin_token');
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        alert('Usuario o contraseña incorrectos');
+                console.log('Datos a enviar:', fullData);
+                
+                // Llamar a la API REAL
+                const formData = new FormData();
+                formData.append('action', 'registerCompany');
+                
+                // Agregar todos los datos
+                Object.keys(fullData).forEach(key => {
+                    if (fullData[key] !== undefined && fullData[key] !== null) {
+                        formData.append(key, fullData[key]);
                     }
-                }
-            } catch (error) {
-                console.error('Error en login:', error);
-                // Modo offline/demo
-                if (user === 'marcelodanielcc@gmail.com' && pass === '789') {
-                    const demoUser = {
-                        id: 'super_001',
-                        nombre: 'Marcelo Daniel Condori',
-                        email: 'marcelodanielcc@gmail.com',
-                        role: 'super',
-                        empresa: 'Nexial Suite',
-                        empresa_id: 'global'
-                    };
+                });
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log('Respuesta de API:', result);
+                
+                if (result && result.success) {
+                    // Mostrar mensaje de éxito con información real de la API
+                    closeCardModal();
                     
-                    localStorage.setItem('nexial_user', JSON.stringify(demoUser));
-                    localStorage.setItem('nexial_token', 'demo_offline_token');
-                    window.location.href = 'dashboard.html';
+                    const successModal = document.createElement('div');
+                    successModal.className = 'cyber-modal';
+                    successModal.style.display = 'flex';
+                    successModal.innerHTML = `
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 style="color: var(--success);"><i class="fas fa-check-circle"></i> ¡REGISTRO EXITOSO!</h2>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                                <h3 style="color: var(--secondary); margin-bottom: 1rem;">¡Bienvenido a Nexial Suite!</h3>
+                                
+                                <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                                    <p><strong>Empresa:</strong> ${registeredCompanyData.nombre}</p>
+                                    <p><strong>ID de Empresa:</strong> ${result.empresa_id}</p>
+                                    <p><strong>Email Jefe:</strong> ${result.email_jefe}</p>
+                                    <p><strong>Contraseña:</strong> La que registró</p>
+                                    <p><strong>Usuario ID:</strong> ${result.user_id}</p>
+                                </div>
+                                
+                                <div class="info-banner">
+                                    <h4><i class="fas fa-gift"></i> PRUEBA GRATUITA ACTIVADA</h4>
+                                    <p>Tienes 30 días completos de acceso gratuito a todas las funciones.</p>
+                                    <p>Mensaje: ${result.message}</p>
+                                </div>
+                                
+                                <div style="margin-top: 2rem;">
+                                    <button class="cyber-btn" onclick="accessAfterRegister('${result.email_jefe}')" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                                        <i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA
+                                    </button>
+                                    <button class="cyber-btn" onclick="closeSuccessModal(this)" style="width: 100%; margin-top: 1rem; background: rgba(255,255,255,0.05); color: white;">
+                                        CERRAR
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(successModal);
+                    document.body.style.overflow = 'hidden';
+                    
                 } else {
-                    alert('Error de conexión. Intenta con usuario demo:\n\nSuperusuario: marcelodanielcc@gmail.com / 789\nDemo: admin / 123');
+                    alert('Error en el registro: ' + (result?.error || 'Error desconocido'));
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
                 }
+                
+            } catch (error) {
+                console.error('Error en registro:', error);
+                alert('Error de conexión con el servidor. Por favor intente nuevamente.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
         }
         
