@@ -948,48 +948,6 @@
     </style>
 </head>
 <body>
-    <!-- ===== PANTALLA DE LOGIN ===== -->
-    <div id="loginScreen">
-        <div class="login-card">
-            <div class="login-header">
-                <h1>NEXIAL SUITE</h1>
-                <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 1.5rem;">Sistema Corporativo Integral</p>
-            </div>
-            
-            <form id="loginForm" onsubmit="login(event)">
-                <div class="form-group">
-                    <label for="username"><i class="fas fa-user"></i> Usuario o Email</label>
-                    <input type="text" id="username" placeholder="usuario@empresa.com" required autofocus>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password"><i class="fas fa-key"></i> Contraseña</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="password" placeholder="Tu contraseña" required>
-                        <button type="button" class="toggle-password" onclick="togglePassword()">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div style="text-align: right; margin-bottom: 1.5rem;">
-                    <a href="#" onclick="showPasswordRecovery()" style="color: var(--primary); font-size: 0.9rem;">
-                        <i class="fas fa-unlock-alt"></i> ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
-                
-                <div class="login-actions">
-                    <button type="button" class="btn" onclick="window.location.href='index.html'" 
-                            style="background: rgba(255,255,255,0.05); color: white;">
-                        <i class="fas fa-home"></i> Página Principal
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- ===== PANEL DE CONTROL PRINCIPAL ===== -->
     <div id="dashboardScreen">
@@ -1364,41 +1322,67 @@
                     currentUser = result.user;
                     currentUser.token = result.token;
                     
-                    // Guardar en localStorage
                     localStorage.setItem('nexial_user', JSON.stringify(currentUser));
                     localStorage.setItem('nexial_token', result.token);
                     
-                    // Cargar datos iniciales
                     await loadEmpresasFromAPI();
                     await loadUsuariosFromAPI();
                     
                     startSession();
                 } else {
-                    // Si no funciona con API, probar usuarios demo
-                    try {
-    const result = await fetchFromAPI('login', {
-        email: username,
-        password: password
-    });
-    
-    if (result && result.success) {
-        currentUser = result.user;
-        currentUser.token = result.token;
-        
-        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
-        localStorage.setItem('nexial_token', result.token);
-        
-        await loadEmpresasFromAPI();
-        await loadUsuariosFromAPI();
-        
-        startSession();
-    } else {
-        alert('Usuario o contraseña incorrectos');
-    }
-} catch (error) {
-    console.error('Error en login:', error);
-    alert('Error de conexión con el servidor');
-} finally {
+                    // Si falla, probar usuarios demo
+                    if (username === 'marcelodanielcc@gmail.com' && password === '789') {
+                        // Usuario super admin
+                        currentUser = {
+                            id: 'super_001',
+                            nombre: 'Marcelo Daniel Condori',
+                            email: 'marcelodanielcc@gmail.com',
+                            role: 'super',
+                            empresa: 'Nexial Suite',
+                            empresa_id: 'global'
+                        };
+                        
+                        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
+                        localStorage.setItem('nexial_token', 'demo_super_token');
+                        startSession();
+                    } else if (username === 'admin' && password === '123') {
+                        // Usuario admin demo
+                        currentUser = {
+                            id: 'admin_001',
+                            nombre: 'Administrador Demo',
+                            email: 'admin@demo.com',
+                            role: 'jefe',
+                            empresa: 'Empresa Demo',
+                            empresa_id: 'demo_001'
+                        };
+                        
+                        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
+                        localStorage.setItem('nexial_token', 'demo_admin_token');
+                        startSession();
+                    } else {
+                        alert('Usuario o contraseña incorrectos');
+                    }
+                }
+            } catch (error) {
+                console.error('Error en login:', error);
+                // Modo offline/demo
+                if (username === 'marcelodanielcc@gmail.com' && password === '789') {
+                    currentUser = {
+                        id: 'super_001',
+                        nombre: 'Marcelo Daniel Condori',
+                        email: 'marcelodanielcc@gmail.com',
+                        role: 'super',
+                        empresa: 'Nexial Suite',
+                        empresa_id: 'global'
+                    };
+                    
+                    localStorage.setItem('nexial_user', JSON.stringify(currentUser));
+                    localStorage.setItem('nexial_token', 'demo_offline_token');
+                    startSession();
+                } else {
+                    alert('Error de conexión. Usuario demo: marcelodanielcc@gmail.com / 789');
+                }
+            } finally {
                 hideLoading();
             }
         }
