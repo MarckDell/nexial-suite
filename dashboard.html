@@ -2748,6 +2748,14 @@
             console.log('🚀 Nexial Suite Panel de Control inicializado');
             console.log('📊 Sistema Corporativo Multiempresa v3.0');
             console.log('🌐 API URL:', API_URL);
+            console.log('🔧 API URL configurada:', API_URL);
+            console.log('🔧 Probando conexión con API...');
+
+            // Test simple de conexión
+            fetch(`${API_URL}?action=test`)
+                .then(r => r.json())
+                .then(data => console.log('✅ Test API:', data))
+                .catch(err => console.error('❌ Error API:', err));
         });
     </script>
 </body>
