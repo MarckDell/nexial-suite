@@ -948,6 +948,53 @@
     </style>
 </head>
 <body>
+    <!-- ===== PANEL DE LOGIN ===== -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-header">
+                <h1><i class="fas fa-brain"></i> NEXIAL SUITE</h1>
+                <p style="color: rgba(255,255,255,0.7);">Sistema Corporativo Multiempresa</p>
+            </div>
+            
+            <form id="loginForm" onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> Usuario o Email</label>
+                    <input type="text" id="username" placeholder="usuario@empresa.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-key"></i> Contraseña</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="Tu contraseña" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="text-align: right; margin-bottom: 1.5rem;">
+                    <a href="#" onclick="showPasswordRecovery()" style="color: var(--primary); font-size: 0.9rem;">
+                        <i class="fas fa-unlock-alt"></i> ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+                
+                <div class="login-actions">
+                    <button type="button" class="btn" onclick="window.location.href='index.html'" 
+                            style="background: rgba(255,255,255,0.05); color: white;">
+                        <i class="fas fa-home"></i> Página Principal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
+                    </button>
+                </div>
+                
+                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
+                    <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
+                    <p><strong>Demo:</strong> admin | Contraseña: 123</p>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- ===== PANEL DE CONTROL PRINCIPAL ===== -->
     <div id="dashboardScreen">
@@ -1925,85 +1972,21 @@
         }
 
         async function crearNuevaEmpresa() {
-    showLoading();
-    
-    const empresaData = {
-        nombre: document.getElementById('nuevaEmpresaNombre').value,
-        ruc: document.getElementById('nuevaEmpresaRUC').value,
-        industria: document.getElementById('nuevaEmpresaIndustria').value,
-        contacto: document.getElementById('nuevaEmpresaContacto').value,
-        email: document.getElementById('nuevaEmpresaEmail').value,
-        telefono: document.getElementById('nuevaEmpresaTelefono').value,
-        password: document.getElementById('nuevaEmpresaPassword').value,
-        estado: document.getElementById('nuevaEmpresaEstado').value
-    };
-    
-    // Validar campos requeridos
-    const required = ['nombre', 'ruc', 'contacto', 'email', 'telefono', 'password'];
-    for (const field of required) {
-        if (!empresaData[field]) {
-            showNotification('error', 'Error', `Complete el campo: ${field}`);
-            hideLoading();
-            return;
-        }
-    }
-    
-    // Validar formato de RUC (11 dígitos para Perú)
-    if (empresaData.ruc.length !== 11 || !/^\d+$/.test(empresaData.ruc)) {
-        showNotification('error', 'Error', 'RUC debe tener 11 dígitos numéricos');
-        hideLoading();
-        return;
-    }
-    
-    // Validar email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(empresaData.email)) {
-        showNotification('error', 'Error', 'Ingrese un email válido');
-        hideLoading();
-        return;
-    }
-    
-    try {
-        // Separar nombre del contacto
-        const nombreParts = empresaData.contacto.split(' ');
-        empresaData.primer_nombre = nombreParts[0] || '';
-        empresaData.primer_apellido = nombreParts.length > 1 ? nombreParts[1] : '';
-        
-        // Crear email para el jefe basado en el contacto
-        const contactoEmail = empresaData.contacto.toLowerCase().replace(/\s+/g, '.') + '@' + 
-                            empresaData.email.split('@')[1];
-        empresaData.email_jefe = contactoEmail;
-        
-        // Llamar a la API para crear empresa
-        const result = await postToAPI('registerCompany', empresaData);
-        
-        if (result && result.success) {
-            showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
+            showLoading();
             
-            // Recargar datos
-            await loadEmpresasFromAPI();
-            await loadUsuariosFromAPI();
-            
-            closeModal();
-            loadSuperDashboard();
-        } else {
-            showNotification('error', 'Error', result?.error || 'Error al crear empresa');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('error', 'Error', 'Error de conexión con la API');
-    } finally {
-        hideLoading();
-    }
-};
-            
-            // Agregar datos de contacto separados
-            const nombreParts = empresaData.contacto.split(' ');
-            empresaData.primer_nombre = nombreParts[0] || '';
-            empresaData.primer_apellido = nombreParts[1] || '';
+            const empresaData = {
+                nombre: document.getElementById('nuevaEmpresaNombre').value,
+                ruc: document.getElementById('nuevaEmpresaRUC').value,
+                industria: document.getElementById('nuevaEmpresaIndustria').value,
+                contacto: document.getElementById('nuevaEmpresaContacto').value,
+                email: document.getElementById('nuevaEmpresaEmail').value,
+                telefono: document.getElementById('nuevaEmpresaTelefono').value,
+                password: document.getElementById('nuevaEmpresaPassword').value,
+                estado: document.getElementById('nuevaEmpresaEstado').value
+            };
             
             // Validar campos requeridos
-            const required = ['nombre', 'ruc', 'email', 'telefono', 'password'];
+            const required = ['nombre', 'ruc', 'contacto', 'email', 'telefono', 'password'];
             for (const field of required) {
                 if (!empresaData[field]) {
                     showNotification('error', 'Error', `Complete el campo: ${field}`);
@@ -2012,7 +1995,32 @@
                 }
             }
             
+            // Validar formato de RUC (11 dígitos para Perú)
+            if (empresaData.ruc.length !== 11 || !/^\d+$/.test(empresaData.ruc)) {
+                showNotification('error', 'Error', 'RUC debe tener 11 dígitos numéricos');
+                hideLoading();
+                return;
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(empresaData.email)) {
+                showNotification('error', 'Error', 'Ingrese un email válido');
+                hideLoading();
+                return;
+            }
+            
             try {
+                // Separar nombre del contacto
+                const nombreParts = empresaData.contacto.split(' ');
+                empresaData.primer_nombre = nombreParts[0] || '';
+                empresaData.primer_apellido = nombreParts.length > 1 ? nombreParts[1] : '';
+                
+                // Crear email para el jefe basado en el contacto
+                const contactoEmail = empresaData.contacto.toLowerCase().replace(/\s+/g, '.') + '@' + 
+                                    empresaData.email.split('@')[1];
+                empresaData.email_jefe = contactoEmail;
+                
                 // Llamar a la API para crear empresa
                 const result = await postToAPI('registerCompany', empresaData);
                 
@@ -2029,6 +2037,7 @@
                     showNotification('error', 'Error', result?.error || 'Error al crear empresa');
                 }
             } catch (error) {
+                console.error('Error:', error);
                 showNotification('error', 'Error', 'Error de conexión con la API');
             } finally {
                 hideLoading();
@@ -2744,4 +2753,3 @@
     </script>
 </body>
 </html>
-
