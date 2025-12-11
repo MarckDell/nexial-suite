@@ -1099,7 +1099,7 @@
         // =============================================
         // LOGIN FUNCIONAL CON TU USUARIO
         // =============================================
-        
+
         async function login() {
             const user = document.getElementById('loginUser').value;
             const pass = document.getElementById('loginPass').value;
@@ -1110,22 +1110,72 @@
             }
             
             try {
-    const response = await fetch(`${API_URL}?action=login&email=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`);
-    const data = await response.json();
-    
-    if (data.success) {
-        localStorage.setItem('nexial_user', JSON.stringify(data.user));
-        localStorage.setItem('nexial_token', data.token);
-        window.location.href = 'dashboard.html';
-    } else {
-        alert('Credenciales incorrectas');
-    }
-} catch (error) {
-    console.error('Error en login:', error);
-    alert('Error de conexión con el servidor');
-}
+                // Intentar login con API
+                const response = await fetch(`${API_URL}?action=login&email=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Guardar datos de sesión
+                    localStorage.setItem('nexial_user', JSON.stringify(data.user));
+                    localStorage.setItem('nexial_token', data.token || 'demo_token');
+                    
+                    // Redirigir al dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Si falla API, probar usuarios demo
+                    if (user === 'marcelodanielcc@gmail.com' && pass === '789') {
+                        // Usuario super admin
+                        const demoUser = {
+                            id: 'super_001',
+                            nombre: 'Marcelo Daniel Condori',
+                            email: 'marcelodanielcc@gmail.com',
+                            role: 'super',
+                            empresa: 'Nexial Suite',
+                            empresa_id: 'global'
+                        };
+                        
+                        localStorage.setItem('nexial_user', JSON.stringify(demoUser));
+                        localStorage.setItem('nexial_token', 'demo_super_token');
+                        window.location.href = 'dashboard.html';
+                    } else if (user === 'admin' && pass === '123') {
+                        // Usuario admin demo
+                        const demoUser = {
+                            id: 'admin_001',
+                            nombre: 'Administrador Demo',
+                            email: 'admin@demo.com',
+                            role: 'jefe',
+                            empresa: 'Empresa Demo',
+                            empresa_id: 'demo_001'
+                        };
+                        
+                        localStorage.setItem('nexial_user', JSON.stringify(demoUser));
+                        localStorage.setItem('nexial_token', 'demo_admin_token');
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        alert('Usuario o contraseña incorrectos');
+                    }
+                }
+            } catch (error) {
+                console.error('Error en login:', error);
+                // Modo offline/demo
+                if (user === 'marcelodanielcc@gmail.com' && pass === '789') {
+                    const demoUser = {
+                        id: 'super_001',
+                        nombre: 'Marcelo Daniel Condori',
+                        email: 'marcelodanielcc@gmail.com',
+                        role: 'super',
+                        empresa: 'Nexial Suite',
+                        empresa_id: 'global'
+                    };
+                    
+                    localStorage.setItem('nexial_user', JSON.stringify(demoUser));
+                    localStorage.setItem('nexial_token', 'demo_offline_token');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert('Error de conexión. Intenta con usuario demo:\n\nSuperusuario: marcelodanielcc@gmail.com / 789\nDemo: admin / 123');
+                }
+            }
         }
-        
         // =============================================
         // REGISTRO PASO 1 - DATOS EMPRESA
         // =============================================
