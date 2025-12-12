@@ -1,5 +1,7 @@
-// Nexial Suite - Service Worker
-const CACHE_NAME = 'nexial-v3.0';
+// =============================================
+// REGIÓN: CONFIGURACIÓN DEL SERVICE WORKER
+// =============================================
+const CACHE_NAME = 'nexial-v3.0-bolivia';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -9,7 +11,9 @@ const urlsToCache = [
   'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
-// Instalar Service Worker
+// =============================================
+// EVENTO: INSTALAR SERVICE WORKER
+// =============================================
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -20,7 +24,9 @@ self.addEventListener('install', event => {
   );
 });
 
-// Interceptar solicitudes
+// =============================================
+// EVENTO: INTERCEPTAR SOLICITUDES
+// =============================================
 self.addEventListener('fetch', event => {
   // No cachear requests a Google Apps Script
   if (event.request.url.includes('script.google.com')) {
@@ -60,14 +66,16 @@ self.addEventListener('fetch', event => {
         if (event.request.url.includes('.html')) {
           return caches.match('/index.html');
         }
-        return new Response('Modo offline - Nexial Suite', {
+        return new Response('Modo offline - Nexial Suite Bolivia', {
           headers: { 'Content-Type': 'text/plain' }
         });
       })
   );
 });
 
-// Actualizar Service Worker
+// =============================================
+// EVENTO: ACTIVAR SERVICE WORKER
+// =============================================
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -83,7 +91,9 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Manejar notificaciones push
+// =============================================
+// EVENTO: MANEJAR NOTIFICACIONES PUSH
+// =============================================
 self.addEventListener('push', event => {
   const options = {
     body: event.data ? event.data.text() : 'Nueva notificación de Nexial Suite',
@@ -97,11 +107,13 @@ self.addEventListener('push', event => {
   };
   
   event.waitUntil(
-    self.registration.showNotification('Nexial Suite', options)
+    self.registration.showNotification('Nexial Suite Bolivia', options)
   );
 });
 
-// Manejar clics en notificaciones
+// =============================================
+// EVENTO: MANEJAR CLICS EN NOTIFICACIONES
+// =============================================
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   
