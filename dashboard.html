@@ -1606,7 +1606,7 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th style="display: none;">ID</th>
                                     <th>Empresa</th>
                                     <th>NIT</th>
                                     <th>Industria</th>
@@ -1627,7 +1627,7 @@
                                     const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresa.id);
                                     return `
                                         <tr>
-                                            <td><code>${empresa.id || 'N/A'}</code></td>
+                                            <td style="display: none;" data-id="${empresa.id || 'N/A'}">${empresa.id || 'N/A'}</td>
                                             <td>
                                                 <strong>${empresa.nombre}</strong>
                                             </td>
@@ -1903,61 +1903,73 @@
         // MÓDULO: MODALES PARA EMPRESAS
         // =============================================
         
-        // FUNCIÓN: Mostrar modal nueva empresa
+        // FUNCIÓN: Mostrar modal nueva empresa (CORREGIDO)
         function showNuevaEmpresaModal() {
             showModal('Nueva Empresa', `
                 <div style="max-width: 600px;">
                     <div class="form-group">
-                        <label>Razón Social *</label>
-                        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa S.A.">
+                        <label style="color: var(--secondary);">Razón Social *</label>
+                        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa S.A." style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>NIT (Bolivia) *</label>
-                        <input type="text" id="nuevaEmpresaNIT" placeholder="1234567890123">
+                        <label style="color: var(--secondary);">NIT (Bolivia) *</label>
+                        <input type="text" id="nuevaEmpresaNIT" placeholder="1234567890123" style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>Industria</label>
-                        <select id="nuevaEmpresaIndustria">
-                            <option value="Tecnología">Tecnología</option>
-                            <option value="Comercio">Comercio</option>
-                            <option value="Manufactura">Manufactura</option>
-                            <option value="Servicios">Servicios</option>
-                            <option value="Alimentos">Alimentos</option>
-                            <option value="Construcción">Construcción</option>
-                            <option value="Mineria">Minería</option>
-                            <option value="Agricultura">Agricultura</option>
-                            <option value="Turismo">Turismo</option>
+                        <label style="color: var(--secondary);">Industria *</label>
+                        <select id="nuevaEmpresaIndustria" style="color: white; background: rgba(255, 255, 255, 0.05);">
+                            <option value="" style="color: #666;">Seleccionar industria</option>
+                            <option value="Tecnología" style="color: white;">Tecnología</option>
+                            <option value="Comercio" style="color: white;">Comercio</option>
+                            <option value="Manufactura" style="color: white;">Manufactura</option>
+                            <option value="Servicios" style="color: white;">Servicios</option>
+                            <option value="Alimentos" style="color: white;">Alimentos</option>
+                            <option value="Construcción" style="color: white;">Construcción</option>
+                            <option value="Mineria" style="color: white;">Minería</option>
+                            <option value="Agricultura" style="color: white;">Agricultura</option>
+                            <option value="Turismo" style="color: white;">Turismo</option>
+                            <option value="Otros" style="color: white;">Otros</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label>Contacto Principal *</label>
-                        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez">
+                        <label style="color: var(--secondary);">Contacto Principal *</label>
+                        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez" style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com.bo">
+                        <label style="color: var(--secondary);">Email *</label>
+                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com.bo" style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>Teléfono/Celular *</label>
-                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+591 60000000">
+                        <label style="color: var(--secondary);">Teléfono/Celular *</label>
+                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+591 60000000" style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>Contraseña Jefe *</label>
-                        <input type="password" id="nuevaEmpresaPassword" value="12345678">
+                        <label style="color: var(--secondary);">Dirección</label>
+                        <input type="text" id="nuevaEmpresaDireccion" placeholder="Av. Principal #123" style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>Estado</label>
-                        <select id="nuevaEmpresaEstado">
-                            <option value="Activa">Activa</option>
-                            <option value="Inactiva">Inactiva</option>
-                            <option value="Pendiente">Pendiente</option>
+                        <label style="color: var(--secondary);">Ciudad</label>
+                        <input type="text" id="nuevaEmpresaCiudad" placeholder="La Paz" style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Contraseña Jefe *</label>
+                        <input type="password" id="nuevaEmpresaPassword" value="12345678" style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Estado</label>
+                        <select id="nuevaEmpresaEstado" style="color: white; background: rgba(255, 255, 255, 0.05);">
+                            <option value="Activa" style="color: white;">Activa</option>
+                            <option value="Inactiva" style="color: white;">Inactiva</option>
+                            <option value="Pendiente" style="color: white;">Pendiente</option>
                         </select>
                     </div>
                     
@@ -2101,105 +2113,116 @@
             `);
         }
         
-// FUNCIÓN: Editar empresa completa (todos los campos del Excel)
-function editEmpresaCompleta(empresaId) {
-    const empresa = database.empresas.find(e => e.id === empresaId);
-    if (!empresa) return;
-    
-    showModal(`Editar Empresa Completa: ${empresa.nombre}`, `
-        <div style="max-width: 700px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label>ID</label>
-                    <input type="text" id="editEmpresaId" value="${empresa.id || ''}" readonly style="background: rgba(255,255,255,0.1);">
-                </div>
-                
-                <div class="form-group">
-                    <label>Razón Social *</label>
-                    <input type="text" id="editEmpresaNombre" value="${empresa.nombre || ''}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>NIT *</label>
-                    <input type="text" id="editEmpresaNIT" value="${empresa.nit || empresa.ruc || ''}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Industria *</label>
-                    <select id="editEmpresaIndustria" required>
-                        <option value="">Seleccionar industria</option>
-                        <option value="Tecnología" ${empresa.industria === 'Tecnología' ? 'selected' : ''}>Tecnología</option>
-                        <option value="Comercio" ${empresa.industria === 'Comercio' ? 'selected' : ''}>Comercio</option>
-                        <option value="Manufactura" ${empresa.industria === 'Manufactura' ? 'selected' : ''}>Manufactura</option>
-                        <option value="Servicios" ${empresa.industria === 'Servicios' ? 'selected' : ''}>Servicios</option>
-                        <option value="Alimentos" ${empresa.industria === 'Alimentos' ? 'selected' : ''}>Alimentos</option>
-                        <option value="Construcción" ${empresa.industria === 'Construcción' ? 'selected' : ''}>Construcción</option>
-                        <option value="Mineria" ${empresa.industria === 'Mineria' ? 'selected' : ''}>Minería</option>
-                        <option value="Agricultura" ${empresa.industria === 'Agricultura' ? 'selected' : ''}>Agricultura</option>
-                        <option value="Turismo" ${empresa.industria === 'Turismo' ? 'selected' : ''}>Turismo</option>
-                        <option value="Otros" ${empresa.industria === 'Otros' ? 'selected' : ''}>Otros</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Contacto *</label>
-                    <input type="text" id="editEmpresaContacto" value="${empresa.contacto || ''}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Email *</label>
-                    <input type="email" id="editEmpresaEmail" value="${empresa.email || ''}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Teléfono *</label>
-                    <input type="text" id="editEmpresaTelefono" value="${empresa.telefono || ''}" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Dirección</label>
-                    <input type="text" id="editEmpresaDireccion" value="${empresa.direccion || ''}">
-                </div>
-                
-                <div class="form-group">
-                    <label>Ciudad</label>
-                    <input type="text" id="editEmpresaCiudad" value="${empresa.ciudad || ''}">
-                </div>
-                
-                <div class="form-group">
-                    <label>Estado *</label>
-                    <select id="editEmpresaEstado" required>
-                        <option value="Activa" ${empresa.estado === 'Activa' ? 'selected' : ''}>Activa</option>
-                        <option value="Inactiva" ${empresa.estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
-                        <option value="Pendiente" ${empresa.estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Tarjeta Registrada</label>
-                    <select id="editEmpresaTarjeta">
-                        <option value="Sí" ${empresa.tarjetaregistrada === 'Sí' ? 'selected' : ''}>Sí</option>
-                        <option value="No" ${empresa.tarjetaregistrada === 'No' ? 'selected' : ''}>No</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Fecha Registro</label>
-                    <input type="date" id="editEmpresaFechaRegistro" value="${empresa.fecharegistro ? empresa.fecharegistro.split(' ')[0] : ''}">
-                </div>
-            </div>
+        // FUNCIÓN: Editar empresa completa (SIN MOSTRAR ID PARA EDITAR)
+        function editEmpresaCompleta(empresaId) {
+            const empresa = database.empresas.find(e => e.id === empresaId);
+            if (!empresa) {
+                showNotification('error', 'Error', 'Empresa no encontrada');
+                return;
+            }
             
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                    Cancelar
-                </button>
-                <button class="btn btn-primary" onclick="guardarEdicionEmpresaCompleta('${empresaId}')" style="flex: 1;">
-                    <i class="fas fa-save"></i> Guardar Cambios
-                </button>
-            </div>
-        </div>
-    `);
-}
+            showModal(`Editar Empresa: ${empresa.nombre}`, `
+                <div style="max-width: 700px;">
+                    <!-- NO MOSTRAMOS EL ID PARA EDITAR -->
+                    <input type="hidden" id="editEmpresaId" value="${empresa.id || ''}">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Razón Social *</label>
+                            <input type="text" id="editEmpresaNombre" value="${empresa.nombre || ''}" required style="color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">NIT *</label>
+                            <input type="text" id="editEmpresaNIT" value="${empresa.nit || empresa.ruc || ''}" required style="color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Industria *</label>
+                            <select id="editEmpresaIndustria" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="" style="color: #666;">Seleccionar industria</option>
+                                <option value="Tecnología" ${empresa.industria === 'Tecnología' ? 'selected' : ''} style="color: white;">Tecnología</option>
+                                <option value="Comercio" ${empresa.industria === 'Comercio' ? 'selected' : ''} style="color: white;">Comercio</option>
+                                <option value="Manufactura" ${empresa.industria === 'Manufactura' ? 'selected' : ''} style="color: white;">Manufactura</option>
+                                <option value="Servicios" ${empresa.industria === 'Servicios' ? 'selected' : ''} style="color: white;">Servicios</option>
+                                <option value="Alimentos" ${empresa.industria === 'Alimentos' ? 'selected' : ''} style="color: white;">Alimentos</option>
+                                <option value="Construcción" ${empresa.industria === 'Construcción' ? 'selected' : ''} style="color: white;">Construcción</option>
+                                <option value="Mineria" ${empresa.industria === 'Mineria' ? 'selected' : ''} style="color: white;">Minería</option>
+                                <option value="Agricultura" ${empresa.industria === 'Agricultura' ? 'selected' : ''} style="color: white;">Agricultura</option>
+                                <option value="Turismo" ${empresa.industria === 'Turismo' ? 'selected' : ''} style="color: white;">Turismo</option>
+                                <option value="Otros" ${empresa.industria === 'Otros' ? 'selected' : ''} style="color: white;">Otros</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Contacto *</label>
+                            <input type="text" id="editEmpresaContacto" value="${empresa.contacto || ''}" required style="color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Email *</label>
+                            <input type="email" id="editEmpresaEmail" value="${empresa.email || ''}" required style="color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Teléfono *</label>
+                            <input type="text" id="editEmpresaTelefono" value="${empresa.telefono || ''}" required style="color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Dirección</label>
+                            <input type="text" id="editEmpresaDireccion" value="${empresa.direccion || ''}" style="color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Ciudad</label>
+                            <input type="text" id="editEmpresaCiudad" value="${empresa.ciudad || ''}" style="color: white;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Estado *</label>
+                            <select id="editEmpresaEstado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Activa" ${empresa.estado === 'Activa' ? 'selected' : ''} style="color: white;">Activa</option>
+                                <option value="Inactiva" ${empresa.estado === 'Inactiva' ? 'selected' : ''} style="color: white;">Inactiva</option>
+                                <option value="Pendiente" ${empresa.estado === 'Pendiente' ? 'selected' : ''} style="color: white;">Pendiente</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Tarjeta Registrada</label>
+                            <select id="editEmpresaTarjeta" style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Sí" ${empresa.tarjetaregistrada === 'Sí' ? 'selected' : ''} style="color: white;">Sí</option>
+                                <option value="No" ${empresa.tarjetaregistrada === 'No' ? 'selected' : ''} style="color: white;">No</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Fecha Registro</label>
+                            <input type="date" id="editEmpresaFechaRegistro" value="${empresa.fecharegistro ? empresa.fecharegistro.split(' ')[0] : ''}" style="color: white;">
+                            <small style="color: rgba(255,255,255,0.6);">Solo para referencia</small>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <p style="color: var(--secondary); margin: 0;">
+                            <i class="fas fa-info-circle"></i> ID de la empresa: <strong>${empresa.id || 'N/A'}</strong>
+                        </p>
+                        <p style="color: rgba(255,255,255,0.7); margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                            El ID se genera automáticamente y no se puede modificar. Solo editable desde Google Sheets.
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="guardarEdicionEmpresaCompleta('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
 
         // FUNCIÓN: Guardar edición completa de empresa
         async function guardarEdicionEmpresaCompleta(empresaId) {
@@ -2286,95 +2309,181 @@ function editEmpresaCompleta(empresaId) {
             }
         }
 
-        // FUNCIÓN: Mostrar modal nuevo usuario avanzado (con autocompletado)
+        // FUNCIÓN: Mostrar modal nuevo usuario avanzado (CORREGIDO)
         function showNuevoUsuarioModalAvanzado() {
             showModal('Nuevo Usuario - Formulario Completo', `
-                <div style="max-width: 600px;">
+                <div style="max-width: 700px;">
                     <div class="form-group">
-                        <label>Empresa *</label>
-                        <select id="nuevoUsuarioEmpresaAvanzado" onchange="cargarEmpleadosEmpresa()" required>
-                            <option value="">Seleccionar empresa</option>
+                        <label style="color: var(--secondary);">ID Usuario</label>
+                        <div style="position: relative;">
+                            <input type="text" id="nuevoUsuarioId" 
+                                placeholder="USU-001 o dejar en blanco para auto-generar"
+                                list="listaUsuariosExistentes"
+                                style="color: white;">
+                            <datalist id="listaUsuariosExistentes">
+                                ${database.usuarios.map(u => `
+                                    <option value="${u.id}">${u.nombre}</option>
+                                `).join('')}
+                            </datalist>
+                        </div>
+                        <small style="color: rgba(255,255,255,0.6);">Dejar en blanco para auto-generar ID único</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Empresa *</label>
+                        <select id="nuevoUsuarioEmpresaAvanzado" onchange="cargarEmpleadosEmpresa()" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                            <option value="" style="color: #666;">Seleccionar empresa</option>
                             ${database.empresas.map(empresa => `
-                                <option value="${empresa.id}">${empresa.nombre}</option>
+                                <option value="${empresa.id}" style="color: white;">${empresa.nombre}</option>
                             `).join('')}
                         </select>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Nombre Completo *</label>
-                        <div style="position: relative;">
-                            <input type="text" id="nuevoUsuarioNombreAvanzado" 
-                                placeholder="Escriba nombre o seleccione de la lista" 
-                                oninput="filtrarEmpleados()"
-                                required>
-                            <div id="sugerenciasEmpleados" style="
-                                position: absolute;
-                                top: 100%;
-                                left: 0;
-                                right: 0;
-                                background: var(--card-bg);
-                                border: 1px solid rgba(124,58,237,0.3);
-                                border-radius: 0 0 8px 8px;
-                                max-height: 200px;
-                                overflow-y: auto;
-                                display: none;
-                                z-index: 1000;
-                            "></div>
+                    <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                        <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Primer Nombre *</label>
+                                <input type="text" id="nuevoUsuarioPrimerNombre" placeholder="Juan" required style="color: white;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Segundo Nombre</label>
+                                <input type="text" id="nuevoUsuarioSegundoNombre" placeholder="Carlos" style="color: white;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Primer Apellido *</label>
+                                <input type="text" id="nuevoUsuarioPrimerApellido" placeholder="Pérez" required style="color: white;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Segundo Apellido</label>
+                                <input type="text" id="nuevoUsuarioSegundoApellido" placeholder="Gómez" style="color: white;">
+                            </div>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com.bo" required>
+                        <label style="color: var(--secondary);">Email *</label>
+                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com.bo" required style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>Password *</label>
-                        <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required>
-                        <small style="color: rgba(255,255,255,0.6);">Se generará automáticamente si se selecciona un empleado</small>
+                        <label style="color: var(--secondary);">Password *</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="color: white; flex: 1;">
+                            <button type="button" onclick="generarPasswordNuevoUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                                <i class="fas fa-random"></i> Generar
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Rol *</label>
-                        <select id="nuevoUsuarioRolAvanzado" required>
-                            <option value="jefe">Jefe Empresa</option>
-                            <option value="comercial">Dirección Comercial</option>
-                            <option value="admin">Administración y Finanzas</option>
-                            <option value="vendedor">Vendedor App</option>
-                            <option value="almacen">Almacén App</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Estado *</label>
-                        <select id="nuevoUsuarioActivoAvanzado" required>
-                            <option value="Sí">Activo</option>
-                            <option value="No">Inactivo</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Fecha Creación</label>
-                        <input type="date" id="nuevoUsuarioFechaCreacion" value="${new Date().toISOString().split('T')[0]}">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Rol *</label>
+                            <select id="nuevoUsuarioRolAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="jefe" style="color: white;">Jefe Empresa</option>
+                                <option value="comercial" style="color: white;">Dirección Comercial</option>
+                                <option value="admin" style="color: white;">Administración y Finanzas</option>
+                                <option value="vendedor" style="color: white;">Vendedor App</option>
+                                <option value="almacen" style="color: white;">Almacén App</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Estado *</label>
+                            <select id="nuevoUsuarioActivoAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Sí" style="color: white;">Activo</option>
+                                <option value="No" style="color: white;">Inactivo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Fecha de Creación *</label>
+                            <input type="date" id="nuevoUsuarioFechaCreacion" 
+                                value="${new Date().toISOString().split('T')[0]}" 
+                                required style="color: white;">
+                            <small style="color: rgba(255,255,255,0.6);">Fecha cuando se crea el usuario en el sistema (hoy por defecto)</small>
+                        </div>
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                         <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
                             Cancelar
                         </button>
-                        <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzado()" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzadoCorregido()" style="flex: 1;">
                             <i class="fas fa-user-plus"></i> Crear Usuario
                         </button>
                     </div>
-                    
-                    <!-- Datos de empleados para autocompletado -->
-                    <div id="empleadosData" style="display: none;"></div>
                 </div>
             `);
+        }
+
+        // FUNCIÓN: Generar password para nuevo usuario
+        function generarPasswordNuevoUsuario() {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('nuevoUsuarioPasswordAvanzado').value = password;
+        }
+
+        // FUNCIÓN: Crear nuevo usuario avanzado (CORREGIDO)
+        async function crearNuevoUsuarioAvanzadoCorregido() {
+            showLoading();
             
-            // Inicializar variables para autocompletado
-            window.empleadosFiltrados = [];
-            window.currentEmpresaId = null;
+            // Construir nombre completo
+            const primerNombre = document.getElementById('nuevoUsuarioPrimerNombre').value.trim();
+            const segundoNombre = document.getElementById('nuevoUsuarioSegundoNombre').value.trim();
+            const primerApellido = document.getElementById('nuevoUsuarioPrimerApellido').value.trim();
+            const segundoApellido = document.getElementById('nuevoUsuarioSegundoApellido').value.trim();
+            
+            // Crear nombre completo
+            let nombreCompleto = primerNombre;
+            if (segundoNombre) nombreCompleto += ' ' + segundoNombre;
+            if (primerApellido) nombreCompleto += ' ' + primerApellido;
+            if (segundoApellido) nombreCompleto += ' ' + segundoApellido;
+            
+            const usuarioData = {
+                id: document.getElementById('nuevoUsuarioId').value.trim() || undefined, // Dejar undefined para auto-generar
+                nombre: nombreCompleto,
+                email: document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase(),
+                password: document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim(),
+                role: document.getElementById('nuevoUsuarioRolAvanzado').value,
+                activo: document.getElementById('nuevoUsuarioActivoAvanzado').value,
+                empresa_id: document.getElementById('nuevoUsuarioEmpresaAvanzado').value,
+                fechacreacion: document.getElementById('nuevoUsuarioFechaCreacion').value
+            };
+            
+            // Validaciones
+            if (!primerNombre || !primerApellido || !usuarioData.email || !usuarioData.empresa_id) {
+                showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
+                hideLoading();
+                return;
+            }
+            
+            try {
+                const result = await postToAPI('addUsuario', usuarioData);
+                
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', `Usuario "${nombreCompleto}" creado exitosamente`);
+                    
+                    // Recargar datos
+                    await loadUsuariosFromAPI();
+                    
+                    closeModal();
+                    loadGestionPersonal();
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
+                }
+            } catch (error) {
+                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+            } finally {
+                hideLoading();
+            }
         }
 
         // FUNCIÓN: Cargar empleados de empresa seleccionada
@@ -2508,80 +2617,243 @@ function editEmpresaCompleta(empresaId) {
             }
         }
 
-        // FUNCIÓN: Editar usuario completo
+        // FUNCIÓN: Editar usuario completo (CON DESPLEGABLE DE IDs Y NOMBRES SEPARADOS)
         function editUsuarioCompleto(usuarioId) {
             const usuario = database.usuarios.find(u => u.id === usuarioId);
-            if (!usuario) return;
+            if (!usuario) {
+                showNotification('error', 'Error', 'Usuario no encontrado');
+                return;
+            }
             
-            const empresa = database.empresas.find(e => e.id === usuario.empresa_id);
+            // Obtener nombres separados (si ya existen en el formato separado)
+            let primerNombre = '';
+            let segundoNombre = '';
+            let primerApellido = '';
+            let segundoApellido = '';
             
-            showModal(`Editar Usuario Completo: ${usuario.nombre}`, `
-                <div style="max-width: 600px;">
+            if (usuario.nombre) {
+                // Intentar dividir el nombre completo
+                const nombres = usuario.nombre.split(' ');
+                if (nombres.length >= 1) primerNombre = nombres[0];
+                if (nombres.length >= 2) segundoNombre = nombres[1] || '';
+                if (nombres.length >= 3) primerApellido = nombres[2] || '';
+                if (nombres.length >= 4) segundoApellido = nombres[3] || '';
+            }
+            
+            showModal(`Editar Usuario: ${usuario.nombre}`, `
+                <div style="max-width: 700px;">
+                    <input type="hidden" id="editUsuarioId" value="${usuario.id || ''}">
+                    
                     <div class="form-group">
-                        <label>ID</label>
-                        <input type="text" id="editUsuarioId" value="${usuario.id || ''}" readonly style="background: rgba(255,255,255,0.1);">
+                        <label style="color: var(--secondary);">ID Usuario *</label>
+                        <div style="position: relative;">
+                            <input type="text" id="editUsuarioIdSeleccion" 
+                                value="${usuario.id || ''}" 
+                                list="listaUsuarios"
+                                onchange="cargarDatosUsuarioPorId()"
+                                required style="color: white;">
+                            <datalist id="listaUsuarios">
+                                ${database.usuarios.map(u => `
+                                    <option value="${u.id}">${u.nombre} - ${u.email}</option>
+                                `).join('')}
+                            </datalist>
+                        </div>
+                        <small style="color: rgba(255,255,255,0.6);">Seleccione o escriba un ID existente</small>
+                    </div>
+                    
+                    <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                        <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Primer Nombre *</label>
+                                <input type="text" id="editUsuarioPrimerNombre" value="${primerNombre}" required style="color: white;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Segundo Nombre</label>
+                                <input type="text" id="editUsuarioSegundoNombre" value="${segundoNombre}" style="color: white;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Primer Apellido *</label>
+                                <input type="text" id="editUsuarioPrimerApellido" value="${primerApellido}" required style="color: white;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="color: var(--secondary);">Segundo Apellido</label>
+                                <input type="text" id="editUsuarioSegundoApellido" value="${segundoApellido}" style="color: white;">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="form-group">
-                        <label>Nombre Completo *</label>
-                        <input type="text" id="editUsuarioNombreCompleto" value="${usuario.nombre || ''}" required>
+                        <label style="color: var(--secondary);">Email *</label>
+                        <input type="email" id="editUsuarioEmail" value="${usuario.email || ''}" required style="color: white;">
                     </div>
                     
                     <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="editUsuarioEmailCompleto" value="${usuario.email || ''}" required>
+                        <label style="color: var(--secondary);">Password *</label>
+                        <input type="text" id="editUsuarioPassword" value="${usuario.password || '12345678'}" required style="color: white;">
+                        <button type="button" onclick="generarPasswordUsuario()" class="btn btn-secondary" style="margin-top: 0.5rem; padding: 0.3rem 0.8rem; font-size: 0.8rem;">
+                            <i class="fas fa-random"></i> Generar Nueva
+                        </button>
                     </div>
                     
-                    <div class="form-group">
-                        <label>Password *</label>
-                        <input type="text" id="editUsuarioPasswordCompleto" value="${usuario.password || '12345678'}" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Rol *</label>
-                        <select id="editUsuarioRolCompleto" required>
-                            <option value="jefe" ${usuario.role === 'jefe' ? 'selected' : ''}>Jefe Empresa</option>
-                            <option value="comercial" ${usuario.role === 'comercial' ? 'selected' : ''}>Dirección Comercial</option>
-                            <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''}>Administración y Finanzas</option>
-                            <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''}>Vendedor App</option>
-                            <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''}>Almacén App</option>
-                            <option value="super" ${usuario.role === 'super' ? 'selected' : ''}>Super Admin</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Empresa *</label>
-                        <select id="editUsuarioEmpresaCompleto" required>
-                            <option value="">Seleccionar empresa</option>
-                            ${database.empresas.map(emp => `
-                                <option value="${emp.id}" ${usuario.empresa_id === emp.id ? 'selected' : ''}>${emp.nombre}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Estado *</label>
-                        <select id="editUsuarioActivoCompleto" required>
-                            <option value="Sí" ${usuario.activo === 'Sí' ? 'selected' : ''}>Activo</option>
-                            <option value="No" ${usuario.activo === 'No' ? 'selected' : ''}>Inactivo</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Fecha Creación</label>
-                        <input type="date" id="editUsuarioFechaCreacion" value="${usuario.fechacreacion ? usuario.fechacreacion.split(' ')[0] : ''}">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Rol *</label>
+                            <select id="editUsuarioRol" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="jefe" ${usuario.role === 'jefe' ? 'selected' : ''} style="color: white;">Jefe Empresa</option>
+                                <option value="comercial" ${usuario.role === 'comercial' ? 'selected' : ''} style="color: white;">Dirección Comercial</option>
+                                <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''} style="color: white;">Administración y Finanzas</option>
+                                <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''} style="color: white;">Vendedor App</option>
+                                <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''} style="color: white;">Almacén App</option>
+                                <option value="super" ${usuario.role === 'super' ? 'selected' : ''} style="color: white;">Super Admin</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Empresa *</label>
+                            <select id="editUsuarioEmpresa" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="" style="color: #666;">Seleccionar empresa</option>
+                                ${database.empresas.map(emp => `
+                                    <option value="${emp.id}" ${usuario.empresa_id === emp.id ? 'selected' : ''} style="color: white;">${emp.nombre}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Estado *</label>
+                            <select id="editUsuarioActivo" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Sí" ${usuario.activo === 'Sí' ? 'selected' : ''} style="color: white;">Activo</option>
+                                <option value="No" ${usuario.activo === 'No' ? 'selected' : ''} style="color: white;">Inactivo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Fecha de Creación *</label>
+                            <input type="date" id="editUsuarioFechaCreacion" 
+                                value="${usuario.fechacreacion ? usuario.fechacreacion.split(' ')[0] : new Date().toISOString().split('T')[0]}" 
+                                required style="color: white;">
+                            <small style="color: rgba(255,255,255,0.6);">Fecha cuando se creó el usuario en el sistema</small>
+                        </div>
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                         <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
                             Cancelar
                         </button>
-                        <button class="btn btn-primary" onclick="guardarUsuarioCompleto('${usuarioId}')" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="guardarUsuarioCompletoCorregido('${usuarioId}')" style="flex: 1;">
                             <i class="fas fa-save"></i> Guardar Cambios
                         </button>
                     </div>
                 </div>
             `);
+        }
+
+        // FUNCIÓN: Cargar datos de usuario por ID seleccionado
+        function cargarDatosUsuarioPorId() {
+            const selectedId = document.getElementById('editUsuarioIdSeleccion').value;
+            const usuario = database.usuarios.find(u => u.id === selectedId);
+            
+            if (usuario) {
+                // Llenar los campos automáticamente
+                document.getElementById('editUsuarioEmail').value = usuario.email || '';
+                document.getElementById('editUsuarioPassword').value = usuario.password || '12345678';
+                document.getElementById('editUsuarioRol').value = usuario.role || 'jefe';
+                document.getElementById('editUsuarioActivo').value = usuario.activo || 'Sí';
+                document.getElementById('editUsuarioEmpresa').value = usuario.empresa_id || '';
+                document.getElementById('editUsuarioFechaCreacion').value = usuario.fechacreacion ? usuario.fechacreacion.split(' ')[0] : new Date().toISOString().split('T')[0];
+                
+                // Dividir nombre si existe
+                if (usuario.nombre) {
+                    const nombres = usuario.nombre.split(' ');
+                    if (nombres.length >= 1) document.getElementById('editUsuarioPrimerNombre').value = nombres[0];
+                    if (nombres.length >= 2) document.getElementById('editUsuarioSegundoNombre').value = nombres[1] || '';
+                    if (nombres.length >= 3) document.getElementById('editUsuarioPrimerApellido').value = nombres[2] || '';
+                    if (nombres.length >= 4) document.getElementById('editUsuarioSegundoApellido').value = nombres[3] || '';
+                }
+                
+                showNotification('info', 'Usuario cargado', `Datos de ${usuario.nombre} cargados automáticamente`);
+            }
+        }
+
+        // FUNCIÓN: Generar nueva contraseña
+        function generarPasswordUsuario() {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
+            let password = '';
+            for (let i = 0; i < 10; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('editUsuarioPassword').value = password;
+            showNotification('success', 'Contraseña generada', 'Nueva contraseña generada: ' + password);
+        }
+
+        // FUNCIÓN: Guardar usuario completo (VERSIÓN CORREGIDA)
+        async function guardarUsuarioCompletoCorregido(usuarioId) {
+            showLoading();
+            
+            // Construir nombre completo
+            const primerNombre = document.getElementById('editUsuarioPrimerNombre').value.trim();
+            const segundoNombre = document.getElementById('editUsuarioSegundoNombre').value.trim();
+            const primerApellido = document.getElementById('editUsuarioPrimerApellido').value.trim();
+            const segundoApellido = document.getElementById('editUsuarioSegundoApellido').value.trim();
+            
+            // Crear nombre completo
+            let nombreCompleto = primerNombre;
+            if (segundoNombre) nombreCompleto += ' ' + segundoNombre;
+            if (primerApellido) nombreCompleto += ' ' + primerApellido;
+            if (segundoApellido) nombreCompleto += ' ' + segundoApellido;
+            
+            // Obtener ID (puede ser nuevo o existente)
+            const nuevoId = document.getElementById('editUsuarioIdSeleccion').value.trim();
+            
+            const usuarioData = {
+                id: nuevoId || usuarioId, // Usar nuevo ID si se cambió
+                nombre: nombreCompleto,
+                email: document.getElementById('editUsuarioEmail').value.trim().toLowerCase(),
+                password: document.getElementById('editUsuarioPassword').value.trim(),
+                role: document.getElementById('editUsuarioRol').value,
+                activo: document.getElementById('editUsuarioActivo').value,
+                empresa_id: document.getElementById('editUsuarioEmpresa').value,
+                fechacreacion: document.getElementById('editUsuarioFechaCreacion').value
+            };
+            
+            // Validaciones
+            if (!usuarioData.nombre || !usuarioData.email || !usuarioData.empresa_id) {
+                showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
+                hideLoading();
+                return;
+            }
+            
+            try {
+                let result;
+                
+                // Si el ID cambió, es un usuario nuevo
+                if (nuevoId !== usuarioId && nuevoId) {
+                    result = await postToAPI('addUsuario', usuarioData);
+                } else {
+                    // Si es el mismo ID, actualizar
+                    result = await postToAPI('updateUsuario', usuarioData);
+                }
+                
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', 'Usuario guardado correctamente');
+                    
+                    // Recargar datos
+                    await loadUsuariosFromAPI();
+                    
+                    closeModal();
+                    loadGestionPersonal();
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al guardar usuario');
+                }
+            } catch (error) {
+                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+            } finally {
+                hideLoading();
+            }
         }
 
         // FUNCIÓN: Guardar usuario completo (con mejor manejo de errores)
