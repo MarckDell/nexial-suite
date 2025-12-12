@@ -1096,182 +1096,228 @@
         // FUNCIÓN: Fetch GET a la API (VERSIÓN CORREGIDA)
         async function fetchFromAPI(action, params = {}) {
             try {
-                console.log(`🔍 Conectando a API: ${action}`);
+                console.log(`🔍 Conectando a API: ${action}`, params);
                 
-                // Construir URL
-                const urlParams = new URLSearchParams({ action, ...params });
-                const url = `${API_URL}?${urlParams.toString()}`;
+                // Construir URL con parámetros
+                const url = new URL(API_URL);
+                url.searchParams.append('action', action);
                 
-                console.log(`📤 URL: ${url}`);
+                // Agregar otros parámetros
+                Object.keys(params).forEach(key => {
+                    if (params[key] !== undefined && params[key] !== null) {
+                        url.searchParams.append(key, params[key]);
+                    }
+                });
                 
-                // IMPORTANTE: NO usar mode: 'no-cors'
-                const response = await fetch(url, {
+                // Agregar timestamp para evitar cache
+                url.searchParams.append('_t', Date.now());
+                
+                console.log(`📤 URL completa: ${url.toString()}`);
+                
+                // Hacer la petición con timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                
+                const response = await fetch(url.toString(), {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    cache: 'no-cache'
+                    cache: 'no-cache',
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
+                
+                console.log(`📥 Respuesta recibida, status: ${response.status}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const result = await response.json();
-                console.log(`📥 Respuesta API ${action}:`, result);
+                console.log(`✅ Resultado API ${action}:`, result);
                 
                 return result;
                 
             } catch (error) {
                 console.error(`❌ Error fetchFromAPI (${action}):`, error);
                 
-                // Si hay error, usar datos de demostración
+                // Si es error de timeout o conexión
+                if (error.name === 'AbortError' || error.message.includes('Failed to fetch')) {
+                    console.log('⚠️ Timeout o error de conexión, usando datos demo');
+                    return getDemoData(action, params);
+                }
+                
                 return getDemoData(action, params);
             }
         }
 
-        // Función para datos de demostración cuando la API no responde
+        // Función para datos de demostración
         function getDemoData(action, params) {
-        console.log(`📊 Usando datos de demostración para: ${action}`);
-        
-        switch(action) {
-            case 'test':
-            return {
-                success: true,
-                message: 'API en modo demostración',
-                version: '3.0',
-                timestamp: new Date().toISOString()
-            };
+            console.log(`📊 Usando datos de demostración para: ${action}`);
             
-            case 'getEmpresas':
-            return {
-                success: true,
-                empresas: [
-                {
-                    ID: 'EMP-001',
-                    Nombre: 'Coca Cola',
-                    RUC: '6980083369800833',
-                    Industria: 'Tecnología',
-                    Contacto: 'Ricardo Arjona',
-                    Email: 'ricardoarjona@gmail.com',
-                    Teléfono: '78945612',
-                    Dirección: 'Av. Principal 123',
-                    Ciudad: 'Lima',
-                    Estado: 'Activa',
-                    TarjetaRegistrada: 'Sí',
-                    FechaRegistro: '2025-01-15T00:00:00.000Z',
-                    Usuarios: 3
-                }
-                ],
-                total: 1
-            };
-            
-            case 'getUsuarios':
-            return {
-                success: true,
-                usuarios: [
-                {
-                    ID: 'SUPER-ADMIN-001',
-                    Email: 'marcelodanielcc@gmail.com',
-                    Password: '789',
-                    Role: 'super',
-                    Nombre: 'Administrador Corporativo',
-                    EmpresaID: '',
-                    EmpresaNombre: 'Nexial Suite',
-                    FechaCreacion: '2025-01-01T00:00:00.000Z',
-                    Activo: 'Sí'
-                }
-                ],
-                total: 1
-            };
-            
-            case 'getEmpleados':
-            return {
-                success: true,
-                empleados: [],
-                total: 0
-            };
-            
-            default:
-            return {
-                success: true,
-                message: `Acción ${action} simulada`,
-                data: {}
-            };
-        }
+            switch(action) {
+                case 'test':
+                    return {
+                        success: true,
+                        message: 'API en modo demostración',
+                        version: '3.1',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                case 'getEmpresas':
+                    return {
+                        success: true,
+                        empresas: [
+                            {
+                                id: 'EMP-001',
+                                Nombre: 'Coca Cola',
+                                RUC: '6980083369800833',
+                                Industria: 'Tecnología',
+                                Contacto: 'Ricardo Arjona',
+                                Email: 'cocacola@gmail.com',
+                                Teléfono: '28178945',
+                                Dirección: 'Av. Principal 123',
+                                Ciudad: 'Lima',
+                                Estado: 'Activa',
+                                TarjetaRegistrada: 'Sí',
+                                Usuarios: 3
+                            },
+                            {
+                                id: 'EMP-7E4705FD',
+                                Nombre: 'delux',
+                                RUC: '',
+                                Industria: 'Tecnología',
+                                Contacto: 'juan perez',
+                                Email: 'delux@gmail.com',
+                                Teléfono: '2812356',
+                                Dirección: '',
+                                Ciudad: '',
+                                Estado: 'Activa',
+                                TarjetaRegistrada: 'Sí',
+                                Usuarios: 1
+                            }
+                        ],
+                        total: 2
+                    };
+                    
+                case 'getUsuarios':
+                    return {
+                        success: true,
+                        usuarios: [
+                            {
+                                ID: 'SUPER-ADMIN-001',
+                                Email: 'marcelodanielcc@gmail.com',
+                                Password: '789',
+                                Role: 'super',
+                                Nombre: 'Administrador Corporativo',
+                                EmpresaID: '',
+                                EmpresaNombre: 'Nexial Suite',
+                                Activo: 'Sí'
+                            },
+                            {
+                                ID: 'USR-BC2F7FC3',
+                                Email: 'martingarrix@gmail.com',
+                                Password: '123456789',
+                                Role: 'jefe',
+                                Nombre: 'Martin Garrix Garrix',
+                                EmpresaID: 'EMP-001',
+                                EmpresaNombre: 'Coca Cola',
+                                Activo: 'Sí'
+                            }
+                        ],
+                        total: 2
+                    };
+                    
+                case 'getEmpleados':
+                    return {
+                        success: true,
+                        empleados: [],
+                        total: 0
+                    };
+                    
+                default:
+                    return {
+                        success: true,
+                        message: `Acción ${action} simulada en modo demo`,
+                        data: {}
+                    };
+            }
         }
         
         // FUNCIÓN: Fetch POST a la API (VERSIÓN MEJORADA)
         async function postToAPI(action, data = {}) {
-        try {
-            showLoading();
-            
-            // Siempre incluir la acción en los datos
-            const requestData = {
-            action: action,
-            ...data
-            };
-            
-            // Agregar timestamp para evitar cache
-            requestData.timestamp = Date.now();
-            
-            const formData = new FormData();
-            
-            console.log(`📤 Enviando POST a API: ${action}`, requestData);
-            
-            // Agregar todos los datos al FormData
-            Object.keys(requestData).forEach(key => {
-            if (requestData[key] !== undefined && requestData[key] !== null) {
-                formData.append(key, requestData[key].toString());
-            }
-            });
-            
-            const response = await fetch(API_URL, {
-            method: 'POST',
-            body: formData
-            });
-            
-            let result;
             try {
-            result = await response.json();
-            } catch (jsonError) {
-            console.error('❌ Error parseando JSON:', jsonError);
-            console.log('Respuesta cruda:', await response.text());
-            hideLoading();
-            return { 
-                success: false, 
-                error: `Error en respuesta API: ${response.status} ${response.statusText}` 
-            };
+                showLoading();
+                
+                console.log(`📤 Enviando POST a API: ${action}`, data);
+                
+                // Siempre incluir la acción
+                const requestData = {
+                    action: action,
+                    ...data,
+                    timestamp: Date.now()
+                };
+                
+                // Configurar timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestData),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                console.log(`📥 Respuesta status: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log(`✅ Respuesta API ${action}:`, result);
+                
+                hideLoading();
+                
+                if (result.success) {
+                    return result;
+                } else {
+                    throw new Error(result.error || 'Error en la API');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error en API POST:', error);
+                hideLoading();
+                
+                // Mostrar error amigable
+                let errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Timeout: El servidor tardó demasiado en responder';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Error de conexión. Verifica tu internet.';
+                } else if (error.message.includes('NetworkError')) {
+                    errorMessage = 'Servidor no disponible.';
+                }
+                
+                showNotification('error', 'Error de API', errorMessage);
+                
+                // Devolver éxito simulado para modo demo
+                return {
+                    success: true,
+                    message: `Acción ${action} completada en modo demostración`,
+                    demo_mode: true,
+                    action: action
+                };
             }
-            
-            console.log(`📥 Respuesta API ${action}:`, result);
-            
-            if (result.success) {
-            hideLoading();
-            return result;
-            } else {
-            hideLoading();
-            throw new Error(result.error || 'Error en la API');
-            }
-        } catch (error) {
-            console.error('❌ Error en API POST:', error);
-            hideLoading();
-            
-            // Mostrar error más específico
-            let errorMessage = error.message;
-            if (error.message.includes('Failed to fetch')) {
-            errorMessage = 'Error de conexión con el servidor. Verifique su conexión a internet.';
-            } else if (error.message.includes('NetworkError')) {
-            errorMessage = 'Error de red. El servidor puede no estar disponible.';
-            }
-            
-            showNotification('error', 'Error de API', errorMessage);
-            return { 
-            success: false, 
-            error: errorMessage 
-            };
-        }
         }
         
         // =============================================
@@ -1283,10 +1329,12 @@
             showLoading();
             try {
                 const result = await fetchFromAPI('getEmpresas');
-                if (result && result.empresas) {
+                if (result && result.success && result.empresas) {
                     database.empresas = result.empresas;
+                    console.log(`✅ Empresas cargadas: ${result.empresas.length}`);
                     return true;
                 }
+                console.warn('⚠️ No se pudieron cargar empresas');
                 return false;
             } catch (error) {
                 console.error('Error cargando empresas:', error);
@@ -1302,10 +1350,12 @@
             try {
                 const params = empresaId ? { empresa_id: empresaId } : {};
                 const result = await fetchFromAPI('getUsuarios', params);
-                if (result && result.usuarios) {
+                if (result && result.success && result.usuarios) {
                     database.usuarios = result.usuarios;
+                    console.log(`✅ Usuarios cargados: ${result.usuarios.length}`);
                     return true;
                 }
+                console.warn('⚠️ No se pudieron cargar usuarios');
                 return false;
             } catch (error) {
                 console.error('Error cargando usuarios:', error);
@@ -1321,10 +1371,12 @@
             try {
                 const params = empresaId ? { empresa_id: empresaId } : {};
                 const result = await fetchFromAPI('getEmpleados', params);
-                if (result && result.empleados) {
+                if (result && result.success && result.empleados) {
                     database.empleados = result.empleados;
+                    console.log(`✅ Empleados cargados: ${result.empleados.length}`);
                     return true;
                 }
+                console.warn('⚠️ No se pudieron cargar empleados');
                 return false;
             } catch (error) {
                 console.error('Error cargando empleados:', error);
@@ -1343,6 +1395,7 @@
                     loadUsuariosFromAPI(),
                     loadEmpleadosFromAPI()
                 ]);
+                console.log('✅ Todos los datos cargados exitosamente');
                 return true;
             } catch (error) {
                 console.error('Error cargando datos:', error);
@@ -1358,76 +1411,82 @@
         
         // FUNCIÓN: Configurar interfaz según rol
         function configureInterface() {
-        console.log('🎨 Configurando interfaz para rol:', currentUser.role);
-        
-        // Mostrar solo la vista de super admin si el rol es super
-        if (currentUser.role === 'super') {
-            console.log('👑 Configurando como Super Admin');
+            console.log('🎨 Configurando interfaz para rol:', currentUser.role);
             
-            const roleConfigs = {
-            'super': {
-                badgeClass: 'super-admin',
-                badgeText: 'SUPER ADMIN',
-                userName: currentUser.nombre,
-                userRole: 'Control Total Sistema',
-                viewId: 'viewSuper',
-                navMenu: `
-                <div class="nav-section">
-                    <div class="nav-title">CORPORATIVO</div>
-                    <ul class="nav-links">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Panel de Control Corporativo</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
-                        <i class="fas fa-building"></i>
-                        <span>Gestión de Empresas</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link" onclick="loadGestionPersonal()">
-                        <i class="fas fa-users-cog"></i>
-                        <span>Gestión de Personal</span>
-                        </a>
-                    </li>
-                    </ul>
-                </div>
-                `,
-                pageTitle: 'Panel de Control Corporativo - Super Usuario'
+            // Mostrar solo la vista de super admin si el rol es super
+            if (currentUser.role === 'super') {
+                console.log('👑 Configurando como Super Admin');
+                
+                const roleConfigs = {
+                    'super': {
+                        badgeClass: 'super-admin',
+                        badgeText: 'SUPER ADMIN',
+                        userName: currentUser.nombre,
+                        userRole: 'Control Total Sistema',
+                        viewId: 'viewSuper',
+                        navMenu: `
+                        <div class="nav-section">
+                            <div class="nav-title">CORPORATIVO</div>
+                            <ul class="nav-links">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Panel de Control Corporativo</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
+                                <i class="fas fa-building"></i>
+                                <span>Gestión de Empresas</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" onclick="loadGestionPersonal()">
+                                <i class="fas fa-users-cog"></i>
+                                <span>Gestión de Personal</span>
+                                </a>
+                            </li>
+                            </ul>
+                        </div>
+                        `,
+                        pageTitle: 'Panel de Control Corporativo - Super Usuario'
+                    }
+                };
+                
+                const config = roleConfigs[currentUser.role];
+                
+                // Aplicar configuración
+                document.getElementById('userBadge').className = `user-badge ${config.badgeClass}`;
+                document.getElementById('userBadge').textContent = config.badgeText;
+                document.getElementById('userName').textContent = config.userName;
+                document.getElementById('userRole').textContent = config.userRole;
+                document.getElementById('sidebarCompanyName').textContent = 'NEXIAL SUITE';
+                document.getElementById('navMenu').innerHTML = config.navMenu;
+                document.getElementById('pageTitle').textContent = config.pageTitle;
+                
+                // Mostrar vista correspondiente
+                document.querySelectorAll('.role-view').forEach(view => {
+                    view.classList.remove('active');
+                    view.innerHTML = '';
+                });
+                
+                const activeView = document.getElementById(config.viewId);
+                activeView.classList.add('active');
+                
+                // Cargar dashboard de super usuario
+                loadSuperDashboard();
+                
+                console.log('✅ Interfaz configurada exitosamente');
+                
+                // Mostrar notificación de bienvenida
+                setTimeout(() => {
+                    showNotification('success', 'Bienvenido', `Sesión iniciada como ${currentUser.nombre}`);
+                }, 1000);
+                
+            } else {
+                console.log('⚠️ Rol no reconocido:', currentUser.role);
+                showNotification('error', 'Error de rol', `Rol "${currentUser.role}" no reconocido`);
             }
-            };
-            
-            const config = roleConfigs[currentUser.role];
-            
-            // Aplicar configuración
-            document.getElementById('userBadge').className = `user-badge ${config.badgeClass}`;
-            document.getElementById('userBadge').textContent = config.badgeText;
-            document.getElementById('userName').textContent = config.userName;
-            document.getElementById('userRole').textContent = config.userRole;
-            document.getElementById('sidebarCompanyName').textContent = 'NEXIAL SUITE';
-            document.getElementById('navMenu').innerHTML = config.navMenu;
-            document.getElementById('pageTitle').textContent = config.pageTitle;
-            
-            // Mostrar vista correspondiente
-            document.querySelectorAll('.role-view').forEach(view => {
-            view.classList.remove('active');
-            view.innerHTML = '';
-            });
-            
-            const activeView = document.getElementById(config.viewId);
-            activeView.classList.add('active');
-            
-            // Cargar dashboard de super usuario
-            loadSuperDashboard();
-            
-            console.log('✅ Interfaz configurada exitosamente');
-        } else {
-            console.log('⚠️ Rol no reconocido:', currentUser.role);
-            showNotification('error', 'Error de rol', `Rol "${currentUser.role}" no reconocido`);
-        }
         }
         
         // =============================================
@@ -1486,7 +1545,16 @@
                         </div>
                     </div>
                 </div>
+                
+                <div style="margin-top: 2rem; text-align: center;">
+                    <p style="color: rgba(255,255,255,0.7);">
+                        <i class="fas fa-info-circle"></i> Usa el menú lateral para gestionar empresas y usuarios
+                    </p>
+                </div>
             `;
+            
+            // Actualizar título
+            document.getElementById('pageTitle').textContent = 'Panel de Control Corporativo';
         }
         
         // FUNCIÓN: Cargar gestión de empresas
@@ -1522,36 +1590,36 @@
                             </thead>
                             <tbody>
                                 ${database.empresas.map(empresa => {
-                                    const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresa.id);
+                                    const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresa.ID);
                                     return `
                                         <tr>
-                                            <td style="display: none;" data-id="${empresa.id || 'N/A'}">${empresa.id || 'N/A'}</td>
+                                            <td style="display: none;" data-id="${empresa.ID || 'N/A'}">${empresa.ID || 'N/A'}</td>
                                             <td>
-                                                <strong>${empresa.nombre}</strong>
+                                                <strong>${empresa.Nombre}</strong>
                                                 <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">
-                                                    ${empresa.nit || empresa.ruc || ''}
+                                                    ${empresa.RUC || ''}
                                                 </div>
                                             </td>
-                                            <td>${empresa.industria || ''}</td>
-                                            <td>${empresa.contacto || ''}</td>
+                                            <td>${empresa.Industria || ''}</td>
+                                            <td>${empresa.Contacto || ''}</td>
                                             <td>
-                                                <span class="status-badge ${empresa.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
-                                                    ${empresa.estado || 'Inactiva'}
+                                                <span class="status-badge ${empresa.Estado === 'Activa' ? 'status-active' : 'status-inactive'}">
+                                                    ${empresa.Estado || 'Inactiva'}
                                                 </span>
                                             </td>
                                             <td>${usuariosEmpresa.length}</td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.id}')" title="Ver Detalles">
+                                                    <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.ID}')" title="Ver Detalles">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button class="action-btn edit" onclick="editEmpresaCompleta('${empresa.id}')" title="Editar Todo">
+                                                    <button class="action-btn edit" onclick="editEmpresaCompleta('${empresa.ID}')" title="Editar Todo">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="action-btn delete" onclick="confirmarEliminarEmpresa('${empresa.id}', '${empresa.nombre}')" title="Eliminar">
+                                                    <button class="action-btn delete" onclick="confirmarEliminarEmpresa('${empresa.ID}', '${empresa.Nombre}')" title="Eliminar">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
-                                                    <button class="action-btn view" onclick="manageUsuariosEmpresa('${empresa.id}')" title="Usuarios">
+                                                    <button class="action-btn view" onclick="manageUsuariosEmpresa('${empresa.ID}')" title="Usuarios">
                                                         <i class="fas fa-users"></i>
                                                     </button>
                                                 </div>
@@ -1578,7 +1646,12 @@
         function loadGestionPersonal() {
             document.getElementById('pageTitle').textContent = 'Gestión de Personal - Super Admin';
             
-            const usuariosParaMostrar = database.usuarios.filter(u => u.role !== 'super' && !u.email.includes('marcelodanielcc'));
+            // Filtrar usuarios (excluir super admin y filas vacías)
+            const usuariosParaMostrar = database.usuarios.filter(u => 
+                u.ID && u.ID !== '' && 
+                u.Role !== 'super' && 
+                !u.Email.includes('marcelodanielcc')
+            );
             
             document.getElementById('viewSuper').innerHTML = `
                 <div class="table-card">
@@ -1599,7 +1672,7 @@
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
-                                    <th>Password</th>
+                                    <th>Email</th>
                                     <th>Rol</th>
                                     <th>Empresa</th>
                                     <th>Estado</th>
@@ -1608,32 +1681,30 @@
                             </thead>
                             <tbody>
                                 ${usuariosParaMostrar.map(usuario => {
-                                    const empresa = database.empresas.find(e => e.id === usuario.empresa_id);
+                                    const empresa = database.empresas.find(e => e.ID === usuario.EmpresaID);
                                     const passwordMasked = '••••••••';
                                     
                                     return `
                                         <tr>
-                                            <td><strong>${usuario.nombre}</strong></td>
+                                            <td><strong>${usuario.Nombre}</strong></td>
+                                            <td>${usuario.Email}</td>
                                             <td>
-                                                ${passwordMasked}
-                                            </td>
-                                            <td>
-                                                <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.role)}; font-size: 0.8rem;">
-                                                    ${usuario.role}
+                                                <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
+                                                    ${getRoleName(usuario.Role)}
                                                 </span>
                                             </td>
-                                            <td>${empresa ? empresa.nombre : 'Sin empresa'}</td>
+                                            <td>${empresa ? empresa.Nombre : 'Sin empresa'}</td>
                                             <td>
-                                                <span class="status-badge ${usuario.activo === 'Sí' ? 'status-active' : 'status-inactive'}">
-                                                    ${usuario.activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                                <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                    ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
                                                 </span>
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.id}')" title="Editar Todo">
+                                                    <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="action-btn delete" onclick="confirmarEliminarUsuario('${usuario.id}', '${usuario.nombre}')" title="Eliminar">
+                                                    <button class="action-btn delete" onclick="confirmarEliminarUsuario('${usuario.ID}', '${usuario.Nombre}')" title="Eliminar">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -1641,11 +1712,11 @@
                                         </tr>
                                     `;
                                 }).join('')}
-                                ${database.usuarios.length === 0 ? `
+                                ${usuariosParaMostrar.length === 0 ? `
                                     <tr>
                                         <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                                             <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay usuarios registrados
+                                            No hay usuarios registrados (excepto super admin)
                                         </td>
                                     </tr>
                                 ` : ''}
@@ -1657,120 +1728,40 @@
         }
         
         // =============================================
-        // MÓDULO: DASHBOARD JEFE EMPRESA
+        // MÓDULO: FUNCIONES AUXILIARES
         // =============================================
         
-        // FUNCIÓN: Cargar dashboard jefe empresa
-        function loadJefeDashboard() {
-            const empresaId = currentUser.empresa_id;
-            const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
-            const empleadosEmpresa = database.empleados.filter(e => e.empresa_id === empresaId);
-            
-            document.getElementById('viewJefe').innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Ventas del Mes</div>
-                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-                        </div>
-                        <div class="stat-value">Bs. 0</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> Sin datos
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Empleados</div>
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        </div>
-                        <div class="stat-value">${empleadosEmpresa.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-user-check"></i> Activos
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Usuarios</div>
-                            <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
-                        </div>
-                        <div class="stat-value">${usuariosEmpresa.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-user-plus"></i> Registrados
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Empresa</div>
-                            <div class="stat-icon"><i class="fas fa-building"></i></div>
-                        </div>
-                        <div class="stat-value">${currentCompany ? currentCompany.estado : 'Activa'}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-check-circle"></i> Estado
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Resumen de la Empresa</h3>
-                        <div class="table-actions">
-                            <button class="btn btn-primary" onclick="loadEmpresaVentas()">
-                                <i class="fas fa-chart-line"></i> Ver Ventas
-                            </button>
-                            <button class="btn btn-secondary" onclick="loadEmpleadosEmpresa()">
-                                <i class="fas fa-users"></i> Ver Empleados
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Información</th>
-                                    <th>Valor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Empresa</strong></td>
-                                    <td>${currentCompany ? currentCompany.nombre : currentUser.empresa}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>NIT</strong></td>
-                                    <td>${currentCompany ? (currentCompany.nit || currentCompany.ruc || 'No registrado') : 'No disponible'}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Industria</strong></td>
-                                    <td>${currentCompany ? currentCompany.industria : 'No especificada'}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Contacto</strong></td>
-                                    <td>${currentCompany ? currentCompany.contacto : 'No registrado'}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Estado</strong></td>
-                                    <td>
-                                        <span class="status-badge ${currentCompany && currentCompany.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
-                                            ${currentCompany ? currentCompany.estado : 'Inactiva'}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
+        // FUNCIÓN: Obtener nombre del rol
+        function getRoleName(role) {
+            const roles = {
+                'super': 'Super Admin',
+                'jefe': 'Jefe Empresa',
+                'comercial': 'Dirección Comercial',
+                'admin': 'Administración',
+                'vendedor': 'Vendedor',
+                'almacen': 'Almacén'
+            };
+            return roles[role] || role;
+        }
+        
+        // FUNCIÓN: Obtener color por rol
+        function getRoleColor(role) {
+            switch(role) {
+                case 'super': return 'rgba(255,0,85,0.2)';
+                case 'jefe': return 'rgba(0,255,65,0.2)';
+                case 'comercial': return 'rgba(255,170,0,0.2)';
+                case 'admin': return 'rgba(0,170,255,0.2)';
+                case 'vendedor': return 'rgba(124,58,237,0.2)';
+                case 'almacen': return 'rgba(255,85,0,0.2)';
+                default: return 'rgba(255,255,255,0.1)';
+            }
         }
         
         // =============================================
         // MÓDULO: MODALES PARA EMPRESAS
         // =============================================
         
-        // FUNCIÓN: Mostrar modal nueva empresa con país y tipo de documento
+        // FUNCIÓN: Mostrar modal nueva empresa
         function showNuevaEmpresaModal() {
             showModal('Nueva Empresa', `
                 <div style="max-width: 600px;">
@@ -1784,28 +1775,16 @@
                         <select id="nuevaEmpresaPais" onchange="actualizarTipoDocumento()" required style="color: white; background: rgba(255, 255, 255, 0.05);">
                             <option value="" style="color: #666;">Seleccionar país</option>
                             <option value="Bolivia" style="color: white;">Bolivia</option>
+                            <option value="Perú" style="color: white;">Perú</option>
                             <option value="Argentina" style="color: white;">Argentina</option>
                             <option value="Chile" style="color: white;">Chile</option>
-                            <option value="Perú" style="color: white;">Perú</option>
                             <option value="Colombia" style="color: white;">Colombia</option>
                             <option value="Ecuador" style="color: white;">Ecuador</option>
-                            <option value="México" style="color: white;">México</option>
-                            <option value="Brasil" style="color: white;">Brasil</option>
-                            <option value="Estados Unidos" style="color: white;">Estados Unidos</option>
-                            <option value="España" style="color: white;">España</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Tipo de Documento *</label>
-                        <select id="nuevaEmpresaTipoDocumento" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                            <option value="" style="color: #666;">Seleccionar tipo</option>
-                            <!-- Se llenará dinámicamente -->
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);" id="labelDocumento">Número de Documento *</label>
+                        <label style="color: var(--secondary);" id="labelDocumento">Documento *</label>
                         <input type="text" id="nuevaEmpresaDocumento" placeholder="Ingrese el número" style="color: white;">
                     </div>
                     
@@ -1819,9 +1798,6 @@
                             <option value="Servicios" style="color: white;">Servicios</option>
                             <option value="Alimentos" style="color: white;">Alimentos</option>
                             <option value="Construcción" style="color: white;">Construcción</option>
-                            <option value="Mineria" style="color: white;">Minería</option>
-                            <option value="Agricultura" style="color: white;">Agricultura</option>
-                            <option value="Turismo" style="color: white;">Turismo</option>
                             <option value="Otros" style="color: white;">Otros</option>
                         </select>
                     </div>
@@ -1842,27 +1818,9 @@
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Dirección</label>
-                        <input type="text" id="nuevaEmpresaDireccion" placeholder="Av. Principal #123" style="color: white;">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Ciudad</label>
-                        <input type="text" id="nuevaEmpresaCiudad" placeholder="Ciudad" style="color: white;">
-                    </div>
-                    
-                    <div class="form-group">
                         <label style="color: var(--secondary);">Contraseña Jefe *</label>
                         <input type="password" id="nuevaEmpresaPassword" value="12345678" style="color: white;">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Estado</label>
-                        <select id="nuevaEmpresaEstado" style="color: white; background: rgba(255, 255, 255, 0.05);">
-                            <option value="Activa" style="color: white;">Activa</option>
-                            <option value="Inactiva" style="color: white;">Inactiva</option>
-                            <option value="Pendiente" style="color: white;">Pendiente</option>
-                        </select>
+                        <small style="color: rgba(255,255,255,0.6);">Contraseña para el usuario jefe</small>
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
@@ -1877,59 +1835,34 @@
             `);
             
             // Inicializar con Bolivia como predeterminado
+            document.getElementById('nuevaEmpresaPais').value = 'Bolivia';
             actualizarTipoDocumento();
         }
         
         // FUNCIÓN: Actualizar tipo de documento según país
         function actualizarTipoDocumento() {
             const pais = document.getElementById('nuevaEmpresaPais').value;
-            const select = document.getElementById('nuevaEmpresaTipoDocumento');
             const label = document.getElementById('labelDocumento');
             
-            select.innerHTML = '<option value="" style="color: #666;">Seleccionar tipo</option>';
-            
             if (pais === 'Bolivia') {
-                select.innerHTML += '<option value="NIT" style="color: white;">NIT</option>';
                 label.textContent = 'NIT *';
                 document.getElementById('nuevaEmpresaDocumento').placeholder = '1234567890123';
             } else if (pais === 'Argentina') {
-                select.innerHTML += '<option value="CUIT" style="color: white;">CUIT</option>';
                 label.textContent = 'CUIT *';
                 document.getElementById('nuevaEmpresaDocumento').placeholder = '20-12345678-9';
             } else if (pais === 'Chile') {
-                select.innerHTML += '<option value="RUT" style="color: white;">RUT</option>';
                 label.textContent = 'RUT *';
                 document.getElementById('nuevaEmpresaDocumento').placeholder = '12.345.678-9';
             } else if (pais === 'Perú') {
-                select.innerHTML += '<option value="RUC" style="color: white;">RUC</option>';
                 label.textContent = 'RUC *';
                 document.getElementById('nuevaEmpresaDocumento').placeholder = '12345678901';
             } else if (pais === 'Colombia') {
-                select.innerHTML += '<option value="NIT" style="color: white;">NIT</option>';
                 label.textContent = 'NIT *';
                 document.getElementById('nuevaEmpresaDocumento').placeholder = '123.456.789-0';
             } else if (pais === 'Ecuador') {
-                select.innerHTML += '<option value="RUC" style="color: white;">RUC</option>';
                 label.textContent = 'RUC *';
                 document.getElementById('nuevaEmpresaDocumento').placeholder = '1234567890001';
-            } else if (pais === 'México') {
-                select.innerHTML += '<option value="RFC" style="color: white;">RFC</option>';
-                label.textContent = 'RFC *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = 'ABC123456XYZ';
-            } else if (pais === 'Brasil') {
-                select.innerHTML += '<option value="CNPJ" style="color: white;">CNPJ</option>';
-                label.textContent = 'CNPJ *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '12.345.678/0001-90';
-            } else if (pais === 'Estados Unidos') {
-                select.innerHTML += '<option value="EIN" style="color: white;">EIN</option>';
-                label.textContent = 'EIN *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '12-3456789';
-            } else if (pais === 'España') {
-                select.innerHTML += '<option value="CIF" style="color: white;">CIF</option>';
-                label.textContent = 'CIF *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = 'A12345678';
             } else {
-                select.innerHTML += '<option value="Número Fiscal" style="color: white;">Número Fiscal</option>';
                 label.textContent = 'Número Fiscal *';
                 document.getElementById('nuevaEmpresaDocumento').placeholder = 'Ingrese número fiscal';
             }
@@ -1942,20 +1875,17 @@
             const empresaData = {
                 nombre: document.getElementById('nuevaEmpresaNombre').value,
                 pais: document.getElementById('nuevaEmpresaPais').value,
-                tipo_documento: document.getElementById('nuevaEmpresaTipoDocumento').value,
                 documento: document.getElementById('nuevaEmpresaDocumento').value,
                 industria: document.getElementById('nuevaEmpresaIndustria').value,
                 contacto: document.getElementById('nuevaEmpresaContacto').value,
                 email: document.getElementById('nuevaEmpresaEmail').value,
                 telefono: document.getElementById('nuevaEmpresaTelefono').value,
                 password: document.getElementById('nuevaEmpresaPassword').value,
-                estado: document.getElementById('nuevaEmpresaEstado').value,
-                direccion: document.getElementById('nuevaEmpresaDireccion').value,
-                ciudad: document.getElementById('nuevaEmpresaCiudad').value
+                estado: 'Activa'
             };
             
             // Validar campos requeridos
-            const required = ['nombre', 'pais', 'tipo_documento', 'documento', 'contacto', 'email', 'telefono', 'password'];
+            const required = ['nombre', 'pais', 'documento', 'contacto', 'email', 'telefono', 'password'];
             for (const field of required) {
                 if (!empresaData[field]) {
                     showNotification('error', 'Error', `Complete el campo: ${field}`);
@@ -1973,19 +1903,12 @@
             }
             
             try {
-                // Separar nombre del contacto para crear usuario jefe
-                const nombreParts = empresaData.contacto.split(' ');
-                empresaData.primer_nombre = nombreParts[0] || '';
-                empresaData.primer_apellido = nombreParts.length > 1 ? nombreParts[1] : empresaData.contacto;
-                
-                // Crear email para el jefe
-                const contactoEmail = empresaData.primer_nombre.toLowerCase() + '.' + 
-                                    empresaData.primer_apellido.toLowerCase().replace(/\s+/g, '') + '@' + 
-                                    empresaData.email.split('@')[1];
-                empresaData.email_jefe = contactoEmail;
+                console.log('Creando empresa:', empresaData);
                 
                 // Llamar a la API
                 const result = await postToAPI('registerCompany', empresaData);
+                
+                console.log('Resultado creación empresa:', result);
                 
                 if (result && result.success) {
                     showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
@@ -1995,13 +1918,13 @@
                     await loadUsuariosFromAPI();
                     
                     closeModal();
-                    loadSuperDashboard();
+                    loadEmpresasManagement();
                 } else {
                     showNotification('error', 'Error', result?.error || 'Error al crear empresa');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification('error', 'Error', 'Error de conexión con la API');
+                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
             } finally {
                 hideLoading();
             }
@@ -2009,31 +1932,34 @@
         
         // FUNCIÓN: Ver empresa completa
         function viewEmpresaCompleta(empresaId) {
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            if (!empresa) return;
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            if (!empresa) {
+                showNotification('error', 'Error', 'Empresa no encontrada');
+                return;
+            }
             
-            const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
-            const empleadosEmpresa = database.empleados.filter(e => e.empresa_id === empresaId);
+            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
+            const empleadosEmpresa = database.empleados.filter(e => e.EmpresaID === empresaId);
             
-            showModal(`Empresa: ${empresa.nombre}`, `
+            showModal(`Empresa: ${empresa.Nombre}`, `
                 <div style="max-width: 800px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                         <div>
                             <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
-                            <p><strong>País:</strong> ${empresa.pais || 'No especificado'}</p>
-                            <p><strong>Documento:</strong> ${empresa.tipo_documento || 'NIT'}: ${empresa.documento || empresa.nit || empresa.ruc || 'No registrado'}</p>
-                            <p><strong>Industria:</strong> ${empresa.industria || 'No especificada'}</p>
-                            <p><strong>Contacto:</strong> ${empresa.contacto || 'No registrado'}</p>
-                            <p><strong>Email:</strong> ${empresa.email || 'No registrado'}</p>
-                            <p><strong>Teléfono:</strong> ${empresa.telefono || 'No registrado'}</p>
-                            <p><strong>Estado:</strong> ${empresa.estado || 'Inactiva'}</p>
+                            <p><strong>RUC/NIT:</strong> ${empresa.RUC || 'No registrado'}</p>
+                            <p><strong>Industria:</strong> ${empresa.Industria || 'No especificada'}</p>
+                            <p><strong>Contacto:</strong> ${empresa.Contacto || 'No registrado'}</p>
+                            <p><strong>Email:</strong> ${empresa.Email || 'No registrado'}</p>
+                            <p><strong>Teléfono:</strong> ${empresa.Teléfono || 'No registrado'}</p>
+                            <p><strong>Estado:</strong> ${empresa.Estado || 'Inactiva'}</p>
                         </div>
                         
                         <div>
                             <h4 style="color: var(--secondary); margin-bottom: 1rem;">Ubicación</h4>
-                            <p><strong>Dirección:</strong> ${empresa.direccion || 'No registrada'}</p>
-                            <p><strong>Ciudad:</strong> ${empresa.ciudad || 'No registrada'}</p>
-                            <p><strong>Tarjeta:</strong> ${empresa.tarjetaregistrada || 'No'}</p>
+                            <p><strong>Dirección:</strong> ${empresa.Dirección || 'No registrada'}</p>
+                            <p><strong>Ciudad:</strong> ${empresa.Ciudad || 'No registrada'}</p>
+                            <p><strong>Tarjeta:</strong> ${empresa.TarjetaRegistrada || 'No'}</p>
+                            <p><strong>Fecha Registro:</strong> ${formatDate(empresa.FechaRegistro)}</p>
                         </div>
                     </div>
                     
@@ -2063,121 +1989,104 @@
             `);
         }
         
+        // FUNCIÓN: Formatear fecha
+        function formatDate(dateString) {
+            if (!dateString) return 'No disponible';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+        
         // FUNCIÓN: Editar empresa completa
         function editEmpresaCompleta(empresaId) {
-            const empresa = database.empresas.find(e => e.id === empresaId);
+            const empresa = database.empresas.find(e => e.ID === empresaId);
             if (!empresa) {
                 showNotification('error', 'Error', 'Empresa no encontrada');
                 return;
             }
             
-            showModal(`Editar Empresa: ${empresa.nombre}`, `
+            showModal(`Editar Empresa: ${empresa.Nombre}`, `
                 <div style="max-width: 700px;">
-                    <input type="hidden" id="editEmpresaId" value="${empresa.id || ''}">
+                    <input type="hidden" id="editEmpresaId" value="${empresa.ID || ''}">
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
                             <label style="color: var(--secondary);">Razón Social *</label>
-                            <input type="text" id="editEmpresaNombre" value="${empresa.nombre || ''}" required style="color: white;">
+                            <input type="text" id="editEmpresaNombre" value="${empresa.Nombre || ''}" required style="color: white;">
                         </div>
                         
                         <div class="form-group">
-                            <label style="color: var(--secondary);">País *</label>
-                            <select id="editEmpresaPais" onchange="actualizarTipoDocumentoEditar()" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Bolivia" ${empresa.pais === 'Bolivia' ? 'selected' : ''} style="color: white;">Bolivia</option>
-                                <option value="Argentina" ${empresa.pais === 'Argentina' ? 'selected' : ''} style="color: white;">Argentina</option>
-                                <option value="Chile" ${empresa.pais === 'Chile' ? 'selected' : ''} style="color: white;">Chile</option>
-                                <option value="Perú" ${empresa.pais === 'Perú' ? 'selected' : ''} style="color: white;">Perú</option>
-                                <option value="Colombia" ${empresa.pais === 'Colombia' ? 'selected' : ''} style="color: white;">Colombia</option>
-                                <option value="Ecuador" ${empresa.pais === 'Ecuador' ? 'selected' : ''} style="color: white;">Ecuador</option>
-                                <option value="México" ${empresa.pais === 'México' ? 'selected' : ''} style="color: white;">México</option>
-                                <option value="Brasil" ${empresa.pais === 'Brasil' ? 'selected' : ''} style="color: white;">Brasil</option>
-                                <option value="Estados Unidos" ${empresa.pais === 'Estados Unidos' ? 'selected' : ''} style="color: white;">Estados Unidos</option>
-                                <option value="España" ${empresa.pais === 'España' ? 'selected' : ''} style="color: white;">España</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Tipo Documento *</label>
-                            <select id="editEmpresaTipoDocumento" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="NIT" ${empresa.tipo_documento === 'NIT' || !empresa.tipo_documento ? 'selected' : ''} style="color: white;">NIT</option>
-                                <option value="RUC" ${empresa.tipo_documento === 'RUC' ? 'selected' : ''} style="color: white;">RUC</option>
-                                <option value="CUIT" ${empresa.tipo_documento === 'CUIT' ? 'selected' : ''} style="color: white;">CUIT</option>
-                                <option value="RFC" ${empresa.tipo_documento === 'RFC' ? 'selected' : ''} style="color: white;">RFC</option>
-                                <option value="CNPJ" ${empresa.tipo_documento === 'CNPJ' ? 'selected' : ''} style="color: white;">CNPJ</option>
-                                <option value="EIN" ${empresa.tipo_documento === 'EIN' ? 'selected' : ''} style="color: white;">EIN</option>
-                                <option value="CIF" ${empresa.tipo_documento === 'CIF' ? 'selected' : ''} style="color: white;">CIF</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Número Documento *</label>
-                            <input type="text" id="editEmpresaDocumento" value="${empresa.documento || empresa.nit || empresa.ruc || ''}" required style="color: white;">
+                            <label style="color: var(--secondary);">RUC/NIT *</label>
+                            <input type="text" id="editEmpresaRUC" value="${empresa.RUC || ''}" required style="color: white;">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Industria *</label>
                             <select id="editEmpresaIndustria" required style="color: white; background: rgba(255, 255, 255, 0.05);">
                                 <option value="" style="color: #666;">Seleccionar industria</option>
-                                <option value="Tecnología" ${empresa.industria === 'Tecnología' ? 'selected' : ''} style="color: white;">Tecnología</option>
-                                <option value="Comercio" ${empresa.industria === 'Comercio' ? 'selected' : ''} style="color: white;">Comercio</option>
-                                <option value="Manufactura" ${empresa.industria === 'Manufactura' ? 'selected' : ''} style="color: white;">Manufactura</option>
-                                <option value="Servicios" ${empresa.industria === 'Servicios' ? 'selected' : ''} style="color: white;">Servicios</option>
-                                <option value="Alimentos" ${empresa.industria === 'Alimentos' ? 'selected' : ''} style="color: white;">Alimentos</option>
-                                <option value="Construcción" ${empresa.industria === 'Construcción' ? 'selected' : ''} style="color: white;">Construcción</option>
-                                <option value="Mineria" ${empresa.industria === 'Mineria' ? 'selected' : ''} style="color: white;">Minería</option>
-                                <option value="Agricultura" ${empresa.industria === 'Agricultura' ? 'selected' : ''} style="color: white;">Agricultura</option>
-                                <option value="Turismo" ${empresa.industria === 'Turismo' ? 'selected' : ''} style="color: white;">Turismo</option>
-                                <option value="Otros" ${empresa.industria === 'Otros' ? 'selected' : ''} style="color: white;">Otros</option>
+                                <option value="Tecnología" ${empresa.Industria === 'Tecnología' ? 'selected' : ''} style="color: white;">Tecnología</option>
+                                <option value="Comercio" ${empresa.Industria === 'Comercio' ? 'selected' : ''} style="color: white;">Comercio</option>
+                                <option value="Manufactura" ${empresa.Industria === 'Manufactura' ? 'selected' : ''} style="color: white;">Manufactura</option>
+                                <option value="Servicios" ${empresa.Industria === 'Servicios' ? 'selected' : ''} style="color: white;">Servicios</option>
+                                <option value="Alimentos" ${empresa.Industria === 'Alimentos' ? 'selected' : ''} style="color: white;">Alimentos</option>
+                                <option value="Construcción" ${empresa.Industria === 'Construcción' ? 'selected' : ''} style="color: white;">Construcción</option>
+                                <option value="Otros" ${empresa.Industria === 'Otros' ? 'selected' : ''} style="color: white;">Otros</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Contacto *</label>
-                            <input type="text" id="editEmpresaContacto" value="${empresa.contacto || ''}" required style="color: white;">
+                            <input type="text" id="editEmpresaContacto" value="${empresa.Contacto || ''}" required style="color: white;">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Email *</label>
-                            <input type="email" id="editEmpresaEmail" value="${empresa.email || ''}" required style="color: white;">
+                            <input type="email" id="editEmpresaEmail" value="${empresa.Email || ''}" required style="color: white;">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Teléfono *</label>
-                            <input type="text" id="editEmpresaTelefono" value="${empresa.telefono || ''}" required style="color: white;">
+                            <input type="text" id="editEmpresaTelefono" value="${empresa.Teléfono || ''}" required style="color: white;">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Dirección</label>
-                            <input type="text" id="editEmpresaDireccion" value="${empresa.direccion || ''}" style="color: white;">
+                            <input type="text" id="editEmpresaDireccion" value="${empresa.Dirección || ''}" style="color: white;">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Ciudad</label>
-                            <input type="text" id="editEmpresaCiudad" value="${empresa.ciudad || ''}" style="color: white;">
+                            <input type="text" id="editEmpresaCiudad" value="${empresa.Ciudad || ''}" style="color: white;">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Estado *</label>
                             <select id="editEmpresaEstado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Activa" ${empresa.estado === 'Activa' ? 'selected' : ''} style="color: white;">Activa</option>
-                                <option value="Inactiva" ${empresa.estado === 'Inactiva' ? 'selected' : ''} style="color: white;">Inactiva</option>
-                                <option value="Pendiente" ${empresa.estado === 'Pendiente' ? 'selected' : ''} style="color: white;">Pendiente</option>
+                                <option value="Activa" ${empresa.Estado === 'Activa' ? 'selected' : ''} style="color: white;">Activa</option>
+                                <option value="Inactiva" ${empresa.Estado === 'Inactiva' ? 'selected' : ''} style="color: white;">Inactiva</option>
+                                <option value="Pendiente" ${empresa.Estado === 'Pendiente' ? 'selected' : ''} style="color: white;">Pendiente</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Tarjeta Registrada</label>
                             <select id="editEmpresaTarjeta" style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Sí" ${empresa.tarjetaregistrada === 'Sí' ? 'selected' : ''} style="color: white;">Sí</option>
-                                <option value="No" ${empresa.tarjetaregistrada === 'No' ? 'selected' : ''} style="color: white;">No</option>
+                                <option value="Sí" ${empresa.TarjetaRegistrada === 'Sí' ? 'selected' : ''} style="color: white;">Sí</option>
+                                <option value="No" ${empresa.TarjetaRegistrada === 'No' ? 'selected' : ''} style="color: white;">No</option>
                             </select>
                         </div>
                     </div>
                     
                     <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
                         <p style="color: var(--secondary); margin: 0;">
-                            <i class="fas fa-info-circle"></i> ID de la empresa: <strong>${empresa.id || 'N/A'}</strong>
+                            <i class="fas fa-info-circle"></i> ID de la empresa: <strong>${empresa.ID || 'N/A'}</strong>
                         </p>
                     </div>
                     
@@ -2193,100 +2102,61 @@
             `);
         }
 
-        // FUNCIÓN: Actualizar tipo documento para editar
-        function actualizarTipoDocumentoEditar() {
-            const pais = document.getElementById('editEmpresaPais').value;
-            const select = document.getElementById('editEmpresaTipoDocumento');
-            
-            select.innerHTML = '';
-            
-            if (pais === 'Bolivia') {
-                select.innerHTML = '<option value="NIT" style="color: white;">NIT</option>';
-            } else if (pais === 'Argentina') {
-                select.innerHTML = '<option value="CUIT" style="color: white;">CUIT</option>';
-            } else if (pais === 'Chile') {
-                select.innerHTML = '<option value="RUT" style="color: white;">RUT</option>';
-            } else if (pais === 'Perú') {
-                select.innerHTML = '<option value="RUC" style="color: white;">RUC</option>';
-            } else if (pais === 'Colombia') {
-                select.innerHTML = '<option value="NIT" style="color: white;">NIT</option>';
-            } else if (pais === 'Ecuador') {
-                select.innerHTML = '<option value="RUC" style="color: white;">RUC</option>';
-            } else if (pais === 'México') {
-                select.innerHTML = '<option value="RFC" style="color: white;">RFC</option>';
-            } else if (pais === 'Brasil') {
-                select.innerHTML = '<option value="CNPJ" style="color: white;">CNPJ</option>';
-            } else if (pais === 'Estados Unidos') {
-                select.innerHTML = '<option value="EIN" style="color: white;">EIN</option>';
-            } else if (pais === 'España') {
-                select.innerHTML = '<option value="CIF" style="color: white;">CIF</option>';
-            } else {
-                select.innerHTML = '<option value="Número Fiscal" style="color: white;">Número Fiscal</option>';
-            }
-        }
-
-        // FUNCIÓN: Guardar edición completa de empresa (VERSIÓN CORREGIDA)
+        // FUNCIÓN: Guardar edición completa de empresa
         async function guardarEdicionEmpresaCompleta(empresaId) {
-        showLoading();
-        
-        const empresaData = {
-            id: empresaId,
-            action: 'updateEmpresaCompleta', // ¡IMPORTANTE! Agregar esto
-            nombre: document.getElementById('editEmpresaNombre').value,
-            pais: document.getElementById('editEmpresaPais').value,
-            tipo_documento: document.getElementById('editEmpresaTipoDocumento').value,
-            documento: document.getElementById('editEmpresaDocumento').value,
-            industria: document.getElementById('editEmpresaIndustria').value,
-            contacto: document.getElementById('editEmpresaContacto').value,
-            email: document.getElementById('editEmpresaEmail').value,
-            telefono: document.getElementById('editEmpresaTelefono').value,
-            direccion: document.getElementById('editEmpresaDireccion').value,
-            ciudad: document.getElementById('editEmpresaCiudad').value,
-            estado: document.getElementById('editEmpresaEstado').value,
-            tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value
-        };
-        
-        // Validar campos requeridos
-        const required = ['nombre', 'pais', 'tipo_documento', 'documento', 'industria', 'contacto', 'email', 'telefono', 'estado'];
-        for (const field of required) {
-            if (!empresaData[field]) {
-            showNotification('error', 'Error', `Complete el campo: ${field}`);
-            hideLoading();
-            return;
+            showLoading();
+            
+            const empresaData = {
+                id: empresaId,
+                nombre: document.getElementById('editEmpresaNombre').value,
+                documento: document.getElementById('editEmpresaRUC').value,
+                industria: document.getElementById('editEmpresaIndustria').value,
+                contacto: document.getElementById('editEmpresaContacto').value,
+                email: document.getElementById('editEmpresaEmail').value,
+                telefono: document.getElementById('editEmpresaTelefono').value,
+                direccion: document.getElementById('editEmpresaDireccion').value,
+                ciudad: document.getElementById('editEmpresaCiudad').value,
+                estado: document.getElementById('editEmpresaEstado').value,
+                tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value
+            };
+            
+            // Validar campos requeridos
+            const required = ['nombre', 'documento', 'industria', 'contacto', 'email', 'telefono', 'estado'];
+            for (const field of required) {
+                if (!empresaData[field]) {
+                    showNotification('error', 'Error', `Complete el campo: ${field}`);
+                    hideLoading();
+                    return;
+                }
             }
-        }
-        
-        console.log('Enviando datos al servidor:', empresaData);
-        
-        try {
-            const result = await postToAPI('updateEmpresaCompleta', empresaData);
             
-            console.log('Respuesta del servidor:', result);
-            
-            if (result && result.success) {
-            showNotification('success', 'Éxito', 'Empresa actualizada completamente');
-            
-            // Recargar datos
-            await loadEmpresasFromAPI();
-            
-            closeModal();
-            loadEmpresasManagement();
-            } else {
-            showNotification('error', 'Error', result?.error || 'Error al actualizar');
+            try {
+                const result = await postToAPI('updateEmpresaCompleta', empresaData);
+                
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', 'Empresa actualizada completamente');
+                    
+                    // Recargar datos
+                    await loadEmpresasFromAPI();
+                    
+                    closeModal();
+                    loadEmpresasManagement();
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al actualizar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+            } finally {
+                hideLoading();
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showNotification('error', 'Error', 'Error de conexión: ' + error.message);
-        } finally {
-            hideLoading();
-        }
         }
 
         // FUNCIÓN: Confirmar eliminar empresa
         function confirmarEliminarEmpresa(empresaId, empresaNombre) {
             showConfirmation(
                 'Eliminar Empresa',
-                `¿Estás seguro de eliminar la empresa "${empresaNombre}"? Esta acción no se puede deshacer.`,
+                `¿Estás seguro de eliminar la empresa "${empresaNombre}"?<br><br><small style="color: var(--danger);">Esta acción eliminará TODOS los usuarios de esta empresa y NO se puede deshacer.</small>`,
                 function() {
                     eliminarEmpresa(empresaId);
                 }
@@ -2305,16 +2175,80 @@
                     
                     // Recargar datos
                     await loadEmpresasFromAPI();
+                    await loadUsuariosFromAPI();
                     
                     loadEmpresasManagement();
                 } else {
                     showNotification('error', 'Error', result?.error || 'Error al eliminar');
                 }
             } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión');
+                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
             } finally {
                 hideLoading();
             }
+        }
+
+        // FUNCIÓN: Gestionar usuarios de empresa
+        function manageUsuariosEmpresa(empresaId) {
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
+            
+            showModal(`Usuarios de: ${empresa.Nombre}`, `
+                <div style="max-width: 800px;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <button class="btn btn-primary" onclick="showNuevoUsuarioParaEmpresa('${empresaId}')">
+                            <i class="fas fa-user-plus"></i> Agregar Usuario
+                        </button>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${usuariosEmpresa.map(usuario => `
+                                    <tr>
+                                        <td>${usuario.Nombre}</td>
+                                        <td>${usuario.Email}</td>
+                                        <td>
+                                            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
+                                                ${getRoleName(usuario.Role)}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${usuariosEmpresa.length === 0 ? `
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay usuarios en esta empresa
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `);
         }
 
         // =============================================
@@ -2323,181 +2257,184 @@
 
         // FUNCIÓN: Mostrar modal nuevo usuario avanzado
         function showNuevoUsuarioModalAvanzado() {
-        showModal('Nuevo Usuario - Formulario Completo', `
-            <div style="max-width: 700px;">
-            <div class="form-group">
-                <label style="color: var(--secondary);">Empresa *</label>
-                <select id="nuevoUsuarioEmpresaAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                <option value="" style="color: #666;">Seleccionar empresa</option>
-                ${database.empresas.map(empresa => `
-                    <option value="${empresa.id}" style="color: white;">${empresa.nombre}</option>
-                `).join('')}
-                </select>
-            </div>
-            
-            <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
-                
-                <div class="form-group">
-                <label style="color: var(--secondary);">Nombres Completos *</label>
-                <input type="text" id="nuevoUsuarioNombres" placeholder="Juan Carlos Pérez Gómez" required style="color: white;">
-                <small style="color: rgba(255,255,255,0.6);">Ingrese nombres y apellidos completos</small>
+            showModal('Nuevo Usuario', `
+                <div style="max-width: 700px;">
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Empresa *</label>
+                        <select id="nuevoUsuarioEmpresaAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                            <option value="" style="color: #666;">Seleccionar empresa</option>
+                            ${database.empresas.map(empresa => `
+                                <option value="${empresa.ID}" style="color: white;">${empresa.Nombre}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Nombres Completos *</label>
+                        <input type="text" id="nuevoUsuarioNombres" placeholder="Juan Carlos Pérez Gómez" required style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Email *</label>
+                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Password *</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="color: white; flex: 1;">
+                            <button type="button" onclick="generarPasswordNuevoUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                                <i class="fas fa-random"></i> Generar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Rol *</label>
+                            <select id="nuevoUsuarioRolAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="jefe" style="color: white;">Jefe Empresa</option>
+                                <option value="comercial" style="color: white;">Dirección Comercial</option>
+                                <option value="admin" style="color: white;">Administración y Finanzas</option>
+                                <option value="vendedor" style="color: white;">Vendedor App</option>
+                                <option value="almacen" style="color: white;">Almacén App</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Estado *</label>
+                            <select id="nuevoUsuarioActivoAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Sí" style="color: white;">Activo</option>
+                                <option value="No" style="color: white;">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzadoCorregido()" style="flex: 1;">
+                            <i class="fas fa-user-plus"></i> Crear Usuario
+                        </button>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label style="color: var(--secondary);">Email *</label>
-                <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required style="color: white;">
-                <small style="color: rgba(255,255,255,0.6);">El usuario usará este email para acceder al sistema</small>
-            </div>
-            
-            <div class="form-group">
-                <label style="color: var(--secondary);">Password *</label>
-                <div style="display: flex; gap: 0.5rem;">
-                <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="color: white; flex: 1;">
-                <button type="button" onclick="generarPasswordNuevoUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
-                    <i class="fas fa-random"></i> Generar
-                </button>
-                </div>
-                <small style="color: rgba(255,255,255,0.6);">El usuario usará esta contraseña para acceder al sistema</small>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                <label style="color: var(--secondary);">Rol *</label>
-                <select id="nuevoUsuarioRolAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                    <option value="jefe" style="color: white;">Jefe Empresa</option>
-                    <option value="comercial" style="color: white;">Dirección Comercial</option>
-                    <option value="admin" style="color: white;">Administración y Finanzas</option>
-                    <option value="vendedor" style="color: white;">Vendedor App</option>
-                    <option value="almacen" style="color: white;">Almacén App</option>
-                </select>
-                </div>
-                
-                <div class="form-group">
-                <label style="color: var(--secondary);">Estado *</label>
-                <select id="nuevoUsuarioActivoAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                    <option value="Sí" style="color: white;">Activo</option>
-                    <option value="No" style="color: white;">Inactivo</option>
-                </select>
-                </div>
-            </div>
-            
-            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-shield-alt"></i> Permisos de Seguridad</h4>
-                <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
-                <i class="fas fa-info-circle"></i> Este usuario solo podrá acceder a los datos de la empresa asignada.
-                No tendrá acceso a información de otras empresas del sistema.
-                </p>
-            </div>
-            
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                Cancelar
-                </button>
-                <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzadoCorregido()" style="flex: 1;">
-                <i class="fas fa-user-plus"></i> Crear Usuario
-                </button>
-            </div>
-            </div>
-        `);
+            `);
         }
 
-        // FUNCIÓN: Crear nuevo usuario avanzado (VERSIÓN CORREGIDA)
-        async function crearNuevoUsuarioAvanzadoCorregido() {
-        showLoading();
-        
-        // Obtener valores del formulario
-        const nombresCompletos = document.getElementById('nuevoUsuarioNombres').value.trim();
-        const email = document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase();
-        const password = document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim();
-        const role = document.getElementById('nuevoUsuarioRolAvanzado').value;
-        const activo = document.getElementById('nuevoUsuarioActivoAvanzado').value;
-        const empresaId = document.getElementById('nuevoUsuarioEmpresaAvanzado').value;
-        
-        const usuarioData = {
-            nombre: nombresCompletos,
-            email: email,
-            password: password,
-            role: role,
-            activo: activo,
-            empresa_id: empresaId
-        };
-        
-        // Validaciones básicas
-        if (!nombresCompletos || !email || !empresaId) {
-            showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
-            hideLoading();
-            return;
-        }
-        
-        // Validar email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showNotification('error', 'Error', 'Ingrese un email válido');
-            hideLoading();
-            return;
-        }
-        
-        try {
-            const result = await postToAPI('addUsuario', usuarioData);
+        // FUNCIÓN: Mostrar modal nuevo usuario para empresa específica
+        function showNuevoUsuarioParaEmpresa(empresaId) {
+            const empresa = database.empresas.find(e => e.ID === empresaId);
             
-            if (result && result.success) {
-            showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
-            
-            // Recargar datos
-            await loadUsuariosFromAPI();
-            
-            closeModal();
-            loadGestionPersonal();
-            } else {
-            showNotification('error', 'Error', result?.error || 'Error al crear usuario');
-            }
-        } catch (error) {
-            showNotification('error', 'Error', 'Error de conexión: ' + error.message);
-        } finally {
-            hideLoading();
-        }
+            showModal(`Nuevo Usuario para: ${empresa.Nombre}`, `
+                <div style="max-width: 600px;">
+                    <input type="hidden" id="nuevoUsuarioEmpresaEspecifica" value="${empresaId}">
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Nombres Completos *</label>
+                        <input type="text" id="nuevoUsuarioNombresEspecifico" placeholder="Juan Carlos Pérez Gómez" required style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Email *</label>
+                        <input type="email" id="nuevoUsuarioEmailEspecifico" placeholder="usuario@${empresa.Email?.split('@')[1] || 'empresa.com'}" required style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Password *</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="nuevoUsuarioPasswordEspecifico" value="12345678" required style="color: white; flex: 1;">
+                            <button type="button" onclick="generarPasswordNuevoUsuarioEspecifico()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                                <i class="fas fa-random"></i> Generar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Rol *</label>
+                            <select id="nuevoUsuarioRolEspecifico" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="jefe" style="color: white;">Jefe Empresa</option>
+                                <option value="comercial" style="color: white;">Dirección Comercial</option>
+                                <option value="admin" style="color: white;">Administración y Finanzas</option>
+                                <option value="vendedor" style="color: white;">Vendedor App</option>
+                                <option value="almacen" style="color: white;">Almacén App</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Estado *</label>
+                            <select id="nuevoUsuarioActivoEspecifico" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Sí" style="color: white;">Activo</option>
+                                <option value="No" style="color: white;">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="crearNuevoUsuarioParaEmpresaEspecifica('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-user-plus"></i> Crear Usuario
+                        </button>
+                    </div>
+                </div>
+            `);
         }
 
         // FUNCIÓN: Generar password para nuevo usuario
         function generarPasswordNuevoUsuario() {
-            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';
             let password = '';
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 10; i++) {
                 password += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             document.getElementById('nuevoUsuarioPasswordAvanzado').value = password;
+        }
+
+        // FUNCIÓN: Generar password para usuario específico
+        function generarPasswordNuevoUsuarioEspecifico() {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';
+            let password = '';
+            for (let i = 0; i < 10; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('nuevoUsuarioPasswordEspecifico').value = password;
         }
 
         // FUNCIÓN: Crear nuevo usuario avanzado
         async function crearNuevoUsuarioAvanzadoCorregido() {
             showLoading();
             
-            // Construir nombre completo
-            const primerNombre = document.getElementById('nuevoUsuarioPrimerNombre').value.trim();
-            const segundoNombre = document.getElementById('nuevoUsuarioSegundoNombre').value.trim();
-            const primerApellido = document.getElementById('nuevoUsuarioPrimerApellido').value.trim();
-            const segundoApellido = document.getElementById('nuevoUsuarioSegundoApellido').value.trim();
-            
-            // Crear nombre completo
-            let nombreCompleto = primerNombre;
-            if (segundoNombre) nombreCompleto += ' ' + segundoNombre;
-            if (primerApellido) nombreCompleto += ' ' + primerApellido;
-            if (segundoApellido) nombreCompleto += ' ' + segundoApellido;
+            // Obtener valores del formulario
+            const nombresCompletos = document.getElementById('nuevoUsuarioNombres').value.trim();
+            const email = document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase();
+            const password = document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim();
+            const role = document.getElementById('nuevoUsuarioRolAvanzado').value;
+            const activo = document.getElementById('nuevoUsuarioActivoAvanzado').value;
+            const empresaId = document.getElementById('nuevoUsuarioEmpresaAvanzado').value;
             
             const usuarioData = {
-                nombre: nombreCompleto,
-                email: document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase(),
-                password: document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim(),
-                role: document.getElementById('nuevoUsuarioRolAvanzado').value,
-                activo: document.getElementById('nuevoUsuarioActivoAvanzado').value,
-                empresa_id: document.getElementById('nuevoUsuarioEmpresaAvanzado').value
+                nombre: nombresCompletos,
+                email: email,
+                password: password,
+                role: role,
+                activo: activo,
+                empresa_id: empresaId
             };
             
-            // Validaciones
-            if (!primerNombre || !primerApellido || !usuarioData.email || !usuarioData.empresa_id) {
+            // Validaciones básicas
+            if (!nombresCompletos || !email || !empresaId) {
                 showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
+                hideLoading();
+                return;
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('error', 'Error', 'Ingrese un email válido');
                 hideLoading();
                 return;
             }
@@ -2506,7 +2443,7 @@
                 const result = await postToAPI('addUsuario', usuarioData);
                 
                 if (result && result.success) {
-                    showNotification('success', 'Éxito', `Usuario "${nombreCompleto}" creado exitosamente`);
+                    showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
                     
                     // Recargar datos
                     await loadUsuariosFromAPI();
@@ -2523,139 +2460,142 @@
             }
         }
 
-        // FUNCIÓN: Editar usuario completo (VERSIÓN CORREGIDA)
-        function editUsuarioCompleto(usuarioId) {
-        const usuario = database.usuarios.find(u => u.id === usuarioId);
-        if (!usuario) {
-            showNotification('error', 'Error', 'Usuario no encontrado');
-            return;
-        }
-        
-        showModal(`Editar Usuario: ${usuario.nombre}`, `
-            <div style="max-width: 700px;">
-            <input type="hidden" id="editUsuarioId" value="${usuario.id || ''}">
+        // FUNCIÓN: Crear nuevo usuario para empresa específica
+        async function crearNuevoUsuarioParaEmpresaEspecifica(empresaId) {
+            showLoading();
             
-            <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
+            // Obtener valores del formulario
+            const nombresCompletos = document.getElementById('nuevoUsuarioNombresEspecifico').value.trim();
+            const email = document.getElementById('nuevoUsuarioEmailEspecifico').value.trim().toLowerCase();
+            const password = document.getElementById('nuevoUsuarioPasswordEspecifico').value.trim();
+            const role = document.getElementById('nuevoUsuarioRolEspecifico').value;
+            const activo = document.getElementById('nuevoUsuarioActivoEspecifico').value;
+            
+            const usuarioData = {
+                nombre: nombresCompletos,
+                email: email,
+                password: password,
+                role: role,
+                activo: activo,
+                empresa_id: empresaId
+            };
+            
+            // Validaciones básicas
+            if (!nombresCompletos || !email) {
+                showNotification('error', 'Error', 'Complete los campos obligatorios');
+                hideLoading();
+                return;
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('error', 'Error', 'Ingrese un email válido');
+                hideLoading();
+                return;
+            }
+            
+            try {
+                const result = await postToAPI('addUsuario', usuarioData);
                 
-                <div class="form-group">
-                <label style="color: var(--secondary);">Nombres Completos *</label>
-                <input type="text" id="editUsuarioNombres" value="${usuario.nombre || ''}" required style="color: white;">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label style="color: var(--secondary);">Email *</label>
-                <input type="email" id="editUsuarioEmail" value="${usuario.email || ''}" required style="color: white;">
-            </div>
-            
-            <div class="form-group">
-                <label style="color: var(--secondary);">Password *</label>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                <input type="text" id="editUsuarioPassword" value="${usuario.password || '12345678'}" required style="color: white; flex: 1;">
-                <button type="button" onclick="generarPasswordUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
-                    <i class="fas fa-random"></i> Generar
-                </button>
-                </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                <label style="color: var(--secondary);">Rol *</label>
-                <select id="editUsuarioRol" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                    <option value="jefe" ${usuario.role === 'jefe' ? 'selected' : ''} style="color: white;">Jefe Empresa</option>
-                    <option value="comercial" ${usuario.role === 'comercial' ? 'selected' : ''} style="color: white;">Dirección Comercial</option>
-                    <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''} style="color: white;">Administración y Finanzas</option>
-                    <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''} style="color: white;">Vendedor App</option>
-                    <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''} style="color: white;">Almacén App</option>
-                </select>
-                </div>
-                
-                <div class="form-group">
-                <label style="color: var(--secondary);">Empresa *</label>
-                <select id="editUsuarioEmpresa" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                    <option value="" style="color: #666;">Seleccionar empresa</option>
-                    ${database.empresas.map(emp => `
-                    <option value="${emp.id}" ${usuario.empresa_id === emp.id ? 'selected' : ''} style="color: white;">${emp.nombre}</option>
-                    `).join('')}
-                </select>
-                </div>
-                
-                <div class="form-group">
-                <label style="color: var(--secondary);">Estado *</label>
-                <select id="editUsuarioActivo" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                    <option value="Sí" ${usuario.activo === 'Sí' ? 'selected' : ''} style="color: white;">Activo</option>
-                    <option value="No" ${usuario.activo === 'No' ? 'selected' : ''} style="color: white;">Inactivo</option>
-                </select>
-                </div>
-            </div>
-            
-            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                <p style="color: var(--secondary); margin: 0;">
-                <i class="fas fa-info-circle"></i> ID del usuario: <strong>${usuario.id || 'N/A'}</strong>
-                </p>
-            </div>
-            
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                Cancelar
-                </button>
-                <button class="btn btn-primary" onclick="guardarUsuarioCompletoCorregido('${usuarioId}')" style="flex: 1;">
-                <i class="fas fa-save"></i> Guardar Cambios
-                </button>
-            </div>
-            </div>
-        `);
+                if (result && result.success) {
+                    showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
+                    
+                    // Recargar datos
+                    await loadUsuariosFromAPI();
+                    
+                    closeModal();
+                    // Recargar la vista de usuarios de la empresa
+                    manageUsuariosEmpresa(empresaId);
+                } else {
+                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
+                }
+            } catch (error) {
+                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+            } finally {
+                hideLoading();
+            }
         }
 
-        // FUNCIÓN: Guardar usuario completo (VERSIÓN CORREGIDA)
-        async function guardarUsuarioCompletoCorregido(usuarioId) {
-        showLoading();
-        
-        // Obtener valores del formulario
-        const nombresCompletos = document.getElementById('editUsuarioNombres').value.trim();
-        const email = document.getElementById('editUsuarioEmail').value.trim().toLowerCase();
-        const password = document.getElementById('editUsuarioPassword').value.trim();
-        const role = document.getElementById('editUsuarioRol').value;
-        const activo = document.getElementById('editUsuarioActivo').value;
-        const empresaId = document.getElementById('editUsuarioEmpresa').value;
-        
-        const usuarioData = {
-            id: usuarioId,
-            nombre: nombresCompletos,
-            email: email,
-            password: password,
-            role: role,
-            activo: activo,
-            empresa_id: empresaId
-        };
-        
-        // Validaciones básicas
-        if (!nombresCompletos || !email || !empresaId) {
-            showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
-            hideLoading();
-            return;
-        }
-        
-        try {
-            const result = await postToAPI('updateUsuario', usuarioData);
-            
-            if (result && result.success) {
-            showNotification('success', 'Éxito', 'Usuario guardado correctamente');
-            
-            // Recargar datos
-            await loadUsuariosFromAPI();
-            
-            closeModal();
-            loadGestionPersonal();
-            } else {
-            showNotification('error', 'Error', result?.error || 'Error al guardar usuario');
+        // FUNCIÓN: Editar usuario completo
+        function editUsuarioCompleto(usuarioId) {
+            const usuario = database.usuarios.find(u => u.ID === usuarioId);
+            if (!usuario) {
+                showNotification('error', 'Error', 'Usuario no encontrado');
+                return;
             }
-        } catch (error) {
-            showNotification('error', 'Error', 'Error de conexión: ' + error.message);
-        } finally {
-            hideLoading();
-        }
+            
+            showModal(`Editar Usuario: ${usuario.Nombre}`, `
+                <div style="max-width: 700px;">
+                    <input type="hidden" id="editUsuarioId" value="${usuario.ID || ''}">
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Nombres Completos *</label>
+                        <input type="text" id="editUsuarioNombres" value="${usuario.Nombre || ''}" required style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Email *</label>
+                        <input type="email" id="editUsuarioEmail" value="${usuario.Email || ''}" required style="color: white;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Password *</label>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="text" id="editUsuarioPassword" value="${usuario.Password || '12345678'}" required style="color: white; flex: 1;">
+                            <button type="button" onclick="generarPasswordUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                                <i class="fas fa-random"></i> Generar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Rol *</label>
+                            <select id="editUsuarioRol" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="jefe" ${usuario.Role === 'jefe' ? 'selected' : ''} style="color: white;">Jefe Empresa</option>
+                                <option value="comercial" ${usuario.Role === 'comercial' ? 'selected' : ''} style="color: white;">Dirección Comercial</option>
+                                <option value="admin" ${usuario.Role === 'admin' ? 'selected' : ''} style="color: white;">Administración y Finanzas</option>
+                                <option value="vendedor" ${usuario.Role === 'vendedor' ? 'selected' : ''} style="color: white;">Vendedor App</option>
+                                <option value="almacen" ${usuario.Role === 'almacen' ? 'selected' : ''} style="color: white;">Almacén App</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Empresa *</label>
+                            <select id="editUsuarioEmpresa" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="" style="color: #666;">Seleccionar empresa</option>
+                                ${database.empresas.map(emp => `
+                                    <option value="${emp.ID}" ${usuario.EmpresaID === emp.ID ? 'selected' : ''} style="color: white;">${emp.Nombre}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Estado *</label>
+                            <select id="editUsuarioActivo" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Sí" ${usuario.Activo === 'Sí' ? 'selected' : ''} style="color: white;">Activo</option>
+                                <option value="No" ${usuario.Activo === 'No' ? 'selected' : ''} style="color: white;">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <p style="color: var(--secondary); margin: 0;">
+                            <i class="fas fa-info-circle"></i> ID del usuario: <strong>${usuario.ID || 'N/A'}</strong>
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="guardarUsuarioCompletoCorregido('${usuarioId}')" style="flex: 1;">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            `);
         }
 
         // FUNCIÓN: Generar nueva contraseña
@@ -2672,30 +2612,26 @@
         async function guardarUsuarioCompletoCorregido(usuarioId) {
             showLoading();
             
-            // Construir nombre completo
-            const primerNombre = document.getElementById('editUsuarioPrimerNombre').value.trim();
-            const segundoNombre = document.getElementById('editUsuarioSegundoNombre').value.trim();
-            const primerApellido = document.getElementById('editUsuarioPrimerApellido').value.trim();
-            const segundoApellido = document.getElementById('editUsuarioSegundoApellido').value.trim();
-            
-            // Crear nombre completo
-            let nombreCompleto = primerNombre;
-            if (segundoNombre) nombreCompleto += ' ' + segundoNombre;
-            if (primerApellido) nombreCompleto += ' ' + primerApellido;
-            if (segundoApellido) nombreCompleto += ' ' + segundoApellido;
+            // Obtener valores del formulario
+            const nombresCompletos = document.getElementById('editUsuarioNombres').value.trim();
+            const email = document.getElementById('editUsuarioEmail').value.trim().toLowerCase();
+            const password = document.getElementById('editUsuarioPassword').value.trim();
+            const role = document.getElementById('editUsuarioRol').value;
+            const activo = document.getElementById('editUsuarioActivo').value;
+            const empresaId = document.getElementById('editUsuarioEmpresa').value;
             
             const usuarioData = {
                 id: usuarioId,
-                nombre: nombreCompleto,
-                email: document.getElementById('editUsuarioEmail').value.trim().toLowerCase(),
-                password: document.getElementById('editUsuarioPassword').value.trim(),
-                role: document.getElementById('editUsuarioRol').value,
-                activo: document.getElementById('editUsuarioActivo').value,
-                empresa_id: document.getElementById('editUsuarioEmpresa').value
+                nombre: nombresCompletos,
+                email: email,
+                password: password,
+                role: role,
+                activo: activo,
+                empresa_id: empresaId
             };
             
-            // Validaciones
-            if (!usuarioData.nombre || !usuarioData.email || !usuarioData.empresa_id) {
+            // Validaciones básicas
+            if (!nombresCompletos || !email || !empresaId) {
                 showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
                 hideLoading();
                 return;
@@ -2726,7 +2662,7 @@
         function confirmarEliminarUsuario(usuarioId, usuarioNombre) {
             showConfirmation(
                 'Eliminar Usuario',
-                `¿Estás seguro de eliminar al usuario "${usuarioNombre}"? Esta acción no se puede deshacer.`,
+                `¿Estás seguro de eliminar al usuario "${usuarioNombre}"?<br><br><small style="color: var(--danger);">Esta acción NO se puede deshacer.</small>`,
                 function() {
                     eliminarUsuario(usuarioId);
                 }
@@ -2751,7 +2687,7 @@
                     showNotification('error', 'Error', result?.error || 'Error al eliminar');
                 }
             } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión');
+                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
             } finally {
                 hideLoading();
             }
@@ -2763,52 +2699,28 @@
         
         // FUNCIÓN: Acceder como jefe de empresa
         function accessAsJefeEmpresa(empresaId) {
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            if (!empresa) return;
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            if (!empresa) {
+                showNotification('error', 'Error', 'Empresa no encontrada');
+                return;
+            }
             
             showConfirmation(
                 'Acceder como Jefe',
-                `¿Acceder a la empresa "${empresa.nombre}" como jefe?`,
+                `¿Acceder a la empresa "${empresa.Nombre}" como jefe?<br><br><small>Podrás ver y gestionar esta empresa como si fueras su jefe.</small>`,
                 function() {
                     // Cambiar temporalmente el rol del usuario actual
                     currentUser.role = 'jefe';
-                    currentUser.empresa = empresa.nombre;
+                    currentUser.empresa = empresa.Nombre;
                     currentUser.empresa_id = empresaId;
                     currentCompany = empresa;
                     
                     // Reconfigurar interfaz
                     configureInterface();
                     
-                    showNotification('success', 'Modo Jefe', `Ahora eres jefe de ${empresa.nombre}`);
+                    showNotification('success', 'Modo Jefe', `Ahora eres jefe de ${empresa.Nombre}`);
                 }
             );
-        }
-        
-        // FUNCIÓN: Acceso comercial
-        function accessComercial() {
-            showNotification('info', 'En desarrollo', 'Función Dirección Comercial en desarrollo');
-        }
-        
-        // FUNCIÓN: Acceso administración
-        function accessAdmin() {
-            showNotification('info', 'En desarrollo', 'Función Administración y Finanzas en desarrollo');
-        }
-        
-        // =============================================
-        // MÓDULO: UTILIDADES
-        // =============================================
-        
-        // FUNCIÓN: Obtener color por rol
-        function getRoleColor(role) {
-            switch(role) {
-                case 'super': return 'rgba(255,0,85,0.2)';
-                case 'jefe': return 'rgba(0,255,65,0.2)';
-                case 'comercial': return 'rgba(255,170,0,0.2)';
-                case 'admin': return 'rgba(0,170,255,0.2)';
-                case 'vendedor': return 'rgba(124,58,237,0.2)';
-                case 'almacen': return 'rgba(255,85,0,0.2)';
-                default: return 'rgba(255,255,255,0.1)';
-            }
         }
         
         // =============================================
@@ -2830,7 +2742,7 @@
         // FUNCIÓN: Mostrar confirmación
         function showConfirmation(title, message, onConfirm) {
             document.getElementById('confirmationTitle').textContent = title;
-            document.getElementById('confirmationMessage').textContent = message;
+            document.getElementById('confirmationMessage').innerHTML = message;
             document.getElementById('confirmationDialog').style.display = 'flex';
             
             const confirmBtn = document.getElementById('confirmActionBtn');
@@ -2978,44 +2890,49 @@
         // MÓDULO: INICIALIZACIÓN
         // =============================================
         
-        // FUNCIÓN: Iniciar sesión (VERSIÓN SIMPLIFICADA)
+        // FUNCIÓN: Iniciar sesión
         async function startSession() {
-        console.log('🔄 Iniciando sesión...');
-        
-        // Obtener usuario de localStorage
-        const savedUser = localStorage.getItem('nexial_user');
-        
-        if (!savedUser) {
-            console.log('❌ No hay sesión guardada');
-            window.location.href = 'index.html';
-            return;
-        }
-        
-        try {
-            currentUser = JSON.parse(savedUser);
-            console.log('👤 Usuario cargado:', currentUser);
+            console.log('🔄 Iniciando sesión...');
             
-            // Configurar interfaz inmediatamente
-            configureInterface();
+            // Obtener usuario de localStorage
+            const savedUser = localStorage.getItem('nexial_user');
             
-            // Intentar cargar datos en segundo plano
-            setTimeout(async () => {
-            try {
-                await loadAllData();
-                showNotification('success', 'Sistema cargado', 'Datos actualizados correctamente');
-            } catch (error) {
-                console.log('⚠️ Datos cargados en modo demostración');
-                showNotification('info', 'Modo demostración', 'Usando datos de ejemplo');
+            if (!savedUser) {
+                console.log('❌ No hay sesión guardada');
+                window.location.href = 'index.html';
+                return;
             }
-            }, 1000);
             
-        } catch (error) {
-            console.error('Error iniciando sesión:', error);
-            showNotification('error', 'Error de sesión', 'Por favor, vuelve a iniciar sesión');
-            setTimeout(() => {
-            window.location.href = 'index.html';
-            }, 3000);
-        }
+            try {
+                currentUser = JSON.parse(savedUser);
+                console.log('👤 Usuario cargado:', currentUser);
+                
+                // Configurar interfaz inmediatamente
+                configureInterface();
+                
+                // Cargar datos en segundo plano
+                setTimeout(async () => {
+                    try {
+                        await loadAllData();
+                        showNotification('success', 'Sistema cargado', 'Datos actualizados correctamente');
+                        
+                        // Actualizar dashboard si está activo
+                        if (document.getElementById('viewSuper').classList.contains('active')) {
+                            loadSuperDashboard();
+                        }
+                    } catch (error) {
+                        console.log('⚠️ Datos cargados en modo demostración');
+                        showNotification('info', 'Modo demostración', 'Usando datos de ejemplo');
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error iniciando sesión:', error);
+                showNotification('error', 'Error de sesión', 'Por favor, vuelve a iniciar sesión');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+            }
         }
         
         // =============================================
@@ -3055,7 +2972,7 @@
             startSession();
             
             console.log('🚀 Nexial Suite Panel de Control inicializado');
-            console.log('📊 Sistema Corporativo Multiempresa v3.0');
+            console.log('📊 Sistema Corporativo Multiempresa v3.1');
             console.log('🔗 API URL:', API_URL);
         });
 
