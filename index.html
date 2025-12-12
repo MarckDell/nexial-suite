@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexial Suite - Sistema Empresarial</title>
+    <title>Nexial Suite - Sistema Empresarial Boliviano</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="pwa-manifest.json">
     <style>
+        /* ============================================= */
+        /* REGIÓN: VARIABLES GLOBALES */
+        /* ============================================= */
         :root {
             --primary: #7c3aed;
             --primary-glow: #9d5bff;
@@ -13,15 +17,24 @@
             --accent: #ffd700;
             --success: #00ff41;
             --danger: #ff0055;
+            --warning: #ffaa00;
+            --info: #00aaff;
+            
             --dark: #0f0f23;
             --darker: #070710;
+            --card-bg: rgba(15, 15, 35, 0.8);
+            --glass: rgba(255, 255, 255, 0.05);
+            
             --neon-shadow: 0 0 15px;
         }
         
+        /* ============================================= */
+        /* MÓDULO: RESET Y BASE */
+        /* ============================================= */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
             background: var(--darker);
             color: #f0f0ff;
             background-image: 
@@ -30,7 +43,9 @@
             overflow-x: hidden;
         }
         
-        /* Header Cyberpunk con animación */
+        /* ============================================= */
+        /* COMPONENTE: HEADER CYBERPUNK */
+        /* ============================================= */
         .cyber-header {
             background: rgba(15, 15, 35, 0.95);
             backdrop-filter: blur(10px);
@@ -81,7 +96,11 @@
             }
         }
         
-        .cyber-nav { display: flex; gap: 2rem; }
+        .cyber-nav { 
+            display: flex; 
+            gap: 2rem; 
+        }
+        
         .cyber-nav a {
             color: #cbd5e1;
             text-decoration: none;
@@ -91,6 +110,7 @@
             position: relative;
             overflow: hidden;
         }
+        
         .cyber-nav a::before {
             content: '';
             position: absolute;
@@ -101,15 +121,17 @@
             background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.2), transparent);
             transition: 0.5s;
         }
-        .cyber-nav a:hover::before {
-            left: 100%;
-        }
+        
+        .cyber-nav a:hover::before { left: 100%; }
         .cyber-nav a:hover {
             background: rgba(124, 58, 237, 0.2);
             color: var(--secondary);
             transform: translateY(-2px);
         }
         
+        /* ============================================= */
+        /* COMPONENTE: BOTONES CYBERPUNK */
+        /* ============================================= */
         .cyber-btn {
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: white;
@@ -122,6 +144,7 @@
             position: relative;
             overflow: hidden;
         }
+        
         .cyber-btn::before {
             content: '';
             position: absolute;
@@ -132,15 +155,25 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: 0.5s;
         }
-        .cyber-btn:hover::before {
-            left: 100%;
-        }
+        
+        .cyber-btn:hover::before { left: 100%; }
         .cyber-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--neon-shadow) rgba(124, 58, 237, 0.5);
         }
         
-        /* Hero Cyberpunk con animaciones */
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        /* ============================================= */
+        /* SECCIÓN: HERO PRINCIPAL */
+        /* ============================================= */
         .cyber-hero {
             padding: 12rem 2rem 6rem;
             text-align: center;
@@ -182,12 +215,8 @@
         }
         
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         .cyber-subtitle {
@@ -209,7 +238,9 @@
             }
         }
         
-        /* Features Cyberpunk con animaciones escalonadas */
+        /* ============================================= */
+        /* MÓDULO: TARJETAS DE CARACTERÍSTICAS */
+        /* ============================================= */
         .cyber-features {
             padding: 6rem 2rem;
             max-width: 1200px;
@@ -265,12 +296,19 @@
             font-size: 1.5rem;
         }
         
-        /* Registration Cyberpunk */
-        .cyber-registration {
-            padding: 6rem 2rem;
-            background: var(--darker);
+        .cyber-card ul {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
         }
         
+        .cyber-card li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* ============================================= */
+        /* SECCIÓN: FORMULARIOS */
+        /* ============================================= */
         .cyber-form {
             background: rgba(15, 15, 35, 0.8);
             padding: 2.5rem;
@@ -303,7 +341,8 @@
             font-weight: 500;
         }
         
-        .form-group input, .form-group select {
+        .form-group input, 
+        .form-group select {
             width: 100%;
             padding: 1rem;
             background: rgba(255, 255, 255, 0.05);
@@ -314,7 +353,8 @@
             transition: all 0.3s;
         }
         
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 10px rgba(124, 58, 237, 0.3),
@@ -342,6 +382,30 @@
             transform: translateY(-50%) scale(1.1);
         }
         
+        /* ============================================= */
+        /* COMPONENTE: BANNERS DE INFORMACIÓN */
+        /* ============================================= */
+        .info-banner {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: neonGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes neonGlow {
+            from {
+                box-shadow: 0 0 10px rgba(0, 245, 255, 0.3),
+                            inset 0 0 10px rgba(0, 245, 255, 0.1);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(0, 245, 255, 0.6),
+                            inset 0 0 20px rgba(0, 245, 255, 0.2);
+            }
+        }
+        
         .warning-box {
             background: rgba(255, 215, 0, 0.1);
             border: 2px solid var(--accent);
@@ -363,7 +427,30 @@
             }
         }
         
-        /* Footer Cyberpunk */
+        .protection-banner {
+            background: rgba(0, 255, 65, 0.1);
+            border: 2px solid var(--success);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            text-align: center;
+            animation: successPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes successPulse {
+            0%, 100% {
+                border-color: var(--success);
+                box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            }
+            50% {
+                border-color: #00ffaa;
+                box-shadow: 0 0 25px rgba(0, 255, 65, 0.4);
+            }
+        }
+        
+        /* ============================================= */
+        /* SECCIÓN: FOOTER */
+        /* ============================================= */
         .cyber-footer {
             background: rgba(7, 7, 16, 0.95);
             padding: 4rem 2rem 2rem;
@@ -385,15 +472,13 @@
         }
         
         @keyframes scanline {
-            0% {
-                left: -100%;
-            }
-            100% {
-                left: 100%;
-            }
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
         
-        /* Modal Cyberpunk (FULL SCREEN) */
+        /* ============================================= */
+        /* MÓDULO: MODALES CYBERPUNK */
+        /* ============================================= */
         .cyber-modal {
             display: none;
             position: fixed;
@@ -467,6 +552,7 @@
             align-items: center;
             justify-content: center;
         }
+        
         .close-modal:hover {
             opacity: 1;
             background: rgba(255, 255, 255, 0.1);
@@ -506,61 +592,9 @@
             margin-top: 1.5rem;
         }
         
-        .info-banner {
-            background: rgba(0, 245, 255, 0.1);
-            border: 1px solid var(--secondary);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            text-align: center;
-            animation: neonGlow 2s ease-in-out infinite alternate;
-        }
-        
-        @keyframes neonGlow {
-            from {
-                box-shadow: 0 0 10px rgba(0, 245, 255, 0.3),
-                            inset 0 0 10px rgba(0, 245, 255, 0.1);
-            }
-            to {
-                box-shadow: 0 0 20px rgba(0, 245, 255, 0.6),
-                            inset 0 0 20px rgba(0, 245, 255, 0.2);
-            }
-        }
-        
-        .info-banner h3 {
-            color: var(--secondary);
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-        
-        .protection-banner {
-            background: rgba(0, 255, 65, 0.1);
-            border: 2px solid var(--success);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 1.5rem 0;
-            text-align: center;
-            animation: successPulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes successPulse {
-            0%, 100% {
-                border-color: var(--success);
-                box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-            }
-            50% {
-                border-color: #00ffaa;
-                box-shadow: 0 0 25px rgba(0, 255, 65, 0.4);
-            }
-        }
-        
-        .protection-banner h3 {
-            color: var(--success);
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-        
-        /* Efectos de partículas para fondo */
+        /* ============================================= */
+        /* COMPONENTE: PARTÍCULAS DE FONDO */
+        /* ============================================= */
         .particles {
             position: fixed;
             top: 0;
@@ -583,39 +617,37 @@
                 transform: translateY(100vh) rotate(0deg);
                 opacity: 0;
             }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
             100% {
                 transform: translateY(-100px) rotate(360deg);
                 opacity: 0;
             }
         }
         
-        /* Responsive */
+        /* ============================================= */
+        /* MEDIA QUERIES - RESPONSIVE */
+        /* ============================================= */
         @media (max-width: 768px) {
-            .cyber-hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .cyber-nav {
-                display: none;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
+            .cyber-hero h1 { font-size: 2.5rem; }
+            .cyber-nav { display: none; }
+            .features-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: 1.5rem; }
+            .form-actions { flex-direction: column; }
+        }
+        
+        @media (max-width: 480px) {
+            .cyber-header { padding: 1rem; }
+            .cyber-hero { padding: 8rem 1rem 4rem; }
+            .cyber-features { padding: 3rem 1rem; }
         }
     </style>
 </head>
 <body>
-    <!-- Partículas de fondo -->
+    <!-- BLOQUE: PARTÍCULAS DE FONDO -->
     <div class="particles" id="particles"></div>
     
-    <!-- Header -->
+    <!-- BLOQUE: HEADER PRINCIPAL -->
     <header class="cyber-header">
         <div class="cyber-logo">
             <i class="fas fa-brain"></i>
@@ -632,9 +664,9 @@
         </button>
     </header>
 
-    <!-- Hero -->
+    <!-- BLOQUE: SECCIÓN HERO -->
     <section class="cyber-hero" id="inicio">
-        <h1>Transforma tu Gestión Empresarial</h1>
+        <h1>Transforma tu Gestión Empresarial en Bolivia</h1>
         <p class="cyber-subtitle">
             Sistema integral por áreas especializadas. Control total, máxima eficiencia.
             Apps para ventas, distribución y almacenes en tiempo real.
@@ -644,7 +676,7 @@
         </button>
     </section>
 
-    <!-- Features -->
+    <!-- BLOQUE: CARACTERÍSTICAS DEL SISTEMA -->
     <section class="cyber-features" id="caracteristicas">
         <div style="text-align: center; margin-bottom: 3rem;">
             <h2 style="color: var(--secondary); font-size: 2.5rem; animation: fadeInUp 1s ease-out;">SISTEMA POR ÁREAS ESPECIALIZADAS</h2>
@@ -655,7 +687,7 @@
             <div class="cyber-card">
                 <h3><i class="fas fa-crown"></i> DIRECCIÓN EJECUTIVA</h3>
                 <p>Control total de su empresa. Panel ejecutivo completo con visibilidad de todas las áreas.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>Supervisión todas las áreas</li>
                     <li>Reportes consolidados en tiempo real</li>
                     <li>Gestión estratégica y toma de decisiones</li>
@@ -667,7 +699,7 @@
             <div class="cyber-card">
                 <h3><i class="fas fa-chart-line"></i> DIRECCIÓN COMERCIAL</h3>
                 <p>Ventas, inventario, rutas y gestión comercial especializada con apps móviles.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>Asignación de zonas geográficas a vendedores</li>
                     <li>Control de inventario en tiempo real</li>
                     <li>Optimización de rutas de distribución</li>
@@ -681,7 +713,7 @@
             <div class="cyber-card">
                 <h3><i class="fas fa-calculator"></i> ADMINISTRACIÓN & FINANZAS</h3>
                 <p>Contabilidad, nómina, facturación y gestión financiera completa.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>Gestión de usuarios y empleados</li>
                     <li>Recursos humanos completo</li>
                     <li>Contabilidad automatizada</li>
@@ -695,7 +727,7 @@
             <div class="cyber-card">
                 <h3><i class="fas fa-mobile-alt"></i> APPS ESPECIALIZADAS</h3>
                 <p>Aplicaciones móviles para cada función operativa.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>App Vendedor: Pedidos en campo</li>
                     <li>App Almacén: Control de inventario</li>
                     <li>App Distribuidor: Rutas y entregas</li>
@@ -707,7 +739,7 @@
         </div>
     </section>
 
-    <!-- Ventajas -->
+    <!-- BLOQUE: SECCIÓN DE VENTAJAS -->
     <section class="cyber-features" id="ventajas" style="background: var(--dark);">
         <div style="text-align: center; margin-bottom: 3rem;">
             <h2 style="color: var(--accent); font-size: 2.5rem;">VENTAJAS DEL SISTEMA</h2>
@@ -718,7 +750,7 @@
             <div class="cyber-card">
                 <h3><i class="fas fa-sync-alt"></i> TIEMPO REAL</h3>
                 <p>Todas las áreas actualizadas al instante. Lo que ve el vendedor en campo lo ve el jefe en su oficina.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>Ventas registradas al instante</li>
                     <li>Stock actualizado en tiempo real</li>
                     <li>Ubicación de distribuidores en vivo</li>
@@ -729,18 +761,18 @@
             <div class="cyber-card">
                 <h3><i class="fas fa-shield-alt"></i> SEGURIDAD TOTAL</h3>
                 <p>Datos protegidos con encriptación de extremo a extremo. Cada empresa solo ve su información.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>Separación de datos por empresa</li>
                     <li>Roles y permisos granulares</li>
                     <li>Backup automático diario</li>
-                    <li>Cumplimiento normativo</li>
+                    <li>Cumplimiento normativo boliviano</li>
                 </ul>
             </div>
             
             <div class="cyber-card">
                 <h3><i class="fas fa-chart-bar"></i> REPORTES AVANZADOS</h3>
                 <p>Análisis detallado de cada aspecto del negocio. Toma decisiones basadas en datos reales.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>Panel ejecutivo personalizable</li>
                     <li>Reportes financieros automáticos</li>
                     <li>Análisis de ventas por zona</li>
@@ -751,7 +783,7 @@
             <div class="cyber-card">
                 <h3><i class="fas fa-cogs"></i> INTEGRACIÓN COMPLETA</h3>
                 <p>Todas las áreas conectadas entre sí. Finanzas ve lo de ventas, ventas ve lo de almacén.</p>
-                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <ul>
                     <li>Flujo de trabajo automatizado</li>
                     <li>Aprobaciones electrónicas</li>
                     <li>Comunicación entre áreas</li>
@@ -761,15 +793,15 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- BLOQUE: FOOTER -->
     <footer class="cyber-footer">
         <div class="cyber-logo" style="justify-content: center; margin-bottom: 1rem;">
             <i class="fas fa-brain"></i>
             NEXIAL SUITE
         </div>
-        <p style="opacity: 0.8; margin-bottom: 2rem;">Sistema de Gestión Empresarial Integral</p>
+        <p style="opacity: 0.8; margin-bottom: 2rem;">Sistema de Gestión Empresarial Integral - Bolivia</p>
         
-        <div style="display: flex; justify-content: center; gap: 2rem; margin: 2rem 0;">
+        <div style="display: flex; justify-content: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap;">
             <a href="#inicio" style="color: var(--secondary); text-decoration: none;">Inicio</a>
             <a href="#caracteristicas" style="color: var(--secondary); text-decoration: none;">Sistema</a>
             <a href="#ventajas" style="color: var(--secondary); text-decoration: none;">Ventajas</a>
@@ -782,9 +814,16 @@
             <i class="fas fa-phone"></i> +591 69800833 | 
             <i class="fas fa-envelope"></i> marcelodanielcc@gmail.com
         </p>
+        <p style="margin-top: 0.5rem; opacity: 0.6; font-size: 0.9rem;">
+            La Paz - Santa Cruz - Cochabamba | Bolivia
+        </p>
     </footer>
 
-    <!-- ===== MODAL DE LOGIN ===== -->
+    <!-- ============================================= -->
+    <!-- MODALES DEL SISTEMA -->
+    <!-- ============================================= -->
+
+    <!-- MODAL: LOGIN -->
     <div class="cyber-modal" id="loginModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeLoginModal()">×</button>
@@ -818,10 +857,17 @@
             <button class="cyber-btn" style="width: 100%; padding: 1rem; font-size: 1.1rem;" onclick="login()">
                 <i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA
             </button>
+            
+            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: rgba(255,255,255,0.7);">¿No tienes cuenta?</p>
+                <button class="cyber-btn btn-secondary" onclick="closeLoginModal(); openRegisterModal();" style="width: 100%; margin-top: 0.5rem;">
+                    <i class="fas fa-building"></i> REGISTRAR EMPRESA
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- ===== MODAL DE REGISTRO EMPRESA ===== -->
+    <!-- MODAL: REGISTRO DE EMPRESA -->
     <div class="cyber-modal" id="registerModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeRegisterModal()">×</button>
@@ -843,8 +889,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label><i class="fas fa-id-card"></i> RUC/NIT *</label>
-                    <input type="text" id="companyRUC" required placeholder="Número de identificación fiscal">
+                    <label><i class="fas fa-id-card"></i> NIT (Bolivia) *</label>
+                    <input type="text" id="companyNIT" required placeholder="Número de Identificación Tributaria">
                 </div>
                 
                 <div class="form-group">
@@ -857,6 +903,9 @@
                         <option value="Servicios">Servicios</option>
                         <option value="Alimentos">Alimentos</option>
                         <option value="Construcción">Construcción</option>
+                        <option value="Mineria">Minería</option>
+                        <option value="Agricultura">Agricultura</option>
+                        <option value="Turismo">Turismo</option>
                         <option value="Otros">Otros</option>
                     </select>
                 </div>
@@ -885,11 +934,11 @@
                 
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email Corporativo *</label>
-                    <input type="email" id="companyEmail" required placeholder="contacto@empresa.com">
+                    <input type="email" id="companyEmail" required placeholder="contacto@empresa.com.bo">
                 </div>
                 
                 <div class="form-group">
-                    <label><i class="fas fa-phone"></i> Teléfono *</label>
+                    <label><i class="fas fa-phone"></i> Teléfono/Celular *</label>
                     <input type="tel" id="companyPhone" required placeholder="+591 60000000">
                 </div>
                 
@@ -917,12 +966,12 @@
                 <div class="form-group">
                     <label style="display: flex; align-items: start; gap: 0.5rem; color: rgba(255,255,255,0.9);">
                         <input type="checkbox" required style="margin-top: 0.3rem;">
-                        <span>Acepto los términos y condiciones del servicio y autorizo el tratamiento de mis datos.</span>
+                        <span>Acepto los términos y condiciones del servicio y autorizo el tratamiento de mis datos según la normativa boliviana.</span>
                     </label>
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" class="cyber-btn" onclick="closeRegisterModal()" style="background: rgba(255,255,255,0.05); color: white;">
+                    <button type="button" class="cyber-btn btn-secondary" onclick="closeRegisterModal()">
                         Cancelar
                     </button>
                     <button type="submit" class="cyber-btn">
@@ -933,7 +982,7 @@
         </div>
     </div>
 
-    <!-- ===== MODAL DE TARJETA DE CRÉDITO ===== -->
+    <!-- MODAL: TARJETA DE CRÉDITO -->
     <div class="cyber-modal" id="cardModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeCardModal()">×</button>
@@ -987,7 +1036,7 @@
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" class="cyber-btn" onclick="backToRegister()" style="background: rgba(255,255,255,0.05); color: white;">
+                    <button type="button" class="cyber-btn btn-secondary" onclick="backToRegister()">
                         <i class="fas fa-arrow-left"></i> VOLVER
                     </button>
                     <button type="submit" class="cyber-btn">
@@ -999,10 +1048,17 @@
     </div>
 
     <script>
+        // =============================================
+        // REGIÓN: CONFIGURACIÓN GLOBAL
+        // =============================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbwrFOz0gKxzixORDHZZFi36ryjRSJKRRKqqZA26de3mzr3AHZwQv4IWdr3Z2iOyqLPZ0A/exec';
         let registeredCompanyData = null;
         
-        // Crear partículas de fondo
+        // =============================================
+        // MÓDULO: UTILIDADES VISUALES
+        // =============================================
+        
+        // FUNCIÓN: Crear partículas de fondo
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             for (let i = 0; i < 50; i++) {
@@ -1018,9 +1074,10 @@
         }
         
         // =============================================
-        // MANEJO DE MODALES
+        // MÓDULO: MANEJO DE MODALES
         // =============================================
         
+        // FUNCIÓN: Abrir modal de login
         function openLoginModal() {
             closeAllModals();
             document.getElementById('loginModal').style.display = 'flex';
@@ -1028,11 +1085,13 @@
             document.body.style.overflow = 'hidden';
         }
         
+        // FUNCIÓN: Cerrar modal de login
         function closeLoginModal() {
             document.getElementById('loginModal').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
         
+        // FUNCIÓN: Abrir modal de registro
         function openRegisterModal() {
             closeAllModals();
             document.getElementById('registerModal').style.display = 'flex';
@@ -1040,12 +1099,14 @@
             document.body.style.overflow = 'hidden';
         }
         
+        // FUNCIÓN: Cerrar modal de registro
         function closeRegisterModal() {
             document.getElementById('registerModal').style.display = 'none';
             document.body.style.overflow = 'auto';
             resetRegisterForm();
         }
         
+        // FUNCIÓN: Abrir modal de tarjeta
         function openCardModal() {
             closeAllModals();
             document.getElementById('cardModal').style.display = 'flex';
@@ -1053,12 +1114,14 @@
             document.body.style.overflow = 'hidden';
         }
         
+        // FUNCIÓN: Cerrar modal de tarjeta
         function closeCardModal() {
             document.getElementById('cardModal').style.display = 'none';
             document.body.style.overflow = 'auto';
             resetCardForm();
         }
         
+        // FUNCIÓN: Cerrar todos los modales
         function closeAllModals() {
             document.querySelectorAll('.cyber-modal').forEach(modal => {
                 modal.style.display = 'none';
@@ -1066,41 +1129,161 @@
             document.body.style.overflow = 'auto';
         }
         
+        // FUNCIÓN: Volver al registro desde tarjeta
         function backToRegister() {
             closeCardModal();
-            openRegisterModal();
+            setTimeout(() => openRegisterModal(), 300);
         }
         
         // =============================================
-        // FUNCIONES DEL FORMULARIO
+        // MÓDULO: FUNCIONES DEL FORMULARIO
         // =============================================
         
+        // FUNCIÓN: Mostrar/ocultar contraseña
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
-            const icon = field.nextElementSibling.querySelector('i');
-            field.type = field.type === 'password' ? 'text' : 'password';
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
+            const button = field.parentElement.querySelector('.toggle-password');
+            const icon = button.querySelector('i');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         }
         
+        // FUNCIÓN: Resetear formulario de registro
         function resetRegisterForm() {
             document.getElementById('registerForm').reset();
             registeredCompanyData = null;
         }
         
+        // FUNCIÓN: Resetear formulario de tarjeta
         function resetCardForm() {
             document.getElementById('cardForm').reset();
         }
         
-        // Enter para login
-        document.getElementById('loginPass')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') login();
-        });
+        // =============================================
+        // MÓDULO: VALIDACIÓN DE FORMULARIOS
+        // =============================================
+        
+        // FUNCIÓN: Validar NIT boliviano
+        function validateBolivianNIT(nit) {
+            // Formato básico de NIT boliviano (puedes ajustar según necesidades)
+            const nitRegex = /^[0-9]{7,15}$/;
+            return nitRegex.test(nit.replace(/\D/g, ''));
+        }
+        
+        // FUNCIÓN: Validar número de tarjeta
+        function validateCardNumber(cardNumber) {
+            const cleanCard = cardNumber.replace(/\s/g, '');
+            // Validar longitud básica
+            return cleanCard.length >= 15 && cleanCard.length <= 19;
+        }
+        
+        // FUNCIÓN: Validar fecha de vencimiento
+        function validateExpiryDate(expiry) {
+            const regex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
+            if (!regex.test(expiry)) return false;
+            
+            const [month, year] = expiry.split('/');
+            const now = new Date();
+            const currentYear = now.getFullYear() % 100;
+            const currentMonth = now.getMonth() + 1;
+            
+            const expiryYear = parseInt(year);
+            const expiryMonth = parseInt(month);
+            
+            if (expiryYear < currentYear) return false;
+            if (expiryYear === currentYear && expiryMonth < currentMonth) return false;
+            
+            return true;
+        }
         
         // =============================================
-        // LOGIN FUNCIONAL CON TU USUARIO
+        // MÓDULO: REGISTRO PASO 1 - DATOS EMPRESA
         // =============================================
-
+        
+        // FUNCIÓN: Procesar registro paso 1
+        function registerCompanyStep1(event) {
+            event.preventDefault();
+            
+            // Validar contraseñas
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Las contraseñas no coinciden');
+                return;
+            }
+            
+            if (password.length < 8) {
+                alert('La contraseña debe tener mínimo 8 caracteres');
+                return;
+            }
+            
+            // Recopilar datos
+            registeredCompanyData = {
+                nombre: document.getElementById('companyName').value.trim(),
+                nit: document.getElementById('companyNIT').value.trim(),
+                industria: document.getElementById('companyIndustry').value,
+                primer_nombre: document.getElementById('firstName').value.trim(),
+                segundo_nombre: document.getElementById('secondName').value.trim() || '',
+                primer_apellido: document.getElementById('firstLastName').value.trim(),
+                segundo_apellido: document.getElementById('secondLastName').value.trim() || '',
+                email: document.getElementById('companyEmail').value.trim().toLowerCase(),
+                telefono: document.getElementById('companyPhone').value.trim(),
+                password: password,
+                pais: 'Bolivia',
+                fecha_registro: new Date().toISOString().split('T')[0]
+            };
+            
+            // Validar campos requeridos
+            const requiredFields = ['nombre', 'nit', 'industria', 'primer_nombre', 
+                                  'primer_apellido', 'email', 'telefono'];
+            
+            for (const field of requiredFields) {
+                if (!registeredCompanyData[field]) {
+                    alert(`Por favor complete el campo: ${field.replace('_', ' ')}`);
+                    return;
+                }
+            }
+            
+            // Validar NIT boliviano
+            if (!validateBolivianNIT(registeredCompanyData.nit)) {
+                alert('Por favor ingrese un NIT válido (solo números, 7-15 dígitos)');
+                return;
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(registeredCompanyData.email)) {
+                alert('Por favor ingrese un email válido');
+                return;
+            }
+            
+            // Validar teléfono boliviano
+            const phoneRegex = /^(\+591|591)?\s?[67]\d{7}$/;
+            const cleanPhone = registeredCompanyData.telefono.replace(/\D/g, '');
+            if (!phoneRegex.test(cleanPhone)) {
+                alert('Por favor ingrese un número de teléfono/celular boliviano válido');
+                return;
+            }
+            
+            // Ir a modal de tarjeta
+            closeRegisterModal();
+            setTimeout(openCardModal, 300);
+        }
+        
+        // =============================================
+        // MÓDULO: REGISTRO PASO 2 - DATOS TARJETA
+        // =============================================
+        
+        // FUNCIÓN: Procesar registro paso 2
         async function registerCompanyStep2(event) {
             event.preventDefault();
             
@@ -1111,17 +1294,32 @@
                 return;
             }
             
+            // Recopilar datos de tarjeta
             const cardData = {
                 tarjeta_numero: document.getElementById('cardNumber').value.replace(/\s/g, ''),
                 tarjeta_vencimiento: document.getElementById('cardExpiry').value,
                 tarjeta_cvv: document.getElementById('cardCVV').value,
-                tarjeta_nombre: document.getElementById('cardName').value
+                tarjeta_nombre: document.getElementById('cardName').value.trim()
             };
             
             // Validar datos de tarjeta
-            if (!cardData.tarjeta_numero || !cardData.tarjeta_vencimiento || 
-                !cardData.tarjeta_cvv || !cardData.tarjeta_nombre) {
-                alert('Complete todos los datos de la tarjeta');
+            if (!validateCardNumber(cardData.tarjeta_numero)) {
+                alert('Número de tarjeta inválido');
+                return;
+            }
+            
+            if (!validateExpiryDate(cardData.tarjeta_vencimiento)) {
+                alert('Fecha de vencimiento inválida o expirada. Use formato MM/AA');
+                return;
+            }
+            
+            if (cardData.tarjeta_cvv.length < 3 || cardData.tarjeta_cvv.length > 4) {
+                alert('CVV inválido (3 o 4 dígitos)');
+                return;
+            }
+            
+            if (!cardData.tarjeta_nombre) {
+                alert('Por favor ingrese el nombre como aparece en la tarjeta');
                 return;
             }
             
@@ -1135,20 +1333,16 @@
                 // Combinar datos
                 const fullData = {
                     ...registeredCompanyData,
-                    ...cardData
+                    ...cardData,
+                    action: 'registerCompany'
                 };
                 
-                console.log('Datos a enviar:', fullData);
+                console.log('Enviando datos a API:', fullData);
                 
-                // Llamar a la API REAL
+                // Llamar a la API
                 const formData = new FormData();
-                formData.append('action', 'registerCompany');
-                
-                // Agregar todos los datos
                 Object.keys(fullData).forEach(key => {
-                    if (fullData[key] !== undefined && fullData[key] !== null) {
-                        formData.append(key, fullData[key]);
-                    }
+                    formData.append(key, fullData[key]);
                 });
                 
                 const response = await fetch(API_URL, {
@@ -1160,51 +1354,8 @@
                 console.log('Respuesta de API:', result);
                 
                 if (result && result.success) {
-                    // Mostrar mensaje de éxito con información real de la API
-                    closeCardModal();
-                    
-                    const successModal = document.createElement('div');
-                    successModal.className = 'cyber-modal';
-                    successModal.style.display = 'flex';
-                    successModal.innerHTML = `
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h2 style="color: var(--success);"><i class="fas fa-check-circle"></i> ¡REGISTRO EXITOSO!</h2>
-                            </div>
-                            
-                            <div style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;"></i>
-                                <h3 style="color: var(--secondary); margin-bottom: 1rem;">¡Bienvenido a Nexial Suite!</h3>
-                                
-                                <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
-                                    <p><strong>Empresa:</strong> ${registeredCompanyData.nombre}</p>
-                                    <p><strong>ID de Empresa:</strong> ${result.empresa_id}</p>
-                                    <p><strong>Email Jefe:</strong> ${result.email_jefe}</p>
-                                    <p><strong>Contraseña:</strong> La que registró</p>
-                                    <p><strong>Usuario ID:</strong> ${result.user_id}</p>
-                                </div>
-                                
-                                <div class="info-banner">
-                                    <h4><i class="fas fa-gift"></i> PRUEBA GRATUITA ACTIVADA</h4>
-                                    <p>Tienes 30 días completos de acceso gratuito a todas las funciones.</p>
-                                    <p>Mensaje: ${result.message}</p>
-                                </div>
-                                
-                                <div style="margin-top: 2rem;">
-                                    <button class="cyber-btn" onclick="accessAfterRegister('${result.email_jefe}')" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
-                                        <i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA
-                                    </button>
-                                    <button class="cyber-btn" onclick="closeSuccessModal(this)" style="width: 100%; margin-top: 1rem; background: rgba(255,255,255,0.05); color: white;">
-                                        CERRAR
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    document.body.appendChild(successModal);
-                    document.body.style.overflow = 'hidden';
-                    
+                    // Éxito - mostrar modal de confirmación
+                    showSuccessModal(result);
                 } else {
                     alert('Error en el registro: ' + (result?.error || 'Error desconocido'));
                     submitBtn.innerHTML = originalText;
@@ -1220,216 +1371,183 @@
         }
         
         // =============================================
-        // REGISTRO PASO 1 - DATOS EMPRESA
+        // MÓDULO: LOGIN DEL SISTEMA
         // =============================================
         
-        function registerCompanyStep1(event) {
-            event.preventDefault();
+        // FUNCIÓN: Procesar login
+        async function login() {
+            const user = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value;
             
-            const password = document.getElementById('adminPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (password !== confirmPassword) {
-                alert('Las contraseñas no coinciden');
+            if (!user || !password) {
+                alert('Por favor complete todos los campos');
                 return;
             }
             
-            if (password.length < 8) {
-                alert('Contraseña mínimo 8 caracteres');
-                return;
-            }
+            // Mostrar loading
+            const loginBtn = document.querySelector('#loginModal .cyber-btn');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> VERIFICANDO...';
+            loginBtn.disabled = true;
             
-            // Guardar datos temporalmente
-            registeredCompanyData = {
-                nombre: document.getElementById('companyName').value,
-                ruc: document.getElementById('companyRUC').value,
-                industria: document.getElementById('companyIndustry').value,
-                primer_nombre: document.getElementById('firstName').value,
-                segundo_nombre: document.getElementById('secondName').value,
-                primer_apellido: document.getElementById('firstLastName').value,
-                segundo_apellido: document.getElementById('secondLastName').value,
-                email: document.getElementById('companyEmail').value,
-                telefono: document.getElementById('companyPhone').value,
-                password: password
-            };
-            
-            // Validar campos requeridos
-            const required = ['nombre', 'ruc', 'industria', 'primer_nombre', 
-                            'primer_apellido', 'email', 'telefono'];
-            
-            for (const field of required) {
-                if (!registeredCompanyData[field]) {
-                    alert(`Por favor complete el campo: ${field.replace('_', ' ')}`);
+            try {
+                // Verificar si es el super admin
+                if (user === 'marcelodanielcc@gmail.com' && password === '789') {
+                    // Login exitoso como super admin
+                    localStorage.setItem('nexial_user', JSON.stringify({
+                        id: 'SUPER-ADMIN-001',
+                        email: 'marcelodanielcc@gmail.com',
+                        nombre: 'Marcelo Daniel Condori',
+                        role: 'super',
+                        empresa: 'Nexial Suite',
+                        empresa_id: 'global',
+                        activo: 'Sí'
+                    }));
+                    
+                    closeLoginModal();
+                    window.location.href = 'dashboard.html';
                     return;
                 }
+                
+                // Login normal via API
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('email', user);
+                formData.append('password', password);
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result && result.success) {
+                    // Guardar datos de usuario
+                    localStorage.setItem('nexial_user', JSON.stringify(result.user));
+                    
+                    // Redirigir al dashboard
+                    closeLoginModal();
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert(result?.error || 'Usuario o contraseña incorrectos');
+                    loginBtn.innerHTML = originalText;
+                    loginBtn.disabled = false;
+                }
+                
+            } catch (error) {
+                console.error('Error en login:', error);
+                alert('Error de conexión. Por favor intente nuevamente.');
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
             }
-            
-            // Validar email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(registeredCompanyData.email)) {
-                alert('Por favor ingrese un email válido');
-                return;
-            }
-            
-            // Ir a modal de tarjeta
-            closeRegisterModal();
-            setTimeout(openCardModal, 300);
         }
         
         // =============================================
-        // REGISTRO PASO 2 - DATOS TARJETA
+        // MÓDULO: MODAL DE ÉXITO
         // =============================================
         
-        function registerCompanyStep2(event) {
-            event.preventDefault();
+        // FUNCIÓN: Mostrar modal de éxito
+        function showSuccessModal(apiResult) {
+            closeCardModal();
             
-            if (!registeredCompanyData) {
-                alert('Error: Datos de empresa no encontrados. Por favor comience de nuevo.');
-                closeCardModal();
-                openRegisterModal();
-                return;
-            }
+            const successModal = document.createElement('div');
+            successModal.className = 'cyber-modal';
+            successModal.style.display = 'flex';
             
-            const cardData = {
-                tarjeta_numero: document.getElementById('cardNumber').value,
-                tarjeta_vencimiento: document.getElementById('cardExpiry').value,
-                tarjeta_cvv: document.getElementById('cardCVV').value,
-                tarjeta_nombre: document.getElementById('cardName').value
-            };
+            // Generar email del jefe
+            const emailJefe = generateJefeEmail(registeredCompanyData);
             
-            // Validar datos de tarjeta
-            if (!cardData.tarjeta_numero || !cardData.tarjeta_vencimiento || 
-                !cardData.tarjeta_cvv || !cardData.tarjeta_nombre) {
-                alert('Complete todos los datos de la tarjeta');
-                return;
-            }
-            
-            // Validar formato de número de tarjeta
-            const cardNumberClean = cardData.tarjeta_numero.replace(/\s/g, '');
-            if (cardNumberClean.length < 15 || cardNumberClean.length > 19) {
-                alert('Número de tarjeta inválido');
-                return;
-            }
-            
-            // Validar fecha de vencimiento
-            const expiryRegex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
-            if (!expiryRegex.test(cardData.tarjeta_vencimiento)) {
-                alert('Fecha de vencimiento inválida. Use formato MM/AA');
-                return;
-            }
-            
-            // Validar CVV
-            if (cardData.tarjeta_cvv.length < 3 || cardData.tarjeta_cvv.length > 4) {
-                alert('CVV inválido');
-                return;
-            }
-            
-            // Simular registro exitoso
-            simulateRegistration(cardData);
-        }
-        
-        function simulateRegistration(cardData) {
-            // Mostrar loading
-            const submitBtn = document.querySelector('#cardForm button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
-            submitBtn.disabled = true;
-            
-            // Simular delay de red
-            setTimeout(() => {
-                // Combinar datos
-                const fullData = {
-                    ...registeredCompanyData,
-                    ...cardData
-                };
-                
-                // Aquí iría la llamada real a la API
-                // const response = await fetch(API_URL, { ... });
-                
-                // Simular éxito
-                const empresaId = 'EMP-' + Math.floor(Math.random() * 10000);
-                
-                // Mostrar mensaje de éxito
-                closeCardModal();
-                
-                // Crear modal de éxito
-                const successModal = document.createElement('div');
-                successModal.className = 'cyber-modal';
-                successModal.style.display = 'flex';
-                successModal.innerHTML = `
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2 style="color: var(--success);"><i class="fas fa-check-circle"></i> ¡REGISTRO EXITOSO!</h2>
+            successModal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 style="color: var(--success);"><i class="fas fa-check-circle"></i> ¡REGISTRO EXITOSO!</h2>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--secondary); margin-bottom: 1rem;">¡Bienvenido a Nexial Suite!</h3>
+                        
+                        <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; text-align: left;">
+                            <p><strong>Empresa:</strong> ${registeredCompanyData.nombre}</p>
+                            <p><strong>NIT:</strong> ${registeredCompanyData.nit}</p>
+                            <p><strong>Email Jefe:</strong> ${emailJefe}</p>
+                            <p><strong>Contraseña:</strong> La que registró</p>
+                            <p><strong>ID Empresa:</strong> ${apiResult?.empresa_id || 'Generado por sistema'}</p>
                         </div>
                         
-                        <div style="text-align: center; padding: 2rem;">
-                            <i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;"></i>
-                            <h3 style="color: var(--secondary); margin-bottom: 1rem;">¡Bienvenido a Nexial Suite!</h3>
-                            
-                            <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
-                                <p><strong>Empresa:</strong> ${registeredCompanyData.nombre}</p>
-                                <p><strong>ID de Empresa:</strong> ${empresaId}</p>
-                                <p><strong>Usuario:</strong> ${registeredCompanyData.email}</p>
-                                <p><strong>Contraseña:</strong> La que registró</p>
-                            </div>
-                            
-                            <div class="info-banner">
-                                <h4><i class="fas fa-gift"></i> PRUEBA GRATUITA ACTIVADA</h4>
-                                <p>Tienes 30 días completos de acceso gratuito a todas las funciones.</p>
-                            </div>
-                            
-                            <div style="margin-top: 2rem;">
-                                <button class="cyber-btn" onclick="accessAfterRegister()" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
-                                    <i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA
-                                </button>
-                                <button class="cyber-btn" onclick="closeSuccessModal(this)" style="width: 100%; margin-top: 1rem; background: rgba(255,255,255,0.05); color: white;">
-                                    CERRAR
-                                </button>
-                            </div>
+                        <div class="info-banner">
+                            <h4><i class="fas fa-gift"></i> PRUEBA GRATUITA ACTIVADA</h4>
+                            <p>Tienes 30 días completos de acceso gratuito a todas las funciones.</p>
+                            <p>${apiResult?.message || 'Registro completado exitosamente'}</p>
+                        </div>
+                        
+                        <div style="margin-top: 2rem;">
+                            <button class="cyber-btn" onclick="accessAfterRegister('${emailJefe}')" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                                <i class="fas fa-sign-in-alt"></i> INGRESAR AL SISTEMA
+                            </button>
+                            <button class="cyber-btn btn-secondary" onclick="closeSuccessModal(this)" style="width: 100%; margin-top: 1rem;">
+                                CERRAR
+                            </button>
                         </div>
                     </div>
-                `;
-                
-                document.body.appendChild(successModal);
-                document.body.style.overflow = 'hidden';
-                
-                // Resetear formularios
-                resetRegisterForm();
-                resetCardForm();
-                registeredCompanyData = null;
-                
-            }, 2000);
+                </div>
+            `;
+            
+            document.body.appendChild(successModal);
+            document.body.style.overflow = 'hidden';
+            
+            // Resetear datos
+            resetRegisterForm();
+            resetCardForm();
         }
         
+        // FUNCIÓN: Generar email del jefe
+        function generateJefeEmail(companyData) {
+            const firstName = companyData.primer_nombre.toLowerCase();
+            const lastName = companyData.primer_apellido.toLowerCase().replace(/\s+/g, '');
+            const domain = companyData.email.split('@')[1] || 'nexialsuite.bo';
+            return `${firstName}.${lastName}@${domain}`;
+        }
+        
+        // FUNCIÓN: Cerrar modal de éxito
         function closeSuccessModal(button) {
             const modal = button.closest('.cyber-modal');
-            modal.remove();
-            document.body.style.overflow = 'auto';
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = 'auto';
+            }
         }
         
-        function accessAfterRegister() {
+        // FUNCIÓN: Acceder después del registro
+        function accessAfterRegister(email) {
             // Cerrar modal de éxito
             document.querySelector('.cyber-modal:last-child')?.remove();
             document.body.style.overflow = 'auto';
             
-            // Abrir modal de login con el email registrado
+            // Abrir login con el email generado
             openLoginModal();
-            if (registeredCompanyData) {
-                document.getElementById('loginUser').value = registeredCompanyData.email;
+            if (email) {
+                document.getElementById('loginUser').value = email;
                 document.getElementById('loginPass').focus();
             }
         }
         
-        // =============================================
-        // FUNCIONES AUXILIARES
-        // =============================================
+        // ============================================= */
+        // MÓDULO: FUNCIONES AUXILIARES */
+        // ============================================= */
         
+        // FUNCIÓN: Recuperar contraseña
         function recoverPassword() {
             const email = prompt('Ingrese su email para recuperar contraseña:');
             if (email) {
                 alert(`Se ha enviado un enlace de recuperación a: ${email}\n\nRevise su bandeja de entrada.`);
             }
         }
+        
+        // ============================================= */
+        // EVENT LISTENERS */
+        // ============================================= */
         
         // Formatear número de tarjeta
         document.getElementById('cardNumber')?.addEventListener('input', function(e) {
@@ -1447,6 +1565,11 @@
             e.target.value = value.substring(0, 5);
         });
         
+        // Enter para login
+        document.getElementById('loginPass')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+        
         // Cerrar modal al hacer click fuera
         document.querySelectorAll('.cyber-modal').forEach(modal => {
             modal.addEventListener('click', function(e) {
@@ -1455,15 +1578,48 @@
                     if (modalId === 'loginModal') closeLoginModal();
                     else if (modalId === 'registerModal') closeRegisterModal();
                     else if (modalId === 'cardModal') closeCardModal();
-                    else this.style.display = 'none';
+                    else this.remove();
                 }
             });
         });
         
-        // Inicializar
+        // =============================================
+        // INICIALIZACIÓN
+        // =============================================
+        
+        // FUNCIÓN: Inicializar PWA
+        function initializePWA() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registrado:', registration);
+                    })
+                    .catch(error => {
+                        console.log('❌ Error registrando Service Worker:', error);
+                    });
+            }
+            
+            // Solicitar permisos para notificaciones
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+        
+        // EVENTO: Cargar página
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
+            initializePWA();
+            
             console.log('🚀 Nexial Suite - Página de Inicio cargada');
+            console.log('📊 Sistema Corporativo Multiempresa v3.0');
+            console.log('🇧🇴 Adaptado para Bolivia');
+            console.log('🔗 API URL:', API_URL);
+            
+            // Verificar si ya hay usuario logueado
+            const savedUser = localStorage.getItem('nexial_user');
+            if (savedUser) {
+                console.log('👤 Usuario encontrado en localStorage');
+            }
         });
     </script>
 </body>
