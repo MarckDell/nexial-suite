@@ -1093,43 +1093,42 @@
         // MÓDULO: FUNCIONES DE API
         // =============================================
         
-        // FUNCIÓN: Fetch GET a la API (VERSIÓN COMPATIBLE)
+        // FUNCIÓN: Fetch GET a la API (VERSIÓN CORREGIDA)
         async function fetchFromAPI(action, params = {}) {
-        try {
-            console.log(`🔍 Intentando conectar a API: ${action}`);
-            
-            // Construir URL
-            const urlParams = new URLSearchParams({ action, ...params });
-            const url = `${API_URL}?${urlParams.toString()}`;
-            
-            console.log(`📤 URL completa: ${url}`);
-            
-            // Intentar con fetch simple primero
-            const response = await fetch(url, {
-            method: 'GET',
-            mode: 'no-cors', // Modo no-cors para evitar problemas CORS
-            headers: {
-                'Accept': 'application/json'
-            },
-            cache: 'no-cache'
-            });
-            
-            console.log(`📥 Respuesta recibida, status:`, response);
-            
-            // En modo no-cors no podemos leer la respuesta, pero sabemos que llegó
-            // Simular una respuesta exitosa para continuar
-            return {
-            success: true,
-            message: 'Conexión establecida',
-            action: action
-            };
-            
-        } catch (error) {
-            console.error(`❌ Error fetchFromAPI (${action}):`, error);
-            
-            // Si hay error, usar datos de demostración
-            return getDemoData(action, params);
-        }
+            try {
+                console.log(`🔍 Conectando a API: ${action}`);
+                
+                // Construir URL
+                const urlParams = new URLSearchParams({ action, ...params });
+                const url = `${API_URL}?${urlParams.toString()}`;
+                
+                console.log(`📤 URL: ${url}`);
+                
+                // IMPORTANTE: NO usar mode: 'no-cors'
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    cache: 'no-cache'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                console.log(`📥 Respuesta API ${action}:`, result);
+                
+                return result;
+                
+            } catch (error) {
+                console.error(`❌ Error fetchFromAPI (${action}):`, error);
+                
+                // Si hay error, usar datos de demostración
+                return getDemoData(action, params);
+            }
         }
 
         // Función para datos de demostración cuando la API no responde
