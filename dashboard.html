@@ -1137,16 +1137,8 @@
                 
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    body: formData,
-                    mode: 'no-cors' // Prueba agregando esto si hay problemas CORS
+                    body: formData
                 });
-                
-                // Para modo no-cors, no podemos leer la respuesta
-                if (response.type === 'opaque') {
-                    console.log('✅ Solicitud enviada (modo no-cors)');
-                    hideLoading();
-                    return { success: true, message: 'Solicitud procesada' };
-                }
                 
                 let result;
                 try {
@@ -1189,24 +1181,6 @@
             }
         }
         
-
-        // FUNCIÓN: Debug para ver datos enviados
-        function debugData(usuarioData) {
-            console.log('🔍 Datos a enviar para actualizar usuario:', usuarioData);
-            console.log('📋 Validando campos:');
-            
-            const camposRequeridos = ['id', 'nombre', 'email', 'role', 'activo', 'empresa_id'];
-            for (const campo of camposRequeridos) {
-                console.log(`  ${campo}: ${usuarioData[campo] || 'FALTANTE'}`);
-            }
-            
-            // Verificar si el ID existe en la base de datos local
-            const usuarioExistente = database.usuarios.find(u => u.id === usuarioData.id);
-            console.log('👤 Usuario en base de datos local:', usuarioExistente);
-            
-            return usuarioExistente;
-        }
-
         // =============================================
         // MÓDULO: CARGA DE DATOS
         // =============================================
@@ -1318,12 +1292,6 @@
                                     <a href="#" class="nav-link" onclick="loadGestionPersonal()">
                                         <i class="fas fa-users-cog"></i>
                                         <span>Gestión de Personal</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadSuperReportes()">
-                                        <i class="fas fa-chart-bar"></i>
-                                        <span>Reportes Globales</span>
                                     </a>
                                 </li>
                             </ul>
@@ -1528,28 +1496,6 @@
                         </div>
                     </div>
                 </div>
-
-                                <!-- Panel de estadísticas generales -->
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Reportes Globales del Sistema</h3>
-                        <div class="table-actions">
-                            <button class="btn btn-primary" onclick="cargarReporteFacturacionMensual()">
-                                <i class="fas fa-chart-bar"></i> Ver Facturación Mensual
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-wrapper">
-                        <div id="reporteFacturacionContenido">
-                            <!-- Aquí se cargará el reporte de facturación mensual -->
-                            <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                                <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                                <p>Haz clic en "Ver Facturación Mensual" para cargar los reportes</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             `;
         }
         
@@ -1577,16 +1523,9 @@
                                 <tr>
                                     <th style="display: none;">ID</th>
                                     <th>Empresa</th>
-                                    <th>NIT</th>
                                     <th>Industria</th>
                                     <th>Contacto</th>
-                                    <th>Email</th>
-                                    <th>Teléfono</th>
-                                    <th>Dirección</th>
-                                    <th>Ciudad</th>
                                     <th>Estado</th>
-                                    <th>Tarjeta Registrada</th>
-                                    <th>Fecha Registro</th>
                                     <th>Usuarios</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -1599,25 +1538,17 @@
                                             <td style="display: none;" data-id="${empresa.id || 'N/A'}">${empresa.id || 'N/A'}</td>
                                             <td>
                                                 <strong>${empresa.nombre}</strong>
+                                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">
+                                                    ${empresa.nit || empresa.ruc || ''}
+                                                </div>
                                             </td>
-                                            <td>${empresa.nit || empresa.ruc || ''}</td>
                                             <td>${empresa.industria || ''}</td>
                                             <td>${empresa.contacto || ''}</td>
-                                            <td>${empresa.email || ''}</td>
-                                            <td>${empresa.telefono || ''}</td>
-                                            <td>${empresa.direccion || ''}</td>
-                                            <td>${empresa.ciudad || ''}</td>
                                             <td>
                                                 <span class="status-badge ${empresa.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
                                                     ${empresa.estado || 'Inactiva'}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <span class="status-badge ${empresa.tarjetaregistrada === 'Sí' ? 'status-active' : 'status-inactive'}">
-                                                    ${empresa.tarjetaregistrada || 'No'}
-                                                </span>
-                                            </td>
-                                            <td>${empresa.fecharegistro || ''}</td>
                                             <td>${usuariosEmpresa.length}</td>
                                             <td>
                                                 <div class="action-buttons">
@@ -1640,7 +1571,7 @@
                                 }).join('')}
                                 ${database.empresas.length === 0 ? `
                                     <tr>
-                                        <td colspan="14" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                        <td colspan="7" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                                             <i class="fas fa-building" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
                                             No hay empresas registradas
                                         </td>
@@ -1657,10 +1588,6 @@
         function loadGestionPersonal() {
             document.getElementById('pageTitle').textContent = 'Gestión de Personal - Super Admin';
             
-            // Filtrar usuarios no super admin para mostrar en sugerencias
-            const usuariosNoSuper = database.usuarios.filter(u => u.role !== 'super' && u.role !== 'SUPER-ADMIN-001');
-
-            // Para mostrar en la tabla, también filtrar super admins
             const usuariosParaMostrar = database.usuarios.filter(u => u.role !== 'super' && !u.email.includes('marcelodanielcc'));
             
             document.getElementById('viewSuper').innerHTML = `
@@ -1681,14 +1608,10 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Nombre</th>
-                                    <th>Email</th>
                                     <th>Password</th>
                                     <th>Rol</th>
-                                    <th>Empresa ID</th>
-                                    <th>Empresa Nombre</th>
-                                    <th>Fecha Creación</th>
+                                    <th>Empresa</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -1696,28 +1619,20 @@
                             <tbody>
                                 ${usuariosParaMostrar.map(usuario => {
                                     const empresa = database.empresas.find(e => e.id === usuario.empresa_id);
-                                    // Ocultar contraseña real, mostrar asteriscos
                                     const passwordMasked = '••••••••';
                                     
                                     return `
                                         <tr>
-                                            <td><code>${usuario.id || 'N/A'}</code></td>
                                             <td><strong>${usuario.nombre}</strong></td>
-                                            <td>${usuario.email}</td>
                                             <td>
                                                 ${passwordMasked}
-                                                <button class="action-btn view" onclick="mostrarPasswordUsuario('${usuario.id}')" title="Ver Contraseña" style="margin-left: 5px; width: 30px; height: 30px;">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
                                             </td>
                                             <td>
                                                 <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.role)}; font-size: 0.8rem;">
                                                     ${usuario.role}
                                                 </span>
                                             </td>
-                                            <td>${usuario.empresa_id || 'Sin empresa'}</td>
                                             <td>${empresa ? empresa.nombre : 'Sin empresa'}</td>
-                                            <td>${usuario.fechacreacion || 'No disponible'}</td>
                                             <td>
                                                 <span class="status-badge ${usuario.activo === 'Sí' ? 'status-active' : 'status-inactive'}">
                                                     ${usuario.activo === 'Sí' ? 'Activo' : 'Inactivo'}
@@ -1738,7 +1653,7 @@
                                 }).join('')}
                                 ${database.usuarios.length === 0 ? `
                                     <tr>
-                                        <td colspan="10" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                        <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                                             <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
                                             No hay usuarios registrados
                                         </td>
@@ -1747,11 +1662,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-                
-                <!-- Datos para autocompletado (ocultos) -->
-                <div id="usuariosData" style="display: none;">
-                    ${JSON.stringify(usuariosNoSuper)}
                 </div>
             `;
         }
@@ -1762,7 +1672,6 @@
         
         // FUNCIÓN: Cargar dashboard jefe empresa
         function loadJefeDashboard() {
-            // Filtrar datos de la empresa actual
             const empresaId = currentUser.empresa_id;
             const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
             const empleadosEmpresa = database.empleados.filter(e => e.empresa_id === empresaId);
@@ -1853,10 +1762,6 @@
                                     <td>${currentCompany ? currentCompany.contacto : 'No registrado'}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Email</strong></td>
-                                    <td>${currentCompany ? currentCompany.email : 'No registrado'}</td>
-                                </tr>
-                                <tr>
                                     <td><strong>Estado</strong></td>
                                     <td>
                                         <span class="status-badge ${currentCompany && currentCompany.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
@@ -1875,7 +1780,7 @@
         // MÓDULO: MODALES PARA EMPRESAS
         // =============================================
         
-        // FUNCIÓN: Mostrar modal nueva empresa (CORREGIDO)
+        // FUNCIÓN: Mostrar modal nueva empresa con país y tipo de documento
         function showNuevaEmpresaModal() {
             showModal('Nueva Empresa', `
                 <div style="max-width: 600px;">
@@ -1885,8 +1790,33 @@
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">NIT (Bolivia) *</label>
-                        <input type="text" id="nuevaEmpresaNIT" placeholder="1234567890123" style="color: white;">
+                        <label style="color: var(--secondary);">País *</label>
+                        <select id="nuevaEmpresaPais" onchange="actualizarTipoDocumento()" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                            <option value="" style="color: #666;">Seleccionar país</option>
+                            <option value="Bolivia" style="color: white;">Bolivia</option>
+                            <option value="Argentina" style="color: white;">Argentina</option>
+                            <option value="Chile" style="color: white;">Chile</option>
+                            <option value="Perú" style="color: white;">Perú</option>
+                            <option value="Colombia" style="color: white;">Colombia</option>
+                            <option value="Ecuador" style="color: white;">Ecuador</option>
+                            <option value="México" style="color: white;">México</option>
+                            <option value="Brasil" style="color: white;">Brasil</option>
+                            <option value="Estados Unidos" style="color: white;">Estados Unidos</option>
+                            <option value="España" style="color: white;">España</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);">Tipo de Documento *</label>
+                        <select id="nuevaEmpresaTipoDocumento" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                            <option value="" style="color: #666;">Seleccionar tipo</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: var(--secondary);" id="labelDocumento">Número de Documento *</label>
+                        <input type="text" id="nuevaEmpresaDocumento" placeholder="Ingrese el número" style="color: white;">
                     </div>
                     
                     <div class="form-group">
@@ -1913,12 +1843,12 @@
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com.bo" style="color: white;">
+                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com" style="color: white;">
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Teléfono/Celular *</label>
-                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+591 60000000" style="color: white;">
+                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+000 00000000" style="color: white;">
                     </div>
                     
                     <div class="form-group">
@@ -1928,7 +1858,7 @@
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Ciudad</label>
-                        <input type="text" id="nuevaEmpresaCiudad" placeholder="La Paz" style="color: white;">
+                        <input type="text" id="nuevaEmpresaCiudad" placeholder="Ciudad" style="color: white;">
                     </div>
                     
                     <div class="form-group">
@@ -1955,6 +1885,64 @@
                     </div>
                 </div>
             `);
+            
+            // Inicializar con Bolivia como predeterminado
+            actualizarTipoDocumento();
+        }
+        
+        // FUNCIÓN: Actualizar tipo de documento según país
+        function actualizarTipoDocumento() {
+            const pais = document.getElementById('nuevaEmpresaPais').value;
+            const select = document.getElementById('nuevaEmpresaTipoDocumento');
+            const label = document.getElementById('labelDocumento');
+            
+            select.innerHTML = '<option value="" style="color: #666;">Seleccionar tipo</option>';
+            
+            if (pais === 'Bolivia') {
+                select.innerHTML += '<option value="NIT" style="color: white;">NIT</option>';
+                label.textContent = 'NIT *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '1234567890123';
+            } else if (pais === 'Argentina') {
+                select.innerHTML += '<option value="CUIT" style="color: white;">CUIT</option>';
+                label.textContent = 'CUIT *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '20-12345678-9';
+            } else if (pais === 'Chile') {
+                select.innerHTML += '<option value="RUT" style="color: white;">RUT</option>';
+                label.textContent = 'RUT *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '12.345.678-9';
+            } else if (pais === 'Perú') {
+                select.innerHTML += '<option value="RUC" style="color: white;">RUC</option>';
+                label.textContent = 'RUC *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '12345678901';
+            } else if (pais === 'Colombia') {
+                select.innerHTML += '<option value="NIT" style="color: white;">NIT</option>';
+                label.textContent = 'NIT *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '123.456.789-0';
+            } else if (pais === 'Ecuador') {
+                select.innerHTML += '<option value="RUC" style="color: white;">RUC</option>';
+                label.textContent = 'RUC *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '1234567890001';
+            } else if (pais === 'México') {
+                select.innerHTML += '<option value="RFC" style="color: white;">RFC</option>';
+                label.textContent = 'RFC *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = 'ABC123456XYZ';
+            } else if (pais === 'Brasil') {
+                select.innerHTML += '<option value="CNPJ" style="color: white;">CNPJ</option>';
+                label.textContent = 'CNPJ *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '12.345.678/0001-90';
+            } else if (pais === 'Estados Unidos') {
+                select.innerHTML += '<option value="EIN" style="color: white;">EIN</option>';
+                label.textContent = 'EIN *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = '12-3456789';
+            } else if (pais === 'España') {
+                select.innerHTML += '<option value="CIF" style="color: white;">CIF</option>';
+                label.textContent = 'CIF *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = 'A12345678';
+            } else {
+                select.innerHTML += '<option value="Número Fiscal" style="color: white;">Número Fiscal</option>';
+                label.textContent = 'Número Fiscal *';
+                document.getElementById('nuevaEmpresaDocumento').placeholder = 'Ingrese número fiscal';
+            }
         }
         
         // FUNCIÓN: Crear nueva empresa
@@ -1963,29 +1951,27 @@
             
             const empresaData = {
                 nombre: document.getElementById('nuevaEmpresaNombre').value,
-                nit: document.getElementById('nuevaEmpresaNIT').value,
+                pais: document.getElementById('nuevaEmpresaPais').value,
+                tipo_documento: document.getElementById('nuevaEmpresaTipoDocumento').value,
+                documento: document.getElementById('nuevaEmpresaDocumento').value,
                 industria: document.getElementById('nuevaEmpresaIndustria').value,
                 contacto: document.getElementById('nuevaEmpresaContacto').value,
                 email: document.getElementById('nuevaEmpresaEmail').value,
                 telefono: document.getElementById('nuevaEmpresaTelefono').value,
                 password: document.getElementById('nuevaEmpresaPassword').value,
                 estado: document.getElementById('nuevaEmpresaEstado').value,
-                pais: 'Bolivia'
+                direccion: document.getElementById('nuevaEmpresaDireccion').value,
+                ciudad: document.getElementById('nuevaEmpresaCiudad').value
             };
             
             // Validar campos requeridos
-            const required = ['nombre', 'nit', 'contacto', 'email', 'telefono', 'password'];
+            const required = ['nombre', 'pais', 'tipo_documento', 'documento', 'contacto', 'email', 'telefono', 'password'];
             for (const field of required) {
                 if (!empresaData[field]) {
                     showNotification('error', 'Error', `Complete el campo: ${field}`);
                     hideLoading();
                     return;
                 }
-            }
-            
-            // Validar NIT boliviano
-            if (!/^\d{7,15}$/.test(empresaData.nit.toString().trim())) {
-                showNotification('warning', 'Advertencia', 'NIT debe contener solo números (7-15 dígitos)');
             }
             
             // Validar email
@@ -2044,37 +2030,39 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                         <div>
                             <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
-                            <p><strong>NIT:</strong> ${empresa.nit || empresa.ruc || 'No registrado'}</p>
+                            <p><strong>País:</strong> ${empresa.pais || 'No especificado'}</p>
+                            <p><strong>Documento:</strong> ${empresa.tipo_documento || 'NIT'}: ${empresa.documento || empresa.nit || empresa.ruc || 'No registrado'}</p>
                             <p><strong>Industria:</strong> ${empresa.industria || 'No especificada'}</p>
                             <p><strong>Contacto:</strong> ${empresa.contacto || 'No registrado'}</p>
                             <p><strong>Email:</strong> ${empresa.email || 'No registrado'}</p>
                             <p><strong>Teléfono:</strong> ${empresa.telefono || 'No registrado'}</p>
                             <p><strong>Estado:</strong> ${empresa.estado || 'Inactiva'}</p>
-                            <p><strong>País:</strong> ${empresa.pais || 'Bolivia'}</p>
                         </div>
                         
                         <div>
-                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
-                            <p><strong>Usuarios:</strong> ${usuariosEmpresa.length}</p>
-                            <p><strong>Empleados:</strong> ${empleadosEmpresa.length}</p>
-                            <p><strong>Fecha Registro:</strong> ${empresa.fecharegistro || 'No disponible'}</p>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Ubicación</h4>
+                            <p><strong>Dirección:</strong> ${empresa.direccion || 'No registrada'}</p>
+                            <p><strong>Ciudad:</strong> ${empresa.ciudad || 'No registrada'}</p>
+                            <p><strong>Tarjeta:</strong> ${empresa.tarjetaregistrada || 'No'}</p>
                         </div>
                     </div>
                     
                     <div style="margin-top: 2rem;">
-                        <h4 style="color: var(--secondary); margin-bottom: 1rem;">Usuarios</h4>
-                        <div style="max-height: 200px; overflow-y: auto; margin-bottom: 1.5rem;">
-                            ${usuariosEmpresa.map(usuario => `
-                                <div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <strong>${usuario.nombre}</strong> (${usuario.email}) - ${usuario.role}
-                                </div>
-                            `).join('')}
-                            ${usuariosEmpresa.length === 0 ? '<p style="text-align: center; color: rgba(255,255,255,0.5);">No hay usuarios</p>' : ''}
+                        <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px;">
+                                <div style="color: var(--secondary); font-size: 0.9rem;">Usuarios</div>
+                                <div style="font-size: 2rem; font-weight: 700;">${usuariosEmpresa.length}</div>
+                            </div>
+                            <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px;">
+                                <div style="color: var(--secondary); font-size: 0.9rem;">Empleados</div>
+                                <div style="font-size: 2rem; font-weight: 700;">${empleadosEmpresa.length}</div>
+                            </div>
                         </div>
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="editEmpresa('${empresaId}')" style="flex: 1;">
+                        <button class="btn btn-secondary" onclick="editEmpresaCompleta('${empresaId}')" style="flex: 1;">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-primary" onclick="accessAsJefeEmpresa('${empresaId}')" style="flex: 1;">
@@ -2085,7 +2073,7 @@
             `);
         }
         
-        // FUNCIÓN: Editar empresa completa (SIN MOSTRAR ID PARA EDITAR)
+        // FUNCIÓN: Editar empresa completa
         function editEmpresaCompleta(empresaId) {
             const empresa = database.empresas.find(e => e.id === empresaId);
             if (!empresa) {
@@ -2095,7 +2083,6 @@
             
             showModal(`Editar Empresa: ${empresa.nombre}`, `
                 <div style="max-width: 700px;">
-                    <!-- NO MOSTRAMOS EL ID PARA EDITAR -->
                     <input type="hidden" id="editEmpresaId" value="${empresa.id || ''}">
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -2105,8 +2092,37 @@
                         </div>
                         
                         <div class="form-group">
-                            <label style="color: var(--secondary);">NIT *</label>
-                            <input type="text" id="editEmpresaNIT" value="${empresa.nit || empresa.ruc || ''}" required style="color: white;">
+                            <label style="color: var(--secondary);">País *</label>
+                            <select id="editEmpresaPais" onchange="actualizarTipoDocumentoEditar()" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="Bolivia" ${empresa.pais === 'Bolivia' ? 'selected' : ''} style="color: white;">Bolivia</option>
+                                <option value="Argentina" ${empresa.pais === 'Argentina' ? 'selected' : ''} style="color: white;">Argentina</option>
+                                <option value="Chile" ${empresa.pais === 'Chile' ? 'selected' : ''} style="color: white;">Chile</option>
+                                <option value="Perú" ${empresa.pais === 'Perú' ? 'selected' : ''} style="color: white;">Perú</option>
+                                <option value="Colombia" ${empresa.pais === 'Colombia' ? 'selected' : ''} style="color: white;">Colombia</option>
+                                <option value="Ecuador" ${empresa.pais === 'Ecuador' ? 'selected' : ''} style="color: white;">Ecuador</option>
+                                <option value="México" ${empresa.pais === 'México' ? 'selected' : ''} style="color: white;">México</option>
+                                <option value="Brasil" ${empresa.pais === 'Brasil' ? 'selected' : ''} style="color: white;">Brasil</option>
+                                <option value="Estados Unidos" ${empresa.pais === 'Estados Unidos' ? 'selected' : ''} style="color: white;">Estados Unidos</option>
+                                <option value="España" ${empresa.pais === 'España' ? 'selected' : ''} style="color: white;">España</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Tipo Documento *</label>
+                            <select id="editEmpresaTipoDocumento" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                                <option value="NIT" ${empresa.tipo_documento === 'NIT' || !empresa.tipo_documento ? 'selected' : ''} style="color: white;">NIT</option>
+                                <option value="RUC" ${empresa.tipo_documento === 'RUC' ? 'selected' : ''} style="color: white;">RUC</option>
+                                <option value="CUIT" ${empresa.tipo_documento === 'CUIT' ? 'selected' : ''} style="color: white;">CUIT</option>
+                                <option value="RFC" ${empresa.tipo_documento === 'RFC' ? 'selected' : ''} style="color: white;">RFC</option>
+                                <option value="CNPJ" ${empresa.tipo_documento === 'CNPJ' ? 'selected' : ''} style="color: white;">CNPJ</option>
+                                <option value="EIN" ${empresa.tipo_documento === 'EIN' ? 'selected' : ''} style="color: white;">EIN</option>
+                                <option value="CIF" ${empresa.tipo_documento === 'CIF' ? 'selected' : ''} style="color: white;">CIF</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Número Documento *</label>
+                            <input type="text" id="editEmpresaDocumento" value="${empresa.documento || empresa.nit || empresa.ruc || ''}" required style="color: white;">
                         </div>
                         
                         <div class="form-group">
@@ -2167,20 +2183,11 @@
                                 <option value="No" ${empresa.tarjetaregistrada === 'No' ? 'selected' : ''} style="color: white;">No</option>
                             </select>
                         </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Fecha Registro</label>
-                            <input type="date" id="editEmpresaFechaRegistro" value="${empresa.fecharegistro ? empresa.fecharegistro.split(' ')[0] : ''}" style="color: white;">
-                            <small style="color: rgba(255,255,255,0.6);">Solo para referencia</small>
-                        </div>
                     </div>
                     
                     <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
                         <p style="color: var(--secondary); margin: 0;">
                             <i class="fas fa-info-circle"></i> ID de la empresa: <strong>${empresa.id || 'N/A'}</strong>
-                        </p>
-                        <p style="color: rgba(255,255,255,0.7); margin: 0.5rem 0 0 0; font-size: 0.9rem;">
-                            El ID se genera automáticamente y no se puede modificar. Solo editable desde Google Sheets.
                         </p>
                     </div>
                     
@@ -2196,6 +2203,38 @@
             `);
         }
 
+        // FUNCIÓN: Actualizar tipo documento para editar
+        function actualizarTipoDocumentoEditar() {
+            const pais = document.getElementById('editEmpresaPais').value;
+            const select = document.getElementById('editEmpresaTipoDocumento');
+            
+            select.innerHTML = '';
+            
+            if (pais === 'Bolivia') {
+                select.innerHTML = '<option value="NIT" style="color: white;">NIT</option>';
+            } else if (pais === 'Argentina') {
+                select.innerHTML = '<option value="CUIT" style="color: white;">CUIT</option>';
+            } else if (pais === 'Chile') {
+                select.innerHTML = '<option value="RUT" style="color: white;">RUT</option>';
+            } else if (pais === 'Perú') {
+                select.innerHTML = '<option value="RUC" style="color: white;">RUC</option>';
+            } else if (pais === 'Colombia') {
+                select.innerHTML = '<option value="NIT" style="color: white;">NIT</option>';
+            } else if (pais === 'Ecuador') {
+                select.innerHTML = '<option value="RUC" style="color: white;">RUC</option>';
+            } else if (pais === 'México') {
+                select.innerHTML = '<option value="RFC" style="color: white;">RFC</option>';
+            } else if (pais === 'Brasil') {
+                select.innerHTML = '<option value="CNPJ" style="color: white;">CNPJ</option>';
+            } else if (pais === 'Estados Unidos') {
+                select.innerHTML = '<option value="EIN" style="color: white;">EIN</option>';
+            } else if (pais === 'España') {
+                select.innerHTML = '<option value="CIF" style="color: white;">CIF</option>';
+            } else {
+                select.innerHTML = '<option value="Número Fiscal" style="color: white;">Número Fiscal</option>';
+            }
+        }
+
         // FUNCIÓN: Guardar edición completa de empresa
         async function guardarEdicionEmpresaCompleta(empresaId) {
             showLoading();
@@ -2203,7 +2242,9 @@
             const empresaData = {
                 id: empresaId,
                 nombre: document.getElementById('editEmpresaNombre').value,
-                nit: document.getElementById('editEmpresaNIT').value,
+                pais: document.getElementById('editEmpresaPais').value,
+                tipo_documento: document.getElementById('editEmpresaTipoDocumento').value,
+                documento: document.getElementById('editEmpresaDocumento').value,
                 industria: document.getElementById('editEmpresaIndustria').value,
                 contacto: document.getElementById('editEmpresaContacto').value,
                 email: document.getElementById('editEmpresaEmail').value,
@@ -2211,12 +2252,11 @@
                 direccion: document.getElementById('editEmpresaDireccion').value,
                 ciudad: document.getElementById('editEmpresaCiudad').value,
                 estado: document.getElementById('editEmpresaEstado').value,
-                tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value,
-                fecharegistro: document.getElementById('editEmpresaFechaRegistro').value
+                tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value
             };
             
             // Validar campos requeridos
-            const required = ['nombre', 'nit', 'industria', 'contacto', 'email', 'telefono', 'estado'];
+            const required = ['nombre', 'pais', 'tipo_documento', 'documento', 'industria', 'contacto', 'email', 'telefono', 'estado'];
             for (const field of required) {
                 if (!empresaData[field]) {
                     showNotification('error', 'Error', `Complete el campo: ${field}`);
@@ -2281,29 +2321,17 @@
             }
         }
 
-        // FUNCIÓN: Mostrar modal nuevo usuario avanzado (CORREGIDO)
+        // =============================================
+        // MÓDULO: FUNCIONES DE USUARIOS
+        // =============================================
+
+        // FUNCIÓN: Mostrar modal nuevo usuario avanzado
         function showNuevoUsuarioModalAvanzado() {
             showModal('Nuevo Usuario - Formulario Completo', `
                 <div style="max-width: 700px;">
-                    <div class="form-group" style="display: none;">
-                        <label style="color: var(--secondary);">ID Usuario</label>
-                        <div style="position: relative;">
-                            <input type="text" id="nuevoUsuarioId" 
-                                placeholder="Auto-generado por el sistema"
-                                list="listaUsuariosExistentes"
-                                style="color: white;">
-                            <datalist id="listaUsuariosExistentes">
-                                ${usuariosNoSuper.map(u => `
-                                    <option value="${u.id}">${u.nombre}</option>
-                                `).join('')}
-                            </datalist>
-                        </div>
-                        <small style="color: rgba(255,255,255,0.6);">ID auto-generado por el sistema</small>
-                    </div>
-                    
                     <div class="form-group">
                         <label style="color: var(--secondary);">Empresa *</label>
-                        <select id="nuevoUsuarioEmpresaAvanzado" onchange="cargarEmpleadosEmpresa()" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                        <select id="nuevoUsuarioEmpresaAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
                             <option value="" style="color: #666;">Seleccionar empresa</option>
                             ${database.empresas.map(empresa => `
                                 <option value="${empresa.id}" style="color: white;">${empresa.nombre}</option>
@@ -2339,7 +2367,8 @@
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com.bo" required style="color: white;">
+                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required style="color: white;">
+                        <small style="color: rgba(255,255,255,0.6);">El usuario usará este email para acceder al sistema</small>
                     </div>
                     
                     <div class="form-group">
@@ -2350,6 +2379,7 @@
                                 <i class="fas fa-random"></i> Generar
                             </button>
                         </div>
+                        <small style="color: rgba(255,255,255,0.6);">El usuario usará esta contraseña para acceder al sistema</small>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -2371,14 +2401,14 @@
                                 <option value="No" style="color: white;">Inactivo</option>
                             </select>
                         </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Fecha de Creación *</label>
-                            <input type="date" id="nuevoUsuarioFechaCreacion" 
-                                value="${new Date().toISOString().split('T')[0]}" 
-                                required style="color: white;">
-                            <small style="color: rgba(255,255,255,0.6);">Fecha cuando se crea el usuario en el sistema (hoy por defecto)</small>
-                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                        <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-shield-alt"></i> Permisos de Seguridad</h4>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                            <i class="fas fa-info-circle"></i> Este usuario solo podrá acceder a los datos de la empresa asignada.
+                            No tendrá acceso a información de otras empresas del sistema.
+                        </p>
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
@@ -2403,7 +2433,7 @@
             document.getElementById('nuevoUsuarioPasswordAvanzado').value = password;
         }
 
-        // FUNCIÓN: Crear nuevo usuario avanzado (CORREGIDO)
+        // FUNCIÓN: Crear nuevo usuario avanzado
         async function crearNuevoUsuarioAvanzadoCorregido() {
             showLoading();
             
@@ -2420,14 +2450,12 @@
             if (segundoApellido) nombreCompleto += ' ' + segundoApellido;
             
             const usuarioData = {
-                id: document.getElementById('nuevoUsuarioId').value.trim() || undefined, // Dejar undefined para auto-generar
                 nombre: nombreCompleto,
                 email: document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase(),
                 password: document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim(),
                 role: document.getElementById('nuevoUsuarioRolAvanzado').value,
                 activo: document.getElementById('nuevoUsuarioActivoAvanzado').value,
-                empresa_id: document.getElementById('nuevoUsuarioEmpresaAvanzado').value,
-                fechacreacion: document.getElementById('nuevoUsuarioFechaCreacion').value
+                empresa_id: document.getElementById('nuevoUsuarioEmpresaAvanzado').value
             };
             
             // Validaciones
@@ -2458,138 +2486,7 @@
             }
         }
 
-        // FUNCIÓN: Cargar empleados de empresa seleccionada
-        function cargarEmpleadosEmpresa() {
-            const empresaId = document.getElementById('nuevoUsuarioEmpresaAvanzado').value;
-            window.currentEmpresaId = empresaId;
-            
-            if (!empresaId) {
-                window.empleadosFiltrados = [];
-                return;
-            }
-            
-            // Filtrar empleados de la empresa seleccionada
-            window.empleadosFiltrados = database.empleados.filter(e => e.empresa_id === empresaId);
-            
-            // Guardar datos para autocompletado
-            document.getElementById('empleadosData').textContent = JSON.stringify(window.empleadosFiltrados);
-        }
-
-        // FUNCIÓN: Filtrar empleados mientras se escribe
-        function filtrarEmpleados() {
-            const input = document.getElementById('nuevoUsuarioNombreAvanzado');
-            const query = input.value.toLowerCase();
-            const sugerenciasDiv = document.getElementById('sugerenciasEmpleados');
-            
-            if (!query || !window.currentEmpresaId || window.empleadosFiltrados.length === 0) {
-                sugerenciasDiv.style.display = 'none';
-                return;
-            }
-            
-            const resultados = window.empleadosFiltrados.filter(empleado => 
-                empleado.nombre.toLowerCase().includes(query)
-            );
-            
-            if (resultados.length === 0) {
-                sugerenciasDiv.style.display = 'none';
-                return;
-            }
-            
-            sugerenciasDiv.innerHTML = resultados.map(empleado => `
-                <div style="padding: 0.5rem 1rem; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1);"
-                    onclick="seleccionarEmpleado('${empleado.id}')"
-                    onmouseover="this.style.background='rgba(124,58,237,0.2)';"
-                    onmouseout="this.style.background='transparent';">
-                    ${empleado.nombre} 
-                    <small style="color: rgba(255,255,255,0.6);">${empleado.cargo || ''}</small>
-                </div>
-            `).join('');
-            
-            sugerenciasDiv.style.display = 'block';
-        }
-
-        // FUNCIÓN: Seleccionar empleado de la lista
-        function seleccionarEmpleado(empleadoId) {
-            const empleado = window.empleadosFiltrados.find(e => e.id === empleadoId);
-            if (!empleado) return;
-            
-            document.getElementById('nuevoUsuarioNombreAvanzado').value = empleado.nombre;
-            document.getElementById('nuevoUsuarioEmailAvanzado').value = empleado.email || generarEmail(empleado.nombre);
-            document.getElementById('nuevoUsuarioPasswordAvanzado').value = generarPassword();
-            
-            document.getElementById('sugerenciasEmpleados').style.display = 'none';
-        }
-
-        // FUNCIÓN: Generar email a partir del nombre
-        function generarEmail(nombre) {
-            const nombreLimpio = nombre.toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
-                .replace(/\s+/g, '.')
-                .replace(/[^a-z0-9.]/g, '');
-            
-            // Obtener dominio de la empresa seleccionada
-            const empresaId = document.getElementById('nuevoUsuarioEmpresaAvanzado').value;
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            
-            const dominio = empresa && empresa.email ? 
-                empresa.email.split('@')[1] : 'nexialsuite.bo';
-            
-            return `${nombreLimpio}@${dominio}`;
-        }
-
-        // FUNCIÓN: Generar password aleatorio
-        function generarPassword() {
-            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let password = '';
-            for (let i = 0; i < 8; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return password;
-        }
-
-        // FUNCIÓN: Crear nuevo usuario avanzado
-        async function crearNuevoUsuarioAvanzado() {
-            showLoading();
-            
-            const usuarioData = {
-                nombre: document.getElementById('nuevoUsuarioNombreAvanzado').value,
-                email: document.getElementById('nuevoUsuarioEmailAvanzado').value,
-                password: document.getElementById('nuevoUsuarioPasswordAvanzado').value,
-                role: document.getElementById('nuevoUsuarioRolAvanzado').value,
-                activo: document.getElementById('nuevoUsuarioActivoAvanzado').value,
-                empresa_id: document.getElementById('nuevoUsuarioEmpresaAvanzado').value,
-                fechacreacion: document.getElementById('nuevoUsuarioFechaCreacion').value || new Date().toISOString().split('T')[0]
-            };
-            
-            // Validar campos
-            if (!usuarioData.nombre || !usuarioData.email || !usuarioData.empresa_id) {
-                showNotification('error', 'Error', 'Complete todos los campos obligatorios');
-                hideLoading();
-                return;
-            }
-            
-            try {
-                const result = await postToAPI('addUsuarioCompleto', usuarioData);
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado exitosamente`);
-                    
-                    // Recargar datos
-                    await loadUsuariosFromAPI();
-                    
-                    closeModal();
-                    loadGestionPersonal();
-                } else {
-                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
-                }
-            } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // FUNCIÓN: Editar usuario completo (CON DESPLEGABLE DE IDs Y NOMBRES SEPARADOS)
+        // FUNCIÓN: Editar usuario completo
         function editUsuarioCompleto(usuarioId) {
             const usuario = database.usuarios.find(u => u.id === usuarioId);
             if (!usuario) {
@@ -2597,14 +2494,13 @@
                 return;
             }
             
-            // Obtener nombres separados (si ya existen en el formato separado)
+            // Obtener nombres separados
             let primerNombre = '';
             let segundoNombre = '';
             let primerApellido = '';
             let segundoApellido = '';
             
             if (usuario.nombre) {
-                // Intentar dividir el nombre completo
                 const nombres = usuario.nombre.split(' ');
                 if (nombres.length >= 1) primerNombre = nombres[0];
                 if (nombres.length >= 2) segundoNombre = nombres[1] || '';
@@ -2615,23 +2511,6 @@
             showModal(`Editar Usuario: ${usuario.nombre}`, `
                 <div style="max-width: 700px;">
                     <input type="hidden" id="editUsuarioId" value="${usuario.id || ''}">
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">ID Usuario *</label>
-                        <div style="position: relative;">
-                            <input type="text" id="editUsuarioIdSeleccion" 
-                                value="${usuario.id || ''}" 
-                                list="listaUsuarios"
-                                onchange="cargarDatosUsuarioPorId()"
-                                required style="color: white;">
-                            <datalist id="listaUsuarios">
-                                ${database.usuarios.map(u => `
-                                    <option value="${u.id}">${u.nombre} - ${u.email}</option>
-                                `).join('')}
-                            </datalist>
-                        </div>
-                        <small style="color: rgba(255,255,255,0.6);">Seleccione o escriba un ID existente</small>
-                    </div>
                     
                     <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
@@ -2681,7 +2560,6 @@
                                 <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''} style="color: white;">Administración y Finanzas</option>
                                 <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''} style="color: white;">Vendedor App</option>
                                 <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''} style="color: white;">Almacén App</option>
-                                <option value="super" ${usuario.role === 'super' ? 'selected' : ''} style="color: white;">Super Admin</option>
                             </select>
                         </div>
                         
@@ -2702,14 +2580,12 @@
                                 <option value="No" ${usuario.activo === 'No' ? 'selected' : ''} style="color: white;">Inactivo</option>
                             </select>
                         </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Fecha de Creación *</label>
-                            <input type="date" id="editUsuarioFechaCreacion" 
-                                value="${usuario.fechacreacion ? usuario.fechacreacion.split(' ')[0] : new Date().toISOString().split('T')[0]}" 
-                                required style="color: white;">
-                            <small style="color: rgba(255,255,255,0.6);">Fecha cuando se creó el usuario en el sistema</small>
-                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <p style="color: var(--secondary); margin: 0;">
+                            <i class="fas fa-info-circle"></i> ID del usuario: <strong>${usuario.id || 'N/A'}</strong>
+                        </p>
                     </div>
                     
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
@@ -2724,33 +2600,6 @@
             `);
         }
 
-        // FUNCIÓN: Cargar datos de usuario por ID seleccionado
-        function cargarDatosUsuarioPorId() {
-            const selectedId = document.getElementById('editUsuarioIdSeleccion').value;
-            const usuario = database.usuarios.find(u => u.id === selectedId);
-            
-            if (usuario) {
-                // Llenar los campos automáticamente
-                document.getElementById('editUsuarioEmail').value = usuario.email || '';
-                document.getElementById('editUsuarioPassword').value = usuario.password || '12345678';
-                document.getElementById('editUsuarioRol').value = usuario.role || 'jefe';
-                document.getElementById('editUsuarioActivo').value = usuario.activo || 'Sí';
-                document.getElementById('editUsuarioEmpresa').value = usuario.empresa_id || '';
-                document.getElementById('editUsuarioFechaCreacion').value = usuario.fechacreacion ? usuario.fechacreacion.split(' ')[0] : new Date().toISOString().split('T')[0];
-                
-                // Dividir nombre si existe
-                if (usuario.nombre) {
-                    const nombres = usuario.nombre.split(' ');
-                    if (nombres.length >= 1) document.getElementById('editUsuarioPrimerNombre').value = nombres[0];
-                    if (nombres.length >= 2) document.getElementById('editUsuarioSegundoNombre').value = nombres[1] || '';
-                    if (nombres.length >= 3) document.getElementById('editUsuarioPrimerApellido').value = nombres[2] || '';
-                    if (nombres.length >= 4) document.getElementById('editUsuarioSegundoApellido').value = nombres[3] || '';
-                }
-                
-                showNotification('info', 'Usuario cargado', `Datos de ${usuario.nombre} cargados automáticamente`);
-            }
-        }
-
         // FUNCIÓN: Generar nueva contraseña
         function generarPasswordUsuario() {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
@@ -2759,10 +2608,9 @@
                 password += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             document.getElementById('editUsuarioPassword').value = password;
-            showNotification('success', 'Contraseña generada', 'Nueva contraseña generada: ' + password);
         }
 
-        // FUNCIÓN: Guardar usuario completo (VERSIÓN CORREGIDA)
+        // FUNCIÓN: Guardar usuario completo
         async function guardarUsuarioCompletoCorregido(usuarioId) {
             showLoading();
             
@@ -2778,18 +2626,14 @@
             if (primerApellido) nombreCompleto += ' ' + primerApellido;
             if (segundoApellido) nombreCompleto += ' ' + segundoApellido;
             
-            // Obtener ID (puede ser nuevo o existente)
-            const nuevoId = document.getElementById('editUsuarioIdSeleccion').value.trim();
-            
             const usuarioData = {
-                id: nuevoId || usuarioId, // Usar nuevo ID si se cambió
+                id: usuarioId,
                 nombre: nombreCompleto,
                 email: document.getElementById('editUsuarioEmail').value.trim().toLowerCase(),
                 password: document.getElementById('editUsuarioPassword').value.trim(),
                 role: document.getElementById('editUsuarioRol').value,
                 activo: document.getElementById('editUsuarioActivo').value,
-                empresa_id: document.getElementById('editUsuarioEmpresa').value,
-                fechacreacion: document.getElementById('editUsuarioFechaCreacion').value
+                empresa_id: document.getElementById('editUsuarioEmpresa').value
             };
             
             // Validaciones
@@ -2800,15 +2644,7 @@
             }
             
             try {
-                let result;
-                
-                // Si el ID cambió, es un usuario nuevo
-                if (nuevoId !== usuarioId && nuevoId) {
-                    result = await postToAPI('addUsuario', usuarioData);
-                } else {
-                    // Si es el mismo ID, actualizar
-                    result = await postToAPI('updateUsuario', usuarioData);
-                }
+                const result = await postToAPI('updateUsuario', usuarioData);
                 
                 if (result && result.success) {
                     showNotification('success', 'Éxito', 'Usuario guardado correctamente');
@@ -2823,101 +2659,6 @@
                 }
             } catch (error) {
                 showNotification('error', 'Error', 'Error de conexión: ' + error.message);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // FUNCIÓN: Guardar usuario completo (con mejor manejo de errores)
-        async function guardarUsuarioCompleto(usuarioId) {
-            showLoading();
-            
-            // Obtener valores de los campos
-            const usuarioData = {
-                id: usuarioId,
-                nombre: document.getElementById('editUsuarioNombreCompleto').value.trim(),
-                email: document.getElementById('editUsuarioEmailCompleto').value.trim().toLowerCase(),
-                password: document.getElementById('editUsuarioPasswordCompleto').value.trim(),
-                role: document.getElementById('editUsuarioRolCompleto').value,
-                activo: document.getElementById('editUsuarioActivoCompleto').value,
-                empresa_id: document.getElementById('editUsuarioEmpresaCompleto').value,
-                fechacreacion: document.getElementById('editUsuarioFechaCreacion').value || new Date().toISOString().split('T')[0]
-            };
-            
-            // Debug: Verificar datos
-            const usuarioExistente = debugData(usuarioData);
-            
-            // Validación básica
-            if (!usuarioData.nombre || !usuarioData.email || !usuarioData.empresa_id) {
-                showNotification('error', 'Error de validación', 'Complete los campos obligatorios: Nombre, Email y Empresa');
-                hideLoading();
-                return;
-            }
-            
-            // Validar formato email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(usuarioData.email)) {
-                showNotification('error', 'Error', 'Ingrese un email válido');
-                hideLoading();
-                return;
-            }
-            
-            try {
-                console.log('🔄 Enviando actualización de usuario...');
-                
-                // PRUEBA: Primero intentar con updateUsuario (más simple)
-                const dataSimple = {
-                    id: usuarioId,
-                    nombre: usuarioData.nombre,
-                    email: usuarioData.email,
-                    role: usuarioData.role,
-                    activo: usuarioData.activo
-                };
-                
-                console.log('📤 Datos simplificados:', dataSimple);
-                
-                let result;
-                
-                // Intentar primero con updateUsuario
-                result = await postToAPI('updateUsuario', dataSimple);
-                
-                if (!result || !result.success) {
-                    // Si falla, intentar con updateUsuarioCompleto
-                    console.log('🔄 Intentando con updateUsuarioCompleto...');
-                    result = await postToAPI('updateUsuarioCompleto', usuarioData);
-                }
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Usuario actualizado correctamente');
-                    
-                    // Recargar datos desde la API
-                    await loadUsuariosFromAPI();
-                    
-                    // Actualizar base de datos local
-                    const index = database.usuarios.findIndex(u => u.id === usuarioId);
-                    if (index !== -1) {
-                        database.usuarios[index] = { ...database.usuarios[index], ...usuarioData };
-                    }
-                    
-                    closeModal();
-                    loadGestionPersonal();
-                    
-                } else {
-                    const errorMsg = result?.error || 'Error desconocido al actualizar';
-                    showNotification('error', 'Error de API', errorMsg);
-                    
-                    // Mostrar más detalles en consola
-                    console.error('❌ Error detallado:', {
-                        datosEnviados: usuarioData,
-                        respuesta: result,
-                        usuarioExistente: usuarioExistente
-                    });
-                }
-                
-            } catch (error) {
-                console.error('❌ Error crítico:', error);
-                showNotification('error', 'Error crítico', 
-                    `Error: ${error.message}. Verifique la consola para más detalles.`);
             } finally {
                 hideLoading();
             }
@@ -2956,247 +2697,6 @@
             } finally {
                 hideLoading();
             }
-        }
-
-        // FUNCIÓN: Mostrar password del usuario
-        function mostrarPasswordUsuario(usuarioId) {
-            const usuario = database.usuarios.find(u => u.id === usuarioId);
-            if (!usuario) return;
-            
-            showNotification('info', 'Contraseña', `La contraseña de ${usuario.nombre} es: ${usuario.password || 'No disponible'}`);
-        }
-        
-        // =============================================
-        // MÓDULO: FUNCIONES DE USUARIOS
-        // =============================================
-        
-        // FUNCIÓN: Mostrar modal nuevo usuario
-        function showNuevoUsuarioModal() {
-            showModal('Nuevo Usuario Global', `
-                <div style="max-width: 500px;">
-                    <div class="form-group">
-                        <label>Empresa *</label>
-                        <select id="nuevoUsuarioEmpresa">
-                            <option value="">Seleccionar empresa</option>
-                            ${database.empresas.map(empresa => `
-                                <option value="${empresa.id}">${empresa.nombre}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Nombre Completo *</label>
-                        <input type="text" id="nuevoUsuarioNombre" placeholder="Juan Pérez">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="nuevoUsuarioEmail" placeholder="usuario@empresa.com.bo">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Rol *</label>
-                        <select id="nuevoUsuarioRol">
-                            <option value="jefe">Jefe Empresa</option>
-                            <option value="comercial">Dirección Comercial</option>
-                            <option value="admin">Administración y Finanzas</option>
-                            <option value="vendedor">Vendedor App</option>
-                            <option value="almacen">Almacén App</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Contraseña *</label>
-                        <input type="password" id="nuevoUsuarioPassword" value="12345678">
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                            Cancelar
-                        </button>
-                        <button class="btn btn-primary" onclick="crearNuevoUsuario()" style="flex: 1;">
-                            <i class="fas fa-user-plus"></i> Crear Usuario
-                        </button>
-                    </div>
-                </div>
-            `);
-        }
-        
-        // FUNCIÓN: Crear nuevo usuario
-        async function crearNuevoUsuario() {
-            showLoading();
-            
-            const usuarioData = {
-                nombre: document.getElementById('nuevoUsuarioNombre').value,
-                email: document.getElementById('nuevoUsuarioEmail').value,
-                role: document.getElementById('nuevoUsuarioRol').value,
-                password: document.getElementById('nuevoUsuarioPassword').value,
-                empresa_id: document.getElementById('nuevoUsuarioEmpresa').value
-            };
-            
-            // Validar campos
-            if (!usuarioData.nombre || !usuarioData.email || !usuarioData.empresa_id) {
-                showNotification('error', 'Error', 'Complete todos los campos');
-                hideLoading();
-                return;
-            }
-            
-            try {
-                const result = await postToAPI('addUsuario', usuarioData);
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado`);
-                    
-                    // Recargar datos
-                    await loadUsuariosFromAPI();
-                    
-                    closeModal();
-                    loadGestionPersonal();
-                } else {
-                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
-                }
-            } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión');
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        // FUNCIÓN: Editar usuario
-        function editUsuario(usuarioId) {
-            const usuario = database.usuarios.find(u => u.id === usuarioId);
-            if (!usuario) return;
-            
-            showModal(`Editar Usuario: ${usuario.nombre}`, `
-                <div style="max-width: 500px;">
-                    <div class="form-group">
-                        <label>Nombre Completo</label>
-                        <input type="text" id="editUsuarioNombre" value="${usuario.nombre || ''}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="editUsuarioEmail" value="${usuario.email || ''}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Rol</label>
-                        <select id="editUsuarioRol">
-                            <option value="jefe" ${usuario.role === 'jefe' ? 'selected' : ''}>Jefe Empresa</option>
-                            <option value="comercial" ${usuario.role === 'comercial' ? 'selected' : ''}>Dirección Comercial</option>
-                            <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''}>Administración y Finanzas</option>
-                            <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''}>Vendedor App</option>
-                            <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''}>Almacén App</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Estado</label>
-                        <select id="editUsuarioActivo">
-                            <option value="Sí" ${usuario.activo === 'Sí' ? 'selected' : ''}>Activo</option>
-                            <option value="No" ${usuario.activo === 'No' ? 'selected' : ''}>Inactivo</option>
-                        </select>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                            Cancelar
-                        </button>
-                        <button class="btn btn-primary" onclick="actualizarUsuario('${usuarioId}')" style="flex: 1;">
-                            <i class="fas fa-save"></i> Guardar Cambios
-                        </button>
-                    </div>
-                </div>
-            `);
-        }
-        
-        // FUNCIÓN: Actualizar usuario
-        async function actualizarUsuario(usuarioId) {
-            showLoading();
-            
-            const usuarioData = {
-                id: usuarioId,
-                nombre: document.getElementById('editUsuarioNombre').value,
-                email: document.getElementById('editUsuarioEmail').value,
-                role: document.getElementById('editUsuarioRol').value,
-                activo: document.getElementById('editUsuarioActivo').value
-            };
-            
-            try {
-                const result = await postToAPI('updateUsuario', usuarioData);
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Usuario actualizado');
-                    
-                    // Recargar datos
-                    await loadUsuariosFromAPI();
-                    
-                    closeModal();
-                    loadGestionPersonal();
-                } else {
-                    showNotification('error', 'Error', result?.error || 'Error al actualizar');
-                }
-            } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión');
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        // FUNCIÓN: Gestionar usuarios de empresa
-        function manageUsuariosEmpresa(empresaId) {
-            const empresa = database.empresas.find(e => e.id === empresaId);
-            if (!empresa) return;
-            
-            const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresaId);
-            
-            showModal(`Usuarios de ${empresa.nombre}`, `
-                <div style="max-width: 800px;">
-                    <div style="margin-bottom: 1.5rem;">
-                        <button class="btn btn-primary" onclick="showNuevoUsuarioModalEmpresa('${empresaId}')">
-                            <i class="fas fa-user-plus"></i> Agregar Usuario
-                        </button>
-                    </div>
-                    
-                    <div style="max-height: 400px; overflow-y: auto;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 1px solid rgba(124,58,237,0.3);">
-                                    <th style="padding: 0.5rem; text-align: left;">Nombre</th>
-                                    <th style="padding: 0.5rem; text-align: left;">Email</th>
-                                    <th style="padding: 0.5rem; text-align: left;">Rol</th>
-                                    <th style="padding: 0.5rem; text-align: left;">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${usuariosEmpresa.map(usuario => `
-                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                        <td style="padding: 0.5rem;">${usuario.nombre}</td>
-                                        <td style="padding: 0.5rem;">${usuario.email}</td>
-                                        <td style="padding: 0.5rem;">
-                                            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.role)}; font-size: 0.8rem;">
-                                                ${usuario.role}
-                                            </span>
-                                        </td>
-                                        <td style="padding: 0.5rem;">
-                                            <span class="status-badge ${usuario.activo === 'Sí' ? 'status-active' : 'status-inactive'}">
-                                                ${usuario.activo === 'Sí' ? 'Activo' : 'Inactivo'}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                                ${usuariosEmpresa.length === 0 ? `
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            No hay usuarios para esta empresa
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `);
         }
         
         // =============================================
@@ -3420,55 +2920,6 @@
         // MÓDULO: INICIALIZACIÓN
         // =============================================
         
-        // FUNCIÓN: Probar conexión API
-        async function testAPI() {
-            showLoading();
-            try {
-                console.log('🔗 Probando conexión con API...');
-                
-                // Probar endpoint simple
-                const testResult = await fetch(`${API_URL}?action=test&timestamp=${Date.now()}`);
-                
-                if (testResult.ok) {
-                    const data = await testResult.json();
-                    console.log('✅ Test API exitoso:', data);
-                    showNotification('success', 'API Conectada', 'Conexión con servidor establecida');
-                    return true;
-                } else {
-                    console.error('❌ Test API falló:', testResult.status);
-                    showNotification('error', 'API No disponible', 
-                        `Error ${testResult.status}: ${testResult.statusText}`);
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ Error test API:', error);
-                showNotification('error', 'Error de conexión', 
-                    'No se puede conectar con el servidor. Verifique la URL API.');
-                return false;
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // FUNCIÓN: Probar actualización de usuario específico
-        async function testUpdateUsuario() {
-            // Usar el usuario super admin para prueba
-            const testData = {
-                id: 'SUPER-ADMIN-001',
-                nombre: 'Administrador Corporativo',
-                email: 'marcelodanielcc@gmail.com',
-                role: 'super',
-                activo: 'Sí'
-            };
-            
-            console.log('🧪 Probando updateUsuario con:', testData);
-            
-            const result = await postToAPI('updateUsuario', testData);
-            console.log('📋 Resultado prueba:', result);
-            
-            return result;
-        }
-
         // FUNCIÓN: Iniciar sesión
         async function startSession() {
             // Obtener usuario de localStorage
@@ -3550,389 +3001,8 @@
             
             console.log('🚀 Nexial Suite Panel de Control inicializado');
             console.log('📊 Sistema Corporativo Multiempresa v3.0');
-            console.log('🇧🇴 Adaptado para Bolivia');
             console.log('🔗 API URL:', API_URL);
-            
-            // Test de conexión API (con retardo para no interferir con login)
-            setTimeout(async () => {
-                const apiConnected = await testAPI();
-                
-                if (!apiConnected) {
-                    // Mostrar advertencia si API no responde
-                    showNotification('warning', 'Modo Offline', 
-                        'API no disponible. Trabajando con datos locales. Algunas funciones pueden no estar disponibles.');
-                    
-                    // Cargar datos de ejemplo si API falla
-                    cargarDatosEjemplo();
-                }
-            }, 2000);
-            
-            // Agregar botón de debug en desarrollo
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                const debugBtn = document.createElement('button');
-                debugBtn.innerHTML = '🐛 Debug API';
-                debugBtn.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background: #ff0055;
-                    color: white;
-                    border: none;
-                    padding: 10px 15px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    z-index: 9999;
-                    font-size: 12px;
-                `;
-                debugBtn.onclick = testUpdateUsuario;
-                document.body.appendChild(debugBtn);
-            }
         });
-
-        // FUNCIÓN: Cargar datos de ejemplo si API falla
-        function cargarDatosEjemplo() {
-            console.log('📂 Cargando datos de ejemplo...');
-            
-            // Datos de ejemplo para empresas
-            if (database.empresas.length === 0) {
-                database.empresas = [
-                    {
-                        id: 'EMP-001',
-                        nombre: 'Coca Cola',
-                        nit: '6980083369800833',
-                        industria: 'Tecnología',
-                        contacto: 'Ricardo Arjona',
-                        email: 'ricardoarjona@gmail.com',
-                        telefono: '78945612',
-                        direccion: 'Av. Principal 123',
-                        ciudad: 'Lima',
-                        estado: 'Activa',
-                        tarjetaregistrada: 'Sí',
-                        fecharegistro: '2025-01-15 00:00:00',
-                        usuarios: 3
-                    }
-                ];
-            }
-            
-            // Datos de ejemplo para usuarios
-            if (database.usuarios.length === 0) {
-                database.usuarios = [
-                    {
-                        id: 'SUPER-ADMIN-001',
-                        email: 'marcelodanielcc@gmail.com',
-                        password: '789',
-                        role: 'super',
-                        nombre: 'Administrador Corporativo',
-                        empresa_id: '',
-                        empresa: 'Nexial Suite',
-                        fechacreacion: '2025-01-01 00:00:00',
-                        activo: 'Sí'
-                    }
-                ];
-            }
-            
-            console.log('✅ Datos de ejemplo cargados:', {
-                empresas: database.empresas.length,
-                usuarios: database.usuarios.length
-            });
-        }
-
-        // =============================================
-        // MÓDULO: REPORTES GLOBALES
-        // =============================================
-
-        // FUNCIÓN: Cargar reporte de facturación mensual
-        async function cargarReporteFacturacionMensual() {
-            showLoading();
-            
-            try {
-                // Obtener el mes actual
-                const fechaActual = new Date();
-                const mesActual = fechaActual.getMonth() + 1;
-                const añoActual = fechaActual.getFullYear();
-                
-                // En una implementación real, aquí llamarías a tu API
-                // Por ahora, mostramos datos de ejemplo
-                const facturacionMensual = {
-                    mes: mesActual,
-                    año: añoActual,
-                    totalFacturado: 0,
-                    empresas: [],
-                    tendencia: []
-                };
-                
-                // Calcular total facturado (ejemplo)
-                // Esto debería venir de tu API
-                let total = 0;
-                database.empresas.forEach(empresa => {
-                    // Simular facturación
-                    const facturacionEmpresa = Math.random() * 50000 + 10000;
-                    total += facturacionEmpresa;
-                    
-                    facturacionMensual.empresas.push({
-                        nombre: empresa.nombre,
-                        facturacion: facturacionEmpresa.toFixed(2),
-                        porcentaje: ((facturacionEmpresa / total) * 100).toFixed(1)
-                    });
-                });
-                
-                facturacionMensual.totalFacturado = total.toFixed(2);
-                
-                // Generar tendencia de últimos 6 meses
-                for (let i = 5; i >= 0; i--) {
-                    const mes = new Date(añoActual, mesActual - 1 - i, 1);
-                    const nombreMes = mes.toLocaleString('es-ES', { month: 'short' });
-                    const facturacionMes = (Math.random() * 30000 + 5000).toFixed(2);
-                    
-                    facturacionMensual.tendencia.push({
-                        mes: nombreMes,
-                        facturacion: facturacionMes
-                    });
-                }
-                
-                // Mostrar el reporte
-                mostrarReporteFacturacion(facturacionMensual);
-                
-            } catch (error) {
-                console.error('Error cargando reporte:', error);
-                showNotification('error', 'Error', 'No se pudo cargar el reporte de facturación');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // FUNCIÓN: Mostrar reporte de facturación
-        function mostrarReporteFacturacion(datos) {
-            const contenido = `
-                <div style="max-width: 100%;">
-                    <div style="background: linear-gradient(45deg, rgba(124,58,237,0.2), rgba(0,245,255,0.2)); 
-                                padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center;">
-                        <h3 style="color: var(--secondary); margin-bottom: 1rem;">Facturación Mensual ${datos.mes}/${datos.año}</h3>
-                        <div style="font-size: 3rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">
-                            Bs. ${Number(datos.totalFacturado).toLocaleString('es-BO')}
-                        </div>
-                        <p style="color: rgba(255,255,255,0.7);">Total facturado este mes</p>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                        <div>
-                            <h4 style="color: var(--secondary); margin-bottom: 1rem; border-bottom: 1px solid rgba(124,58,237,0.3); padding-bottom: 0.5rem;">
-                                <i class="fas fa-building"></i> Facturación por Empresa
-                            </h4>
-                            
-                            <div style="max-height: 300px; overflow-y: auto;">
-                                ${datos.empresas.map(empresa => `
-                                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;">
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                            <strong style="color: white;">${empresa.nombre}</strong>
-                                            <span style="color: var(--success);">Bs. ${Number(empresa.facturacion).toLocaleString('es-BO')}</span>
-                                        </div>
-                                        <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
-                                            <div style="background: linear-gradient(90deg, var(--primary), var(--secondary)); 
-                                                        width: ${empresa.porcentaje}%; height: 100%;">
-                                            </div>
-                                        </div>
-                                        <div style="display: flex; justify-content: space-between; margin-top: 0.3rem;">
-                                            <small style="color: rgba(255,255,255,0.6);">${empresa.porcentaje}% del total</small>
-                                            <small style="color: rgba(255,255,255,0.6);">${((empresa.facturacion / datos.totalFacturado) * 100).toFixed(1)}%</small>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 style="color: var(--secondary); margin-bottom: 1rem; border-bottom: 1px solid rgba(124,58,237,0.3); padding-bottom: 0.5rem;">
-                                <i class="fas fa-chart-line"></i> Tendencia de Facturación
-                            </h4>
-                            
-                            <div style="height: 250px; position: relative;">
-                                <canvas id="facturacionChart"></canvas>
-                            </div>
-                            
-                            <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
-                                ${datos.tendencia.map(item => `
-                                    <div style="text-align: center;">
-                                        <div style="color: var(--secondary); font-weight: 600;">${item.mes}</div>
-                                        <div style="color: white;">Bs. ${Number(item.facturacion).toLocaleString('es-BO')}</div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-                            <div style="background: rgba(0,255,65,0.1); padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
-                                <div style="color: var(--success); font-size: 1.2rem; font-weight: 600;">Empresas Activas</div>
-                                <div style="color: white; font-size: 2rem; font-weight: 700;">${database.empresas.length}</div>
-                            </div>
-                            
-                            <div style="background: rgba(0,170,255,0.1); padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
-                                <div style="color: var(--info); font-size: 1.2rem; font-weight: 600;">Promedio por Empresa</div>
-                                <div style="color: white; font-size: 2rem; font-weight: 700;">Bs. ${(datos.totalFacturado / database.empresas.length).toFixed(0).toLocaleString('es-BO')}</div>
-                            </div>
-                            
-                            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
-                                <div style="color: var(--primary); font-size: 1.2rem; font-weight: 600;">Crecimiento Mensual</div>
-                                <div style="color: white; font-size: 2rem; font-weight: 700;">+15.5%</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('reporteFacturacionContenido').innerHTML = contenido;
-            
-            // Crear gráfico
-            setTimeout(() => {
-                crearGraficoFacturacion(datos.tendencia);
-            }, 100);
-        }
-
-        // FUNCIÓN: Crear gráfico de facturación
-        function crearGraficoFacturacion(tendencia) {
-            const ctx = document.getElementById('facturacionChart').getContext('2d');
-            
-            if (window.facturacionChart) {
-                window.facturacionChart.destroy();
-            }
-            
-            window.facturacionChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: tendencia.map(item => item.mes),
-                    datasets: [{
-                        label: 'Facturación Mensual',
-                        data: tendencia.map(item => item.facturacion),
-                        borderColor: '#7c3aed',
-                        backgroundColor: 'rgba(124, 58, 237, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#fff'
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#fff'
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#fff',
-                                callback: function(value) {
-                                    return 'Bs. ' + value.toLocaleString('es-BO');
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // =============================================
-        // MÓDULO: FUNCIÓN PARA "REPORTES GLOBALES"
-        // =============================================
-
-        // FUNCIÓN: Cargar reportes globales (para el menú)
-        function loadSuperReportes() {
-            document.getElementById('pageTitle').textContent = 'Reportes Globales - Super Admin';
-            
-            document.getElementById('viewSuper').innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Facturación Mes Actual</div>
-                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
-                        </div>
-                        <div class="stat-value" id="facturacionActual">Bs. 0</div>
-                        <div class="stat-change positive" id="cambioFacturacion">
-                            <i class="fas fa-arrow-up"></i> Cargando...
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Empresas Activas</div>
-                            <div class="stat-icon"><i class="fas fa-building"></i></div>
-                        </div>
-                        <div class="stat-value">${database.empresas.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-chart-line"></i> Registradas
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Crecimiento Mensual</div>
-                            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-                        </div>
-                        <div class="stat-value" id="crecimientoMensual">0%</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> Vs. mes anterior
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Proyección Anual</div>
-                            <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
-                        </div>
-                        <div class="stat-value" id="proyeccionAnual">Bs. 0</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-calendar-alt"></i> Estimado
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3 class="table-title">Reportes de Facturación Detallados</h3>
-                        <div class="table-actions">
-                            <button class="btn btn-primary" onclick="cargarReporteFacturacionMensual()">
-                                <i class="fas fa-sync-alt"></i> Actualizar Datos
-                            </button>
-                            <button class="btn btn-secondary" onclick="exportarReporteExcel()">
-                                <i class="fas fa-file-excel"></i> Exportar a Excel
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="table-wrapper">
-                        <div id="reporteGlobalContenido" style="padding: 1rem;">
-                            <!-- El contenido se cargará automáticamente -->
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Cargar datos iniciales
-            setTimeout(() => {
-                cargarReporteFacturacionMensual();
-            }, 500);
-        }
-
-        // FUNCIÓN: Exportar a Excel (simulada)
-        function exportarReporteExcel() {
-            showNotification('info', 'Exportar Reporte', 'Función de exportación a Excel en desarrollo');
-        }
 
     </script>
 </body>
