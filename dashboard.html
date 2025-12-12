@@ -1054,7 +1054,7 @@
         // =============================================
         // REGIÓN: CONFIGURACIÓN GLOBAL
         // =============================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwrFOz0gKxzixORDHZZFi36ryjRSJKRRKqqZA26de3mzr3AHZwQv4IWdr3Z2iOyqLPZ0A/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyS-pX-WcC1j8p4mBN23aj2TuxOnyuqhnUnZdpyl3-VTJjLCP39uKxR-1alWtLV34pR_A/exec';
         
         // =============================================
         // VARIABLES GLOBALES
@@ -1093,27 +1093,52 @@
         // MÓDULO: FUNCIONES DE API
         // =============================================
         
-        // FUNCIÓN: Fetch GET a la API
+        // FUNCIÓN: Fetch GET a la API (VERSIÓN MEJORADA)
         async function fetchFromAPI(action, params = {}) {
-            try {
-                const urlParams = new URLSearchParams({
-                    action: action,
-                    ...params
-                });
-                
-                const response = await fetch(`${API_URL}?${urlParams.toString()}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    return data;
-                } else {
-                    throw new Error(data.error || 'Error en la API');
-                }
-            } catch (error) {
-                console.error('Error en API GET:', error);
-                showNotification('error', 'Error de API', error.message);
-                return null;
+        try {
+            console.log(`🔍 Fetch API: ${action}`, params);
+            
+            // Crear URL con parámetros
+            const urlParams = new URLSearchParams({
+            action: action,
+            ...params
+            });
+            
+            const fullUrl = `${API_URL}?${urlParams.toString()}`;
+            console.log(`📤 URL solicitada: ${fullUrl}`);
+            
+            const response = await fetch(fullUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
             }
+            });
+            
+            console.log(`📥 Status de respuesta: ${response.status} ${response.statusText}`);
+            
+            const textResponse = await response.text();
+            console.log(`📄 Respuesta cruda: ${textResponse.substring(0, 500)}...`);
+            
+            let data;
+            try {
+            data = JSON.parse(textResponse);
+            } catch (jsonError) {
+            console.error('❌ Error parseando JSON:', jsonError);
+            throw new Error(`Respuesta no es JSON válido: ${textResponse.substring(0, 100)}`);
+            }
+            
+            console.log(`✅ Datos parseados para ${action}:`, data);
+            
+            if (data.success) {
+            return data;
+            } else {
+            throw new Error(data.error || `Error en la acción ${action}`);
+            }
+        } catch (error) {
+            console.error(`❌ Error en API GET (${action}):`, error);
+            showNotification('error', `Error de API (${action})`, error.message);
+            return null;
+        }
         }
         
         // FUNCIÓN: Fetch POST a la API (VERSIÓN MEJORADA)
@@ -1272,179 +1297,76 @@
         
         // FUNCIÓN: Configurar interfaz según rol
         function configureInterface() {
+        console.log('🎨 Configurando interfaz para rol:', currentUser.role);
+        
+        // Mostrar solo la vista de super admin si el rol es super
+        if (currentUser.role === 'super') {
+            console.log('👑 Configurando como Super Admin');
+            
             const roleConfigs = {
-                'super': {
-                    badgeClass: 'super-admin',
-                    badgeText: 'SUPER ADMIN',
-                    userName: currentUser.nombre,
-                    userRole: 'Control Total Sistema',
-                    viewId: 'viewSuper',
-                    navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">CORPORATIVO</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
-                                        <i class="fas fa-tachometer-alt"></i>
-                                        <span>Panel de Control Corporativo</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
-                                        <i class="fas fa-building"></i>
-                                        <span>Gestión de Empresas</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadGestionPersonal()">
-                                        <i class="fas fa-users-cog"></i>
-                                        <span>Gestión de Personal</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    pageTitle: 'Panel de Control Corporativo - Super Usuario'
-                },
-                'jefe': {
-                    badgeClass: 'jefe',
-                    badgeText: 'JEFE PRINCIPAL',
-                    userName: currentUser.nombre,
-                    userRole: `Empresa: ${currentCompany ? currentCompany.nombre : currentUser.empresa}`,
-                    viewId: 'viewJefe',
-                    navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">EJECUTIVO</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" onclick="loadJefeDashboard()">
-                                        <i class="fas fa-tachometer-alt"></i>
-                                        <span>Panel de Control Ejecutivo</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadEmpresaVentas()">
-                                        <i class="fas fa-chart-line"></i>
-                                        <span>Ventas y Comercial</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadEmpresaFinanzas()">
-                                        <i class="fas fa-calculator"></i>
-                                        <span>Finanzas y Administración</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <div class="nav-section">
-                            <div class="nav-title">ÁREAS</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="accessComercial()">
-                                        <i class="fas fa-chart-line"></i>
-                                        <span>Dirección Comercial</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="accessAdmin()">
-                                        <i class="fas fa-calculator"></i>
-                                        <span>Administración y Finanzas</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadEmpleadosEmpresa()">
-                                        <i class="fas fa-users"></i>
-                                        <span>Empleados</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    pageTitle: `Panel de Control Ejecutivo - ${currentCompany ? currentCompany.nombre : currentUser.empresa}`
-                },
-                'comercial': {
-                    badgeClass: 'comercial',
-                    badgeText: 'COMERCIAL',
-                    userName: currentUser.nombre,
-                    userRole: `Dirección Comercial - ${currentUser.empresa}`,
-                    viewId: 'viewComercial',
-                    navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">COMERCIAL</div>
-                            <ul class="nav-links">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" onclick="loadComercialDashboard()">
-                                        <i class="fas fa-tachometer-alt"></i>
-                                        <span>Panel Comercial</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadVentasManagement()">
-                                        <i class="fas fa-shopping-cart"></i>
-                                        <span>Ventas</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadClientesManagement()">
-                                        <i class="fas fa-user-tie"></i>
-                                        <span>Clientes</span>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link" onclick="loadProductosManagement()">
-                                        <i class="fas fa-box"></i>
-                                        <span>Productos</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    `,
-                    pageTitle: `Dirección Comercial - ${currentUser.empresa}`
-                }
+            'super': {
+                badgeClass: 'super-admin',
+                badgeText: 'SUPER ADMIN',
+                userName: currentUser.nombre,
+                userRole: 'Control Total Sistema',
+                viewId: 'viewSuper',
+                navMenu: `
+                <div class="nav-section">
+                    <div class="nav-title">CORPORATIVO</div>
+                    <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Panel de Control Corporativo</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
+                        <i class="fas fa-building"></i>
+                        <span>Gestión de Empresas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="loadGestionPersonal()">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Gestión de Personal</span>
+                        </a>
+                    </li>
+                    </ul>
+                </div>
+                `,
+                pageTitle: 'Panel de Control Corporativo - Super Usuario'
+            }
             };
             
-            const config = roleConfigs[currentUser.role] || roleConfigs['super'];
+            const config = roleConfigs[currentUser.role];
             
             // Aplicar configuración
             document.getElementById('userBadge').className = `user-badge ${config.badgeClass}`;
             document.getElementById('userBadge').textContent = config.badgeText;
             document.getElementById('userName').textContent = config.userName;
             document.getElementById('userRole').textContent = config.userRole;
-            document.getElementById('sidebarCompanyName').textContent = currentUser.empresa;
+            document.getElementById('sidebarCompanyName').textContent = 'NEXIAL SUITE';
             document.getElementById('navMenu').innerHTML = config.navMenu;
             document.getElementById('pageTitle').textContent = config.pageTitle;
             
             // Mostrar vista correspondiente
             document.querySelectorAll('.role-view').forEach(view => {
-                view.classList.remove('active');
-                view.innerHTML = '';
+            view.classList.remove('active');
+            view.innerHTML = '';
             });
             
             const activeView = document.getElementById(config.viewId);
             activeView.classList.add('active');
             
-            // Cargar contenido inicial según rol
-            switch(currentUser.role) {
-                case 'super':
-                    loadSuperDashboard();
-                    break;
-                case 'jefe':
-                    loadJefeDashboard();
-                    break;
-                case 'comercial':
-                    loadComercialDashboard();
-                    break;
-                case 'admin':
-                    loadAdminDashboard();
-                    break;
-                case 'vendedor':
-                    loadVendedorDashboard();
-                    break;
-                case 'almacen':
-                    loadAlmacenDashboard();
-                    break;
-            }
+            // Cargar dashboard de super usuario
+            loadSuperDashboard();
+            
+            console.log('✅ Interfaz configurada exitosamente');
+        } else {
+            console.log('⚠️ Rol no reconocido:', currentUser.role);
+            showNotification('error', 'Error de rol', `Rol "${currentUser.role}" no reconocido`);
+        }
         }
         
         // =============================================
@@ -2995,47 +2917,79 @@
         // MÓDULO: INICIALIZACIÓN
         // =============================================
         
-        // FUNCIÓN: Iniciar sesión
+        // FUNCIÓN: Iniciar sesión (VERSIÓN CORREGIDA)
         async function startSession() {
-            // Obtener usuario de localStorage
-            const savedUser = localStorage.getItem('nexial_user');
+        console.log('🔄 Iniciando sesión...');
+        
+        // Obtener usuario de localStorage
+        const savedUser = localStorage.getItem('nexial_user');
+        
+        if (!savedUser) {
+            console.log('❌ No hay usuario en localStorage, redirigiendo al login');
+            // Redirigir al login si no hay usuario
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        try {
+            currentUser = JSON.parse(savedUser);
+            currentRole = currentUser.role;
             
-            if (!savedUser) {
-                // Redirigir al login si no hay usuario
-                window.location.href = 'index.html';
-                return;
+            console.log('👤 Usuario encontrado:', currentUser);
+            
+            // Primero probar si la API está funcionando
+            showLoading();
+            
+            // Hacer una prueba simple a la API
+            const testResult = await fetchFromAPI('test');
+            
+            if (!testResult || !testResult.success) {
+            console.error('❌ Error en prueba de API:', testResult);
+            hideLoading();
+            showNotification('error', 'Error de conexión', 'No se pudo conectar con el servidor. Verifica tu conexión.');
+            return;
             }
             
-            try {
-                currentUser = JSON.parse(savedUser);
-                currentRole = currentUser.role;
-                
-                // Si es jefe, obtener datos de la empresa
-                if (currentUser.role === 'jefe' && currentUser.empresa_id) {
-                    const empresaResult = await fetchFromAPI('getEmpresa', { id: currentUser.empresa_id });
-                    if (empresaResult && empresaResult.empresa) {
-                        currentCompany = empresaResult.empresa;
-                    }
-                }
-                
-                // Cargar datos iniciales
-                showLoading();
-                await loadAllData();
-                
-                // Configurar interfaz
-                configureInterface();
-                
-                // Mostrar notificación de bienvenida
-                showNotification('success', 'Sesión iniciada', `Bienvenido ${currentUser.nombre}`);
-                
-                console.log('👤 Usuario autenticado:', currentUser);
-                
-            } catch (error) {
-                console.error('Error iniciando sesión:', error);
-                showNotification('error', 'Error', 'Error al cargar datos de sesión');
-            } finally {
-                hideLoading();
+            console.log('✅ API funcionando correctamente');
+            
+            // Si es jefe, obtener datos de la empresa
+            if (currentUser.role === 'jefe' && currentUser.empresa_id) {
+            console.log('🔍 Obteniendo datos de empresa para jefe...');
+            const empresaResult = await fetchFromAPI('getEmpresa', { id: currentUser.empresa_id });
+            if (empresaResult && empresaResult.empresa) {
+                currentCompany = empresaResult.empresa;
+                console.log('🏢 Empresa cargada:', currentCompany.nombre);
             }
+            }
+            
+            // Cargar datos iniciales
+            console.log('📥 Cargando datos del sistema...');
+            
+            // Cargar datos en paralelo
+            const loadPromises = [
+            loadEmpresasFromAPI(),
+            loadUsuariosFromAPI(),
+            loadEmpleadosFromAPI()
+            ];
+            
+            const loadResults = await Promise.allSettled(loadPromises);
+            
+            console.log('📊 Resultados de carga:', loadResults);
+            
+            // Configurar interfaz
+            configureInterface();
+            
+            // Mostrar notificación de bienvenida
+            showNotification('success', 'Sesión iniciada', `Bienvenido ${currentUser.nombre}`);
+            
+            console.log('✅ Sesión iniciada exitosamente');
+            
+        } catch (error) {
+            console.error('❌ Error iniciando sesión:', error);
+            showNotification('error', 'Error', 'Error al cargar datos de sesión: ' + error.message);
+        } finally {
+            hideLoading();
+        }
         }
         
         // =============================================
