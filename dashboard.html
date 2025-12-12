@@ -2327,100 +2327,141 @@
 
         // FUNCIÓN: Mostrar modal nuevo usuario avanzado
         function showNuevoUsuarioModalAvanzado() {
-            showModal('Nuevo Usuario - Formulario Completo', `
-                <div style="max-width: 700px;">
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Empresa *</label>
-                        <select id="nuevoUsuarioEmpresaAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                            <option value="" style="color: #666;">Seleccionar empresa</option>
-                            ${database.empresas.map(empresa => `
-                                <option value="${empresa.id}" style="color: white;">${empresa.nombre}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-                    
-                    <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                        <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Primer Nombre *</label>
-                                <input type="text" id="nuevoUsuarioPrimerNombre" placeholder="Juan" required style="color: white;">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Segundo Nombre</label>
-                                <input type="text" id="nuevoUsuarioSegundoNombre" placeholder="Carlos" style="color: white;">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Primer Apellido *</label>
-                                <input type="text" id="nuevoUsuarioPrimerApellido" placeholder="Pérez" required style="color: white;">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Segundo Apellido</label>
-                                <input type="text" id="nuevoUsuarioSegundoApellido" placeholder="Gómez" style="color: white;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required style="color: white;">
-                        <small style="color: rgba(255,255,255,0.6);">El usuario usará este email para acceder al sistema</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Password *</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="color: white; flex: 1;">
-                            <button type="button" onclick="generarPasswordNuevoUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
-                                <i class="fas fa-random"></i> Generar
-                            </button>
-                        </div>
-                        <small style="color: rgba(255,255,255,0.6);">El usuario usará esta contraseña para acceder al sistema</small>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Rol *</label>
-                            <select id="nuevoUsuarioRolAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="jefe" style="color: white;">Jefe Empresa</option>
-                                <option value="comercial" style="color: white;">Dirección Comercial</option>
-                                <option value="admin" style="color: white;">Administración y Finanzas</option>
-                                <option value="vendedor" style="color: white;">Vendedor App</option>
-                                <option value="almacen" style="color: white;">Almacén App</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Estado *</label>
-                            <select id="nuevoUsuarioActivoAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Sí" style="color: white;">Activo</option>
-                                <option value="No" style="color: white;">Inactivo</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                        <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-shield-alt"></i> Permisos de Seguridad</h4>
-                        <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
-                            <i class="fas fa-info-circle"></i> Este usuario solo podrá acceder a los datos de la empresa asignada.
-                            No tendrá acceso a información de otras empresas del sistema.
-                        </p>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                            Cancelar
-                        </button>
-                        <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzadoCorregido()" style="flex: 1;">
-                            <i class="fas fa-user-plus"></i> Crear Usuario
-                        </button>
-                    </div>
+        showModal('Nuevo Usuario - Formulario Completo', `
+            <div style="max-width: 700px;">
+            <div class="form-group">
+                <label style="color: var(--secondary);">Empresa *</label>
+                <select id="nuevoUsuarioEmpresaAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                <option value="" style="color: #666;">Seleccionar empresa</option>
+                ${database.empresas.map(empresa => `
+                    <option value="${empresa.id}" style="color: white;">${empresa.nombre}</option>
+                `).join('')}
+                </select>
+            </div>
+            
+            <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
+                
+                <div class="form-group">
+                <label style="color: var(--secondary);">Nombres Completos *</label>
+                <input type="text" id="nuevoUsuarioNombres" placeholder="Juan Carlos Pérez Gómez" required style="color: white;">
+                <small style="color: rgba(255,255,255,0.6);">Ingrese nombres y apellidos completos</small>
                 </div>
-            `);
+            </div>
+            
+            <div class="form-group">
+                <label style="color: var(--secondary);">Email *</label>
+                <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required style="color: white;">
+                <small style="color: rgba(255,255,255,0.6);">El usuario usará este email para acceder al sistema</small>
+            </div>
+            
+            <div class="form-group">
+                <label style="color: var(--secondary);">Password *</label>
+                <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="color: white; flex: 1;">
+                <button type="button" onclick="generarPasswordNuevoUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-random"></i> Generar
+                </button>
+                </div>
+                <small style="color: rgba(255,255,255,0.6);">El usuario usará esta contraseña para acceder al sistema</small>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                <label style="color: var(--secondary);">Rol *</label>
+                <select id="nuevoUsuarioRolAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                    <option value="jefe" style="color: white;">Jefe Empresa</option>
+                    <option value="comercial" style="color: white;">Dirección Comercial</option>
+                    <option value="admin" style="color: white;">Administración y Finanzas</option>
+                    <option value="vendedor" style="color: white;">Vendedor App</option>
+                    <option value="almacen" style="color: white;">Almacén App</option>
+                </select>
+                </div>
+                
+                <div class="form-group">
+                <label style="color: var(--secondary);">Estado *</label>
+                <select id="nuevoUsuarioActivoAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                    <option value="Sí" style="color: white;">Activo</option>
+                    <option value="No" style="color: white;">Inactivo</option>
+                </select>
+                </div>
+            </div>
+            
+            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-shield-alt"></i> Permisos de Seguridad</h4>
+                <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Este usuario solo podrá acceder a los datos de la empresa asignada.
+                No tendrá acceso a información de otras empresas del sistema.
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                Cancelar
+                </button>
+                <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzadoCorregido()" style="flex: 1;">
+                <i class="fas fa-user-plus"></i> Crear Usuario
+                </button>
+            </div>
+            </div>
+        `);
+        }
+
+        // FUNCIÓN: Crear nuevo usuario avanzado (VERSIÓN CORREGIDA)
+        async function crearNuevoUsuarioAvanzadoCorregido() {
+        showLoading();
+        
+        // Obtener valores del formulario
+        const nombresCompletos = document.getElementById('nuevoUsuarioNombres').value.trim();
+        const email = document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase();
+        const password = document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim();
+        const role = document.getElementById('nuevoUsuarioRolAvanzado').value;
+        const activo = document.getElementById('nuevoUsuarioActivoAvanzado').value;
+        const empresaId = document.getElementById('nuevoUsuarioEmpresaAvanzado').value;
+        
+        const usuarioData = {
+            nombre: nombresCompletos,
+            email: email,
+            password: password,
+            role: role,
+            activo: activo,
+            empresa_id: empresaId
+        };
+        
+        // Validaciones básicas
+        if (!nombresCompletos || !email || !empresaId) {
+            showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
+            hideLoading();
+            return;
+        }
+        
+        // Validar email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showNotification('error', 'Error', 'Ingrese un email válido');
+            hideLoading();
+            return;
+        }
+        
+        try {
+            const result = await postToAPI('addUsuario', usuarioData);
+            
+            if (result && result.success) {
+            showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
+            
+            // Recargar datos
+            await loadUsuariosFromAPI();
+            
+            closeModal();
+            loadGestionPersonal();
+            } else {
+            showNotification('error', 'Error', result?.error || 'Error al crear usuario');
+            }
+        } catch (error) {
+            showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+        } finally {
+            hideLoading();
+        }
         }
 
         // FUNCIÓN: Generar password para nuevo usuario
@@ -2486,118 +2527,139 @@
             }
         }
 
-        // FUNCIÓN: Editar usuario completo
+        // FUNCIÓN: Editar usuario completo (VERSIÓN CORREGIDA)
         function editUsuarioCompleto(usuarioId) {
-            const usuario = database.usuarios.find(u => u.id === usuarioId);
-            if (!usuario) {
-                showNotification('error', 'Error', 'Usuario no encontrado');
-                return;
-            }
+        const usuario = database.usuarios.find(u => u.id === usuarioId);
+        if (!usuario) {
+            showNotification('error', 'Error', 'Usuario no encontrado');
+            return;
+        }
+        
+        showModal(`Editar Usuario: ${usuario.nombre}`, `
+            <div style="max-width: 700px;">
+            <input type="hidden" id="editUsuarioId" value="${usuario.id || ''}">
             
-            // Obtener nombres separados
-            let primerNombre = '';
-            let segundoNombre = '';
-            let primerApellido = '';
-            let segundoApellido = '';
-            
-            if (usuario.nombre) {
-                const nombres = usuario.nombre.split(' ');
-                if (nombres.length >= 1) primerNombre = nombres[0];
-                if (nombres.length >= 2) segundoNombre = nombres[1] || '';
-                if (nombres.length >= 3) primerApellido = nombres[2] || '';
-                if (nombres.length >= 4) segundoApellido = nombres[3] || '';
-            }
-            
-            showModal(`Editar Usuario: ${usuario.nombre}`, `
-                <div style="max-width: 700px;">
-                    <input type="hidden" id="editUsuarioId" value="${usuario.id || ''}">
-                    
-                    <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                        <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Primer Nombre *</label>
-                                <input type="text" id="editUsuarioPrimerNombre" value="${primerNombre}" required style="color: white;">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Segundo Nombre</label>
-                                <input type="text" id="editUsuarioSegundoNombre" value="${segundoNombre}" style="color: white;">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Primer Apellido *</label>
-                                <input type="text" id="editUsuarioPrimerApellido" value="${primerApellido}" required style="color: white;">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label style="color: var(--secondary);">Segundo Apellido</label>
-                                <input type="text" id="editUsuarioSegundoApellido" value="${segundoApellido}" style="color: white;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="editUsuarioEmail" value="${usuario.email || ''}" required style="color: white;">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Password *</label>
-                        <input type="text" id="editUsuarioPassword" value="${usuario.password || '12345678'}" required style="color: white;">
-                        <button type="button" onclick="generarPasswordUsuario()" class="btn btn-secondary" style="margin-top: 0.5rem; padding: 0.3rem 0.8rem; font-size: 0.8rem;">
-                            <i class="fas fa-random"></i> Generar Nueva
-                        </button>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Rol *</label>
-                            <select id="editUsuarioRol" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="jefe" ${usuario.role === 'jefe' ? 'selected' : ''} style="color: white;">Jefe Empresa</option>
-                                <option value="comercial" ${usuario.role === 'comercial' ? 'selected' : ''} style="color: white;">Dirección Comercial</option>
-                                <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''} style="color: white;">Administración y Finanzas</option>
-                                <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''} style="color: white;">Vendedor App</option>
-                                <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''} style="color: white;">Almacén App</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Empresa *</label>
-                            <select id="editUsuarioEmpresa" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="" style="color: #666;">Seleccionar empresa</option>
-                                ${database.empresas.map(emp => `
-                                    <option value="${emp.id}" ${usuario.empresa_id === emp.id ? 'selected' : ''} style="color: white;">${emp.nombre}</option>
-                                `).join('')}
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Estado *</label>
-                            <select id="editUsuarioActivo" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Sí" ${usuario.activo === 'Sí' ? 'selected' : ''} style="color: white;">Activo</option>
-                                <option value="No" ${usuario.activo === 'No' ? 'selected' : ''} style="color: white;">Inactivo</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                        <p style="color: var(--secondary); margin: 0;">
-                            <i class="fas fa-info-circle"></i> ID del usuario: <strong>${usuario.id || 'N/A'}</strong>
-                        </p>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                            Cancelar
-                        </button>
-                        <button class="btn btn-primary" onclick="guardarUsuarioCompletoCorregido('${usuarioId}')" style="flex: 1;">
-                            <i class="fas fa-save"></i> Guardar Cambios
-                        </button>
-                    </div>
+            <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <h4 style="color: var(--secondary); margin-bottom: 0.5rem;"><i class="fas fa-user"></i> Datos Personales</h4>
+                
+                <div class="form-group">
+                <label style="color: var(--secondary);">Nombres Completos *</label>
+                <input type="text" id="editUsuarioNombres" value="${usuario.nombre || ''}" required style="color: white;">
                 </div>
-            `);
+            </div>
+            
+            <div class="form-group">
+                <label style="color: var(--secondary);">Email *</label>
+                <input type="email" id="editUsuarioEmail" value="${usuario.email || ''}" required style="color: white;">
+            </div>
+            
+            <div class="form-group">
+                <label style="color: var(--secondary);">Password *</label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" id="editUsuarioPassword" value="${usuario.password || '12345678'}" required style="color: white; flex: 1;">
+                <button type="button" onclick="generarPasswordUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+                    <i class="fas fa-random"></i> Generar
+                </button>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                <label style="color: var(--secondary);">Rol *</label>
+                <select id="editUsuarioRol" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                    <option value="jefe" ${usuario.role === 'jefe' ? 'selected' : ''} style="color: white;">Jefe Empresa</option>
+                    <option value="comercial" ${usuario.role === 'comercial' ? 'selected' : ''} style="color: white;">Dirección Comercial</option>
+                    <option value="admin" ${usuario.role === 'admin' ? 'selected' : ''} style="color: white;">Administración y Finanzas</option>
+                    <option value="vendedor" ${usuario.role === 'vendedor' ? 'selected' : ''} style="color: white;">Vendedor App</option>
+                    <option value="almacen" ${usuario.role === 'almacen' ? 'selected' : ''} style="color: white;">Almacén App</option>
+                </select>
+                </div>
+                
+                <div class="form-group">
+                <label style="color: var(--secondary);">Empresa *</label>
+                <select id="editUsuarioEmpresa" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                    <option value="" style="color: #666;">Seleccionar empresa</option>
+                    ${database.empresas.map(emp => `
+                    <option value="${emp.id}" ${usuario.empresa_id === emp.id ? 'selected' : ''} style="color: white;">${emp.nombre}</option>
+                    `).join('')}
+                </select>
+                </div>
+                
+                <div class="form-group">
+                <label style="color: var(--secondary);">Estado *</label>
+                <select id="editUsuarioActivo" required style="color: white; background: rgba(255, 255, 255, 0.05);">
+                    <option value="Sí" ${usuario.activo === 'Sí' ? 'selected' : ''} style="color: white;">Activo</option>
+                    <option value="No" ${usuario.activo === 'No' ? 'selected' : ''} style="color: white;">Inactivo</option>
+                </select>
+                </div>
+            </div>
+            
+            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                <p style="color: var(--secondary); margin: 0;">
+                <i class="fas fa-info-circle"></i> ID del usuario: <strong>${usuario.id || 'N/A'}</strong>
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                Cancelar
+                </button>
+                <button class="btn btn-primary" onclick="guardarUsuarioCompletoCorregido('${usuarioId}')" style="flex: 1;">
+                <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+            </div>
+        `);
+        }
+
+        // FUNCIÓN: Guardar usuario completo (VERSIÓN CORREGIDA)
+        async function guardarUsuarioCompletoCorregido(usuarioId) {
+        showLoading();
+        
+        // Obtener valores del formulario
+        const nombresCompletos = document.getElementById('editUsuarioNombres').value.trim();
+        const email = document.getElementById('editUsuarioEmail').value.trim().toLowerCase();
+        const password = document.getElementById('editUsuarioPassword').value.trim();
+        const role = document.getElementById('editUsuarioRol').value;
+        const activo = document.getElementById('editUsuarioActivo').value;
+        const empresaId = document.getElementById('editUsuarioEmpresa').value;
+        
+        const usuarioData = {
+            id: usuarioId,
+            nombre: nombresCompletos,
+            email: email,
+            password: password,
+            role: role,
+            activo: activo,
+            empresa_id: empresaId
+        };
+        
+        // Validaciones básicas
+        if (!nombresCompletos || !email || !empresaId) {
+            showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
+            hideLoading();
+            return;
+        }
+        
+        try {
+            const result = await postToAPI('updateUsuario', usuarioData);
+            
+            if (result && result.success) {
+            showNotification('success', 'Éxito', 'Usuario guardado correctamente');
+            
+            // Recargar datos
+            await loadUsuariosFromAPI();
+            
+            closeModal();
+            loadGestionPersonal();
+            } else {
+            showNotification('error', 'Error', result?.error || 'Error al guardar usuario');
+            }
+        } catch (error) {
+            showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+        } finally {
+            hideLoading();
+        }
         }
 
         // FUNCIÓN: Generar nueva contraseña
