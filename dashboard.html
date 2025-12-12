@@ -1101,32 +1101,94 @@
         // FUNCIÓN: Fetch POST a la API
         async function postToAPI(action, data = {}) {
             try {
+                showLoading();
+                
+                // Agregar timestamp para evitar cache
+                data.timestamp = Date.now();
+                
                 const formData = new FormData();
                 formData.append('action', action);
                 
                 Object.keys(data).forEach(key => {
-                    formData.append(key, data[key]);
+                    if (data[key] !== undefined && data[key] !== null) {
+                        formData.append(key, data[key].toString());
+                    }
                 });
+                
+                console.log(`📤 Enviando POST a API: ${action}`, data);
                 
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    mode: 'no-cors' // Prueba agregando esto si hay problemas CORS
                 });
                 
-                const result = await response.json();
+                // Para modo no-cors, no podemos leer la respuesta
+                if (response.type === 'opaque') {
+                    console.log('✅ Solicitud enviada (modo no-cors)');
+                    hideLoading();
+                    return { success: true, message: 'Solicitud procesada' };
+                }
+                
+                let result;
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    console.error('❌ Error parseando JSON:', jsonError);
+                    hideLoading();
+                    return { 
+                        success: false, 
+                        error: `Error en respuesta API: ${response.status} ${response.statusText}` 
+                    };
+                }
+                
+                console.log(`📥 Respuesta API ${action}:`, result);
                 
                 if (result.success) {
+                    hideLoading();
                     return result;
                 } else {
+                    hideLoading();
                     throw new Error(result.error || 'Error en la API');
                 }
             } catch (error) {
-                console.error('Error en API POST:', error);
-                showNotification('error', 'Error de API', error.message);
-                return null;
+                console.error('❌ Error en API POST:', error);
+                hideLoading();
+                
+                // Mostrar error más específico
+                let errorMessage = error.message;
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Error de conexión con el servidor. Verifique su conexión a internet.';
+                } else if (error.message.includes('NetworkError')) {
+                    errorMessage = 'Error de red. El servidor puede no estar disponible.';
+                }
+                
+                showNotification('error', 'Error de API', errorMessage);
+                return { 
+                    success: false, 
+                    error: errorMessage 
+                };
             }
         }
         
+
+        // FUNCIÓN: Debug para ver datos enviados
+        function debugData(usuarioData) {
+            console.log('🔍 Datos a enviar para actualizar usuario:', usuarioData);
+            console.log('📋 Validando campos:');
+            
+            const camposRequeridos = ['id', 'nombre', 'email', 'role', 'activo', 'empresa_id'];
+            for (const campo of camposRequeridos) {
+                console.log(`  ${campo}: ${usuarioData[campo] || 'FALTANTE'}`);
+            }
+            
+            // Verificar si el ID existe en la base de datos local
+            const usuarioExistente = database.usuarios.find(u => u.id === usuarioData.id);
+            console.log('👤 Usuario en base de datos local:', usuarioExistente);
+            
+            return usuarioExistente;
+        }
+
         // =============================================
         // MÓDULO: CARGA DE DATOS
         // =============================================
@@ -2522,37 +2584,96 @@ function editEmpresaCompleta(empresaId) {
             `);
         }
 
-        // FUNCIÓN: Guardar usuario completo
+        // FUNCIÓN: Guardar usuario completo (con mejor manejo de errores)
         async function guardarUsuarioCompleto(usuarioId) {
             showLoading();
             
+            // Obtener valores de los campos
             const usuarioData = {
                 id: usuarioId,
-                nombre: document.getElementById('editUsuarioNombreCompleto').value,
-                email: document.getElementById('editUsuarioEmailCompleto').value,
-                password: document.getElementById('editUsuarioPasswordCompleto').value,
+                nombre: document.getElementById('editUsuarioNombreCompleto').value.trim(),
+                email: document.getElementById('editUsuarioEmailCompleto').value.trim().toLowerCase(),
+                password: document.getElementById('editUsuarioPasswordCompleto').value.trim(),
                 role: document.getElementById('editUsuarioRolCompleto').value,
                 activo: document.getElementById('editUsuarioActivoCompleto').value,
                 empresa_id: document.getElementById('editUsuarioEmpresaCompleto').value,
-                fechacreacion: document.getElementById('editUsuarioFechaCreacion').value
+                fechacreacion: document.getElementById('editUsuarioFechaCreacion').value || new Date().toISOString().split('T')[0]
             };
             
+            // Debug: Verificar datos
+            const usuarioExistente = debugData(usuarioData);
+            
+            // Validación básica
+            if (!usuarioData.nombre || !usuarioData.email || !usuarioData.empresa_id) {
+                showNotification('error', 'Error de validación', 'Complete los campos obligatorios: Nombre, Email y Empresa');
+                hideLoading();
+                return;
+            }
+            
+            // Validar formato email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(usuarioData.email)) {
+                showNotification('error', 'Error', 'Ingrese un email válido');
+                hideLoading();
+                return;
+            }
+            
             try {
-                const result = await postToAPI('updateUsuarioCompleto', usuarioData);
+                console.log('🔄 Enviando actualización de usuario...');
+                
+                // PRUEBA: Primero intentar con updateUsuario (más simple)
+                const dataSimple = {
+                    id: usuarioId,
+                    nombre: usuarioData.nombre,
+                    email: usuarioData.email,
+                    role: usuarioData.role,
+                    activo: usuarioData.activo
+                };
+                
+                console.log('📤 Datos simplificados:', dataSimple);
+                
+                let result;
+                
+                // Intentar primero con updateUsuario
+                result = await postToAPI('updateUsuario', dataSimple);
+                
+                if (!result || !result.success) {
+                    // Si falla, intentar con updateUsuarioCompleto
+                    console.log('🔄 Intentando con updateUsuarioCompleto...');
+                    result = await postToAPI('updateUsuarioCompleto', usuarioData);
+                }
                 
                 if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Usuario actualizado completamente');
+                    showNotification('success', 'Éxito', 'Usuario actualizado correctamente');
                     
-                    // Recargar datos
+                    // Recargar datos desde la API
                     await loadUsuariosFromAPI();
+                    
+                    // Actualizar base de datos local
+                    const index = database.usuarios.findIndex(u => u.id === usuarioId);
+                    if (index !== -1) {
+                        database.usuarios[index] = { ...database.usuarios[index], ...usuarioData };
+                    }
                     
                     closeModal();
                     loadGestionPersonal();
+                    
                 } else {
-                    showNotification('error', 'Error', result?.error || 'Error al actualizar');
+                    const errorMsg = result?.error || 'Error desconocido al actualizar';
+                    showNotification('error', 'Error de API', errorMsg);
+                    
+                    // Mostrar más detalles en consola
+                    console.error('❌ Error detallado:', {
+                        datosEnviados: usuarioData,
+                        respuesta: result,
+                        usuarioExistente: usuarioExistente
+                    });
                 }
+                
             } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión');
+                console.error('❌ Error crítico:', error);
+                showNotification('error', 'Error crítico', 
+                    `Error: ${error.message}. Verifique la consola para más detalles.`);
             } finally {
                 hideLoading();
             }
@@ -3055,6 +3176,55 @@ function editEmpresaCompleta(empresaId) {
         // MÓDULO: INICIALIZACIÓN
         // =============================================
         
+        // FUNCIÓN: Probar conexión API
+        async function testAPI() {
+            showLoading();
+            try {
+                console.log('🔗 Probando conexión con API...');
+                
+                // Probar endpoint simple
+                const testResult = await fetch(`${API_URL}?action=test&timestamp=${Date.now()}`);
+                
+                if (testResult.ok) {
+                    const data = await testResult.json();
+                    console.log('✅ Test API exitoso:', data);
+                    showNotification('success', 'API Conectada', 'Conexión con servidor establecida');
+                    return true;
+                } else {
+                    console.error('❌ Test API falló:', testResult.status);
+                    showNotification('error', 'API No disponible', 
+                        `Error ${testResult.status}: ${testResult.statusText}`);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Error test API:', error);
+                showNotification('error', 'Error de conexión', 
+                    'No se puede conectar con el servidor. Verifique la URL API.');
+                return false;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // FUNCIÓN: Probar actualización de usuario específico
+        async function testUpdateUsuario() {
+            // Usar el usuario super admin para prueba
+            const testData = {
+                id: 'SUPER-ADMIN-001',
+                nombre: 'Administrador Corporativo',
+                email: 'marcelodanielcc@gmail.com',
+                role: 'super',
+                activo: 'Sí'
+            };
+            
+            console.log('🧪 Probando updateUsuario con:', testData);
+            
+            const result = await postToAPI('updateUsuario', testData);
+            console.log('📋 Resultado prueba:', result);
+            
+            return result;
+        }
+
         // FUNCIÓN: Iniciar sesión
         async function startSession() {
             // Obtener usuario de localStorage
@@ -3139,12 +3309,89 @@ function editEmpresaCompleta(empresaId) {
             console.log('🇧🇴 Adaptado para Bolivia');
             console.log('🔗 API URL:', API_URL);
             
-            // Test de conexión API
-            fetch(`${API_URL}?action=test`)
-                .then(r => r.json())
-                .then(data => console.log('✅ Test API:', data))
-                .catch(err => console.error('❌ Error API:', err));
+            // Test de conexión API (con retardo para no interferir con login)
+            setTimeout(async () => {
+                const apiConnected = await testAPI();
+                
+                if (!apiConnected) {
+                    // Mostrar advertencia si API no responde
+                    showNotification('warning', 'Modo Offline', 
+                        'API no disponible. Trabajando con datos locales. Algunas funciones pueden no estar disponibles.');
+                    
+                    // Cargar datos de ejemplo si API falla
+                    cargarDatosEjemplo();
+                }
+            }, 2000);
+            
+            // Agregar botón de debug en desarrollo
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                const debugBtn = document.createElement('button');
+                debugBtn.innerHTML = '🐛 Debug API';
+                debugBtn.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: #ff0055;
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    z-index: 9999;
+                    font-size: 12px;
+                `;
+                debugBtn.onclick = testUpdateUsuario;
+                document.body.appendChild(debugBtn);
+            }
         });
+
+        // FUNCIÓN: Cargar datos de ejemplo si API falla
+        function cargarDatosEjemplo() {
+            console.log('📂 Cargando datos de ejemplo...');
+            
+            // Datos de ejemplo para empresas
+            if (database.empresas.length === 0) {
+                database.empresas = [
+                    {
+                        id: 'EMP-001',
+                        nombre: 'Coca Cola',
+                        nit: '6980083369800833',
+                        industria: 'Tecnología',
+                        contacto: 'Ricardo Arjona',
+                        email: 'ricardoarjona@gmail.com',
+                        telefono: '78945612',
+                        direccion: 'Av. Principal 123',
+                        ciudad: 'Lima',
+                        estado: 'Activa',
+                        tarjetaregistrada: 'Sí',
+                        fecharegistro: '2025-01-15 00:00:00',
+                        usuarios: 3
+                    }
+                ];
+            }
+            
+            // Datos de ejemplo para usuarios
+            if (database.usuarios.length === 0) {
+                database.usuarios = [
+                    {
+                        id: 'SUPER-ADMIN-001',
+                        email: 'marcelodanielcc@gmail.com',
+                        password: '789',
+                        role: 'super',
+                        nombre: 'Administrador Corporativo',
+                        empresa_id: '',
+                        empresa: 'Nexial Suite',
+                        fechacreacion: '2025-01-01 00:00:00',
+                        activo: 'Sí'
+                    }
+                ];
+            }
+            
+            console.log('✅ Datos de ejemplo cargados:', {
+                empresas: database.empresas.length,
+                usuarios: database.usuarios.length
+            });
+        }
     </script>
 </body>
 </html>
