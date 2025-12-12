@@ -46,141 +46,9 @@
                 radial-gradient(circle at 90% 80%, rgba(0, 245, 255, 0.05) 0%, transparent 20%);
         }
         
-        /* ===== SISTEMA DE LOGIN ===== */
-        #loginScreen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--dark), var(--darker));
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 9999;
-        }
-        
-        .login-card {
-            background: var(--card-bg);
-            padding: 3rem;
-            border-radius: 20px;
-            border: 1px solid rgba(124, 58, 237, 0.3);
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-        
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .login-header h1 {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--secondary);
-            font-weight: 500;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(124, 58, 237, 0.3);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
-        }
-        
-        .password-wrapper {
-            position: relative;
-        }
-        
-        .toggle-password {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--secondary);
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-        
-        .login-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1.5rem;
-        }
-        
-        .btn {
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
-        }
-        
         /* ===== LAYOUT PRINCIPAL ===== */
         #dashboardScreen {
-            display: none;
+            display: block;
             min-height: 100vh;
             animation: fadeIn 0.5s ease-out;
         }
@@ -948,54 +816,6 @@
     </style>
 </head>
 <body>
-    <!-- ===== PANEL DE LOGIN ===== -->
-    <div id="loginScreen">
-        <div class="login-card">
-            <div class="login-header">
-                <h1><i class="fas fa-brain"></i> NEXIAL SUITE</h1>
-                <p style="color: rgba(255,255,255,0.7);">Sistema Corporativo Multiempresa</p>
-            </div>
-            
-            <form id="loginForm" onsubmit="login(event)">
-                <div class="form-group">
-                    <label for="username"><i class="fas fa-user"></i> Usuario o Email</label>
-                    <input type="text" id="username" placeholder="usuario@empresa.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password"><i class="fas fa-key"></i> Contraseña</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="password" placeholder="Tu contraseña" required>
-                        <button type="button" class="toggle-password" onclick="togglePassword()">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div style="text-align: right; margin-bottom: 1.5rem;">
-                    <a href="#" onclick="showPasswordRecovery()" style="color: var(--primary); font-size: 0.9rem;">
-                        <i class="fas fa-unlock-alt"></i> ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
-                
-                <div class="login-actions">
-                    <button type="button" class="btn" onclick="window.location.href='index.html'" 
-                            style="background: rgba(255,255,255,0.05); color: white;">
-                        <i class="fas fa-home"></i> Página Principal
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
-                    </button>
-                </div>
-                
-                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
-                    <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
-                    <p><strong>Demo:</strong> admin | Contraseña: 123</p>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- ===== PANEL DE CONTROL PRINCIPAL ===== -->
     <div id="dashboardScreen">
         <div class="dashboard-container">
@@ -1009,8 +829,8 @@
                 </div>
                 
                 <div class="user-info">
-                    <div class="user-badge" id="userBadge">SUPER ADMIN</div>
-                    <div class="user-name" id="userName">Administrador Corporativo</div>
+                    <div class="user-badge super-admin" id="userBadge">SUPER ADMIN</div>
+                    <div class="user-name" id="userName">Marcelo Daniel Condori</div>
                     <div class="user-role" id="userRole">Control Total Sistema</div>
                 </div>
                 
@@ -1040,7 +860,7 @@
                 </div>
 
                 <!-- VISTA SUPER USUARIO -->
-                <div id="viewSuper" class="role-view">
+                <div id="viewSuper" class="role-view active">
                     <!-- Contenido Super Usuario -->
                 </div>
 
@@ -1115,8 +935,15 @@
         // =============================================
         // VARIABLES GLOBALES Y CONFIGURACIÓN
         // =============================================
-        let currentUser = null;
-        let currentRole = '';
+        let currentUser = {
+            id: 'super_001',
+            nombre: 'Marcelo Daniel Condori',
+            email: 'marcelodanielcc@gmail.com',
+            role: 'super',
+            empresa: 'Nexial Suite',
+            empresa_id: 'global'
+        };
+        let currentRole = 'super';
         let currentCompany = null;
         let notifications = [];
         let empresasData = [];
@@ -1235,205 +1062,6 @@
             }
         }
         
-        // =============================================
-        // SISTEMA DE AUTENTICACIÓN
-        // =============================================
-        function togglePassword() {
-            const passwordField = document.getElementById('password');
-            const icon = document.querySelector('.toggle-password i');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-
-        function showPasswordRecovery() {
-            document.getElementById('loginForm').innerHTML = `
-                <div style="text-align: center; padding: 1rem;">
-                    <i class="fas fa-unlock-alt" style="font-size: 3rem; color: var(--secondary); margin-bottom: 1rem;"></i>
-                    <h3 style="color: var(--secondary); margin-bottom: 1rem;">Recuperar Contraseña</h3>
-                    <p style="margin-bottom: 1.5rem; color: rgba(255,255,255,0.7);">
-                        Ingresa tu email para recibir un enlace de recuperación
-                    </p>
-                    
-                    <div class="form-group">
-                        <label for="recoveryEmail"><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="recoveryEmail" placeholder="usuario@empresa.com" required>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button type="button" class="btn" onclick="resetLoginForm()" 
-                                style="background: rgba(255,255,255,0.05); color: white; flex: 1;">
-                            <i class="fas fa-arrow-left"></i> Volver
-                        </button>
-                        <button type="button" class="btn btn-primary" onclick="sendRecovery()" style="flex: 1;">
-                            <i class="fas fa-paper-plane"></i> Enviar
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function resetLoginForm() {
-            document.getElementById('loginForm').innerHTML = `
-                <div class="form-group">
-                    <label for="username"><i class="fas fa-user"></i> Usuario o Email</label>
-                    <input type="text" id="username" placeholder="usuario@empresa.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password"><i class="fas fa-key"></i> Contraseña</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="password" placeholder="Tu contraseña" required>
-                        <button type="button" class="toggle-password" onclick="togglePassword()">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div style="text-align: right; margin-bottom: 1.5rem;">
-                    <a href="#" onclick="showPasswordRecovery()" style="color: var(--primary); font-size: 0.9rem;">
-                        <i class="fas fa-unlock-alt"></i> ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
-                
-                <div class="login-actions">
-                    <button type="button" class="btn" onclick="window.location.href='index.html'" 
-                            style="background: rgba(255,255,255,0.05); color: white;">
-                        <i class="fas fa-home"></i> Página Principal
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
-                    </button>
-                </div>
-                
-                <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
-                    <p><strong>Superusuario:</strong> marcelodanielcc@gmail.com | Contraseña: 789</p>
-                    <p><strong>Demo:</strong> admin | Contraseña: 123</p>
-                </div>
-            `;
-        }
-
-        function sendRecovery() {
-            const email = document.getElementById('recoveryEmail').value;
-            if (!email) {
-                alert('Por favor ingresa tu email');
-                return;
-            }
-            
-            document.getElementById('loginForm').innerHTML = `
-                <div style="text-align: center; padding: 2rem;">
-                    <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
-                    <h3 style="color: var(--success);">¡Enlace Enviado!</h3>
-                    <p style="margin: 1rem 0; color: rgba(255,255,255,0.7);">
-                        Hemos enviado un enlace de recuperación a:<br>
-                        <strong>${email}</strong>
-                    </p>
-                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">
-                        Revisa tu bandeja de entrada (y carpeta de spam).
-                    </p>
-                    <button type="button" class="btn btn-primary" onclick="resetLoginForm()" style="margin-top: 1.5rem;">
-                        <i class="fas fa-arrow-left"></i> Volver al Login
-                    </button>
-                </div>
-            `;
-        }
-
-        async function login(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (!username || !password) {
-                alert('Por favor completa todos los campos');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                // Intentar login con API
-                const result = await fetchFromAPI('login', {
-                    email: username,
-                    password: password
-                });
-                
-                if (result && result.success) {
-                    currentUser = result.user;
-                    currentUser.token = result.token;
-                    
-                    localStorage.setItem('nexial_user', JSON.stringify(currentUser));
-                    localStorage.setItem('nexial_token', result.token);
-                    
-                    await loadEmpresasFromAPI();
-                    await loadUsuariosFromAPI();
-                    
-                    startSession();
-                } else {
-                    // Si falla, probar usuarios demo
-                    if (username === 'marcelodanielcc@gmail.com' && password === '789') {
-                        // Usuario super admin
-                        currentUser = {
-                            id: 'super_001',
-                            nombre: 'Marcelo Daniel Condori',
-                            email: 'marcelodanielcc@gmail.com',
-                            role: 'super',
-                            empresa: 'Nexial Suite',
-                            empresa_id: 'global'
-                        };
-                        
-                        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
-                        localStorage.setItem('nexial_token', 'demo_super_token');
-                        startSession();
-                    } else if (username === 'admin' && password === '123') {
-                        // Usuario admin demo
-                        currentUser = {
-                            id: 'admin_001',
-                            nombre: 'Administrador Demo',
-                            email: 'admin@demo.com',
-                            role: 'jefe',
-                            empresa: 'Empresa Demo',
-                            empresa_id: 'demo_001'
-                        };
-                        
-                        localStorage.setItem('nexial_user', JSON.stringify(currentUser));
-                        localStorage.setItem('nexial_token', 'demo_admin_token');
-                        startSession();
-                    } else {
-                        alert('Usuario o contraseña incorrectos');
-                    }
-                }
-            } catch (error) {
-                console.error('Error en login:', error);
-                // Modo offline/demo
-                if (username === 'marcelodanielcc@gmail.com' && password === '789') {
-                    currentUser = {
-                        id: 'super_001',
-                        nombre: 'Marcelo Daniel Condori',
-                        email: 'marcelodanielcc@gmail.com',
-                        role: 'super',
-                        empresa: 'Nexial Suite',
-                        empresa_id: 'global'
-                    };
-                    
-                    localStorage.setItem('nexial_user', JSON.stringify(currentUser));
-                    localStorage.setItem('nexial_token', 'demo_offline_token');
-                    startSession();
-                } else {
-                    alert('Error de conexión. Usuario demo: marcelodanielcc@gmail.com / 789');
-                }
-            } finally {
-                hideLoading();
-            }
-        }
-
         // =============================================
         // CONFIGURACIÓN DE INTERFAZ POR ROL
         // =============================================
@@ -1996,10 +1624,9 @@
             }
             
             // Validar formato de RUC (11 dígitos para Perú)
-            if (empresaData.ruc.length !== 11 || !/^\d+$/.test(empresaData.ruc)) {
-                showNotification('error', 'Error', 'RUC debe tener 11 dígitos numéricos');
-                hideLoading();
-                return;
+            if (empresaData.ruc && !/^\d{11}$/.test(empresaData.ruc.toString().trim())) {
+                showNotification('warning', 'Advertencia', 'RUC debe tener 11 dígitos numéricos. Se registrará de todos modos.');
+                // No bloqueamos, solo mostramos advertencia
             }
             
             // Validar email
@@ -2011,21 +1638,40 @@
             }
             
             try {
-                // Separar nombre del contacto
+                // Separar nombre del contacto para crear usuario jefe
                 const nombreParts = empresaData.contacto.split(' ');
                 empresaData.primer_nombre = nombreParts[0] || '';
-                empresaData.primer_apellido = nombreParts.length > 1 ? nombreParts[1] : '';
+                empresaData.primer_apellido = nombreParts.length > 1 ? nombreParts[1] : empresaData.contacto;
                 
                 // Crear email para el jefe basado en el contacto
-                const contactoEmail = empresaData.contacto.toLowerCase().replace(/\s+/g, '.') + '@' + 
+                const contactoEmail = empresaData.primer_nombre.toLowerCase() + '.' + 
+                                    empresaData.primer_apellido.toLowerCase().replace(/\s+/g, '') + '@' + 
                                     empresaData.email.split('@')[1];
                 empresaData.email_jefe = contactoEmail;
                 
-                // Llamar a la API para crear empresa
-                const result = await postToAPI('registerCompany', empresaData);
+                console.log('Enviando datos a API:', empresaData);
+                
+                // Llamar a la API para crear empresa usando FormData
+                const formData = new FormData();
+                formData.append('action', 'registerCompany');
+                
+                // Agregar todos los datos al formData
+                Object.keys(empresaData).forEach(key => {
+                    if (empresaData[key] !== undefined && empresaData[key] !== null) {
+                        formData.append(key, empresaData[key]);
+                    }
+                });
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                console.log('Respuesta de API:', result);
                 
                 if (result && result.success) {
-                    showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
+                    showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente. Email jefe: ${empresaData.email_jefe}`);
                     
                     // Recargar datos
                     await loadEmpresasFromAPI();
@@ -2038,7 +1684,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification('error', 'Error', 'Error de conexión con la API');
+                showNotification('error', 'Error', 'Error de conexión con la API: ' + error.message);
             } finally {
                 hideLoading();
             }
@@ -2617,10 +2263,6 @@
         // FUNCIONES DE INICIALIZACIÓN Y SESIÓN
         // =============================================
         async function startSession() {
-            // Ocultar login, mostrar panel de control
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboardScreen').style.display = 'block';
-            
             // Cargar datos iniciales
             showLoading();
             try {
@@ -2642,30 +2284,8 @@
         }
 
         function logout() {
-            // Resetear estado
-            currentUser = null;
-            currentRole = '';
-            currentCompany = null;
-            empresasData = [];
-            usuariosData = [];
-            empleadosData = [];
-            database.empresas = [];
-            database.usuarios = [];
-            database.empleados = [];
-            
-            // Limpiar localStorage
-            localStorage.removeItem('nexial_user');
-            localStorage.removeItem('nexial_token');
-            
-            // Mostrar login, ocultar panel de control
-            document.getElementById('dashboardScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-            
-            // Resetear formulario
-            document.getElementById('loginForm').reset();
-            document.getElementById('username').focus();
-            
-            showNotification('info', 'Sesión cerrada', 'Has cerrado sesión exitosamente');
+            // Simplemente recargar la página para volver al dashboard
+            window.location.reload();
         }
 
         function accessComercial() {
@@ -2711,37 +2331,13 @@
                 }
             });
             
-            // Permitir login con Enter
-            document.getElementById('password').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-                }
-            });
-            
-            document.getElementById('username').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('password').focus();
-                }
-            });
-            
-            // Auto-focus en el campo de usuario
-            document.getElementById('username').focus();
-            
-            // Verificar si hay sesión activa
-            const savedUser = localStorage.getItem('nexial_user');
-            if (savedUser) {
-                try {
-                    currentUser = JSON.parse(savedUser);
-                    startSession();
-                } catch (e) {
-                    console.error('Error al cargar sesión:', e);
-                }
-            }
+            // Iniciar sesión automáticamente
+            startSession();
             
             console.log('🚀 Nexial Suite Panel de Control inicializado');
             console.log('📊 Sistema Corporativo Multiempresa v3.0');
-            console.log('🌐 API URL:', API_URL);
-            console.log('🔧 API URL configurada:', API_URL);
+            console.log('🔧 Modo Desarrollo - Sin Login');
+            console.log('🔧 API URL:', API_URL);
             console.log('🔧 Probando conexión con API...');
 
             // Test simple de conexión
