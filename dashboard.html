@@ -1116,69 +1116,76 @@
             }
         }
         
-        // FUNCIÓN: Fetch POST a la API
+        // FUNCIÓN: Fetch POST a la API (VERSIÓN MEJORADA)
         async function postToAPI(action, data = {}) {
-            try {
-                showLoading();
-                
-                // Agregar timestamp para evitar cache
-                data.timestamp = Date.now();
-                
-                const formData = new FormData();
-                formData.append('action', action);
-                
-                Object.keys(data).forEach(key => {
-                    if (data[key] !== undefined && data[key] !== null) {
-                        formData.append(key, data[key].toString());
-                    }
-                });
-                
-                console.log(`📤 Enviando POST a API: ${action}`, data);
-                
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                let result;
-                try {
-                    result = await response.json();
-                } catch (jsonError) {
-                    console.error('❌ Error parseando JSON:', jsonError);
-                    hideLoading();
-                    return { 
-                        success: false, 
-                        error: `Error en respuesta API: ${response.status} ${response.statusText}` 
-                    };
-                }
-                
-                console.log(`📥 Respuesta API ${action}:`, result);
-                
-                if (result.success) {
-                    hideLoading();
-                    return result;
-                } else {
-                    hideLoading();
-                    throw new Error(result.error || 'Error en la API');
-                }
-            } catch (error) {
-                console.error('❌ Error en API POST:', error);
-                hideLoading();
-                
-                // Mostrar error más específico
-                let errorMessage = error.message;
-                if (error.message.includes('Failed to fetch')) {
-                    errorMessage = 'Error de conexión con el servidor. Verifique su conexión a internet.';
-                } else if (error.message.includes('NetworkError')) {
-                    errorMessage = 'Error de red. El servidor puede no estar disponible.';
-                }
-                
-                showNotification('error', 'Error de API', errorMessage);
-                return { 
-                    success: false, 
-                    error: errorMessage 
-                };
+        try {
+            showLoading();
+            
+            // Siempre incluir la acción en los datos
+            const requestData = {
+            action: action,
+            ...data
+            };
+            
+            // Agregar timestamp para evitar cache
+            requestData.timestamp = Date.now();
+            
+            const formData = new FormData();
+            
+            console.log(`📤 Enviando POST a API: ${action}`, requestData);
+            
+            // Agregar todos los datos al FormData
+            Object.keys(requestData).forEach(key => {
+            if (requestData[key] !== undefined && requestData[key] !== null) {
+                formData.append(key, requestData[key].toString());
             }
+            });
+            
+            const response = await fetch(API_URL, {
+            method: 'POST',
+            body: formData
+            });
+            
+            let result;
+            try {
+            result = await response.json();
+            } catch (jsonError) {
+            console.error('❌ Error parseando JSON:', jsonError);
+            console.log('Respuesta cruda:', await response.text());
+            hideLoading();
+            return { 
+                success: false, 
+                error: `Error en respuesta API: ${response.status} ${response.statusText}` 
+            };
+            }
+            
+            console.log(`📥 Respuesta API ${action}:`, result);
+            
+            if (result.success) {
+            hideLoading();
+            return result;
+            } else {
+            hideLoading();
+            throw new Error(result.error || 'Error en la API');
+            }
+        } catch (error) {
+            console.error('❌ Error en API POST:', error);
+            hideLoading();
+            
+            // Mostrar error más específico
+            let errorMessage = error.message;
+            if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Error de conexión con el servidor. Verifique su conexión a internet.';
+            } else if (error.message.includes('NetworkError')) {
+            errorMessage = 'Error de red. El servidor puede no estar disponible.';
+            }
+            
+            showNotification('error', 'Error de API', errorMessage);
+            return { 
+            success: false, 
+            error: errorMessage 
+            };
+        }
         }
         
         // =============================================
@@ -2235,55 +2242,61 @@
             }
         }
 
-        // FUNCIÓN: Guardar edición completa de empresa
+        // FUNCIÓN: Guardar edición completa de empresa (VERSIÓN CORREGIDA)
         async function guardarEdicionEmpresaCompleta(empresaId) {
-            showLoading();
-            
-            const empresaData = {
-                id: empresaId,
-                nombre: document.getElementById('editEmpresaNombre').value,
-                pais: document.getElementById('editEmpresaPais').value,
-                tipo_documento: document.getElementById('editEmpresaTipoDocumento').value,
-                documento: document.getElementById('editEmpresaDocumento').value,
-                industria: document.getElementById('editEmpresaIndustria').value,
-                contacto: document.getElementById('editEmpresaContacto').value,
-                email: document.getElementById('editEmpresaEmail').value,
-                telefono: document.getElementById('editEmpresaTelefono').value,
-                direccion: document.getElementById('editEmpresaDireccion').value,
-                ciudad: document.getElementById('editEmpresaCiudad').value,
-                estado: document.getElementById('editEmpresaEstado').value,
-                tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value
-            };
-            
-            // Validar campos requeridos
-            const required = ['nombre', 'pais', 'tipo_documento', 'documento', 'industria', 'contacto', 'email', 'telefono', 'estado'];
-            for (const field of required) {
-                if (!empresaData[field]) {
-                    showNotification('error', 'Error', `Complete el campo: ${field}`);
-                    hideLoading();
-                    return;
-                }
+        showLoading();
+        
+        const empresaData = {
+            id: empresaId,
+            action: 'updateEmpresaCompleta', // ¡IMPORTANTE! Agregar esto
+            nombre: document.getElementById('editEmpresaNombre').value,
+            pais: document.getElementById('editEmpresaPais').value,
+            tipo_documento: document.getElementById('editEmpresaTipoDocumento').value,
+            documento: document.getElementById('editEmpresaDocumento').value,
+            industria: document.getElementById('editEmpresaIndustria').value,
+            contacto: document.getElementById('editEmpresaContacto').value,
+            email: document.getElementById('editEmpresaEmail').value,
+            telefono: document.getElementById('editEmpresaTelefono').value,
+            direccion: document.getElementById('editEmpresaDireccion').value,
+            ciudad: document.getElementById('editEmpresaCiudad').value,
+            estado: document.getElementById('editEmpresaEstado').value,
+            tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value
+        };
+        
+        // Validar campos requeridos
+        const required = ['nombre', 'pais', 'tipo_documento', 'documento', 'industria', 'contacto', 'email', 'telefono', 'estado'];
+        for (const field of required) {
+            if (!empresaData[field]) {
+            showNotification('error', 'Error', `Complete el campo: ${field}`);
+            hideLoading();
+            return;
             }
+        }
+        
+        console.log('Enviando datos al servidor:', empresaData);
+        
+        try {
+            const result = await postToAPI('updateEmpresaCompleta', empresaData);
             
-            try {
-                const result = await postToAPI('updateEmpresaCompleta', empresaData);
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Empresa actualizada completamente');
-                    
-                    // Recargar datos
-                    await loadEmpresasFromAPI();
-                    
-                    closeModal();
-                    loadEmpresasManagement();
-                } else {
-                    showNotification('error', 'Error', result?.error || 'Error al actualizar');
-                }
-            } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión');
-            } finally {
-                hideLoading();
+            console.log('Respuesta del servidor:', result);
+            
+            if (result && result.success) {
+            showNotification('success', 'Éxito', 'Empresa actualizada completamente');
+            
+            // Recargar datos
+            await loadEmpresasFromAPI();
+            
+            closeModal();
+            loadEmpresasManagement();
+            } else {
+            showNotification('error', 'Error', result?.error || 'Error al actualizar');
             }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+        } finally {
+            hideLoading();
+        }
         }
 
         // FUNCIÓN: Confirmar eliminar empresa
