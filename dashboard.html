@@ -775,6 +775,24 @@
             border-color: var(--primary);
             box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
         }
+
+        /* Estilos para opciones de select */
+        .form-group select option {
+            background: var(--dark);
+            color: white;
+        }
+
+        /* Para desplegables nativos en modales */
+        select option {
+            background: var(--dark);
+            color: white;
+        }
+
+        /* Para datalist */
+        datalist option {
+            background: var(--dark);
+            color: white;
+        }
         
         .btn {
             padding: 0.8rem 1.5rem;
@@ -1511,74 +1529,25 @@
                     </div>
                 </div>
 
+                                <!-- Panel de estadísticas generales -->
                 <div class="table-card">
                     <div class="table-header">
-                        <h3 class="table-title">Empresas del Sistema</h3>
+                        <h3 class="table-title">Reportes Globales del Sistema</h3>
                         <div class="table-actions">
-                            <button class="btn btn-primary" onclick="showNuevaEmpresaModal()">
-                                <i class="fas fa-plus"></i> Nueva Empresa
-                            </button>
-                            <button class="btn btn-secondary" onclick="showNuevoUsuarioModal()">
-                                <i class="fas fa-user-plus"></i> Nuevo Usuario
+                            <button class="btn btn-primary" onclick="cargarReporteFacturacionMensual()">
+                                <i class="fas fa-chart-bar"></i> Ver Facturación Mensual
                             </button>
                         </div>
                     </div>
                     
                     <div class="table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Empresa</th>
-                                    <th>NIT</th>
-                                    <th>Contacto</th>
-                                    <th>Estado</th>
-                                    <th>Usuarios</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="empresasTable">
-                                ${database.empresas.map(empresa => {
-                                    const usuariosEmpresa = database.usuarios.filter(u => u.empresa_id === empresa.id);
-                                    return `
-                                        <tr>
-                                            <td>
-                                                <strong>${empresa.nombre}</strong><br>
-                                                <small style="color: rgba(255,255,255,0.5);">${empresa.email || ''}</small>
-                                            </td>
-                                            <td>${empresa.nit || empresa.ruc || ''}</td>
-                                            <td>${empresa.contacto || ''}</td>
-                                            <td>
-                                                <span class="status-badge ${empresa.estado === 'Activa' ? 'status-active' : 'status-inactive'}">
-                                                    ${empresa.estado || 'Inactiva'}
-                                                </span>
-                                            </td>
-                                            <td>${usuariosEmpresa.length}</td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.id}')" title="Ver Detalles">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button class="action-btn edit" onclick="editEmpresa('${empresa.id}')" title="Editar">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="action-btn view" onclick="accessAsJefeEmpresa('${empresa.id}')" title="Acceder como Jefe">
-                                                        <i class="fas fa-sign-in-alt"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                                ${database.empresas.length === 0 ? `
-                                    <tr>
-                                        <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-building" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay empresas registradas
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
+                        <div id="reporteFacturacionContenido">
+                            <!-- Aquí se cargará el reporte de facturación mensual -->
+                            <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                                <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                                <p>Haz clic en "Ver Facturación Mensual" para cargar los reportes</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -1689,7 +1658,10 @@
             document.getElementById('pageTitle').textContent = 'Gestión de Personal - Super Admin';
             
             // Filtrar usuarios no super admin para mostrar en sugerencias
-            const usuariosNoSuper = database.usuarios.filter(u => u.role !== 'super');
+            const usuariosNoSuper = database.usuarios.filter(u => u.role !== 'super' && u.role !== 'SUPER-ADMIN-001');
+
+            // Para mostrar en la tabla, también filtrar super admins
+            const usuariosParaMostrar = database.usuarios.filter(u => u.role !== 'super' && !u.email.includes('marcelodanielcc'));
             
             document.getElementById('viewSuper').innerHTML = `
                 <div class="table-card">
@@ -1722,7 +1694,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${database.usuarios.map(usuario => {
+                                ${usuariosParaMostrar.map(usuario => {
                                     const empresa = database.empresas.find(e => e.id === usuario.empresa_id);
                                     // Ocultar contraseña real, mostrar asteriscos
                                     const passwordMasked = '••••••••';
@@ -2313,20 +2285,20 @@
         function showNuevoUsuarioModalAvanzado() {
             showModal('Nuevo Usuario - Formulario Completo', `
                 <div style="max-width: 700px;">
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label style="color: var(--secondary);">ID Usuario</label>
                         <div style="position: relative;">
                             <input type="text" id="nuevoUsuarioId" 
-                                placeholder="USU-001 o dejar en blanco para auto-generar"
+                                placeholder="Auto-generado por el sistema"
                                 list="listaUsuariosExistentes"
                                 style="color: white;">
                             <datalist id="listaUsuariosExistentes">
-                                ${database.usuarios.map(u => `
+                                ${usuariosNoSuper.map(u => `
                                     <option value="${u.id}">${u.nombre}</option>
                                 `).join('')}
                             </datalist>
                         </div>
-                        <small style="color: rgba(255,255,255,0.6);">Dejar en blanco para auto-generar ID único</small>
+                        <small style="color: rgba(255,255,255,0.6);">ID auto-generado por el sistema</small>
                     </div>
                     
                     <div class="form-group">
@@ -3664,6 +3636,304 @@
                 usuarios: database.usuarios.length
             });
         }
+
+        // =============================================
+        // MÓDULO: REPORTES GLOBALES
+        // =============================================
+
+        // FUNCIÓN: Cargar reporte de facturación mensual
+        async function cargarReporteFacturacionMensual() {
+            showLoading();
+            
+            try {
+                // Obtener el mes actual
+                const fechaActual = new Date();
+                const mesActual = fechaActual.getMonth() + 1;
+                const añoActual = fechaActual.getFullYear();
+                
+                // En una implementación real, aquí llamarías a tu API
+                // Por ahora, mostramos datos de ejemplo
+                const facturacionMensual = {
+                    mes: mesActual,
+                    año: añoActual,
+                    totalFacturado: 0,
+                    empresas: [],
+                    tendencia: []
+                };
+                
+                // Calcular total facturado (ejemplo)
+                // Esto debería venir de tu API
+                let total = 0;
+                database.empresas.forEach(empresa => {
+                    // Simular facturación
+                    const facturacionEmpresa = Math.random() * 50000 + 10000;
+                    total += facturacionEmpresa;
+                    
+                    facturacionMensual.empresas.push({
+                        nombre: empresa.nombre,
+                        facturacion: facturacionEmpresa.toFixed(2),
+                        porcentaje: ((facturacionEmpresa / total) * 100).toFixed(1)
+                    });
+                });
+                
+                facturacionMensual.totalFacturado = total.toFixed(2);
+                
+                // Generar tendencia de últimos 6 meses
+                for (let i = 5; i >= 0; i--) {
+                    const mes = new Date(añoActual, mesActual - 1 - i, 1);
+                    const nombreMes = mes.toLocaleString('es-ES', { month: 'short' });
+                    const facturacionMes = (Math.random() * 30000 + 5000).toFixed(2);
+                    
+                    facturacionMensual.tendencia.push({
+                        mes: nombreMes,
+                        facturacion: facturacionMes
+                    });
+                }
+                
+                // Mostrar el reporte
+                mostrarReporteFacturacion(facturacionMensual);
+                
+            } catch (error) {
+                console.error('Error cargando reporte:', error);
+                showNotification('error', 'Error', 'No se pudo cargar el reporte de facturación');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // FUNCIÓN: Mostrar reporte de facturación
+        function mostrarReporteFacturacion(datos) {
+            const contenido = `
+                <div style="max-width: 100%;">
+                    <div style="background: linear-gradient(45deg, rgba(124,58,237,0.2), rgba(0,245,255,0.2)); 
+                                padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center;">
+                        <h3 style="color: var(--secondary); margin-bottom: 1rem;">Facturación Mensual ${datos.mes}/${datos.año}</h3>
+                        <div style="font-size: 3rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">
+                            Bs. ${Number(datos.totalFacturado).toLocaleString('es-BO')}
+                        </div>
+                        <p style="color: rgba(255,255,255,0.7);">Total facturado este mes</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem; border-bottom: 1px solid rgba(124,58,237,0.3); padding-bottom: 0.5rem;">
+                                <i class="fas fa-building"></i> Facturación por Empresa
+                            </h4>
+                            
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                ${datos.empresas.map(empresa => `
+                                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                            <strong style="color: white;">${empresa.nombre}</strong>
+                                            <span style="color: var(--success);">Bs. ${Number(empresa.facturacion).toLocaleString('es-BO')}</span>
+                                        </div>
+                                        <div style="background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+                                            <div style="background: linear-gradient(90deg, var(--primary), var(--secondary)); 
+                                                        width: ${empresa.porcentaje}%; height: 100%;">
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-top: 0.3rem;">
+                                            <small style="color: rgba(255,255,255,0.6);">${empresa.porcentaje}% del total</small>
+                                            <small style="color: rgba(255,255,255,0.6);">${((empresa.facturacion / datos.totalFacturado) * 100).toFixed(1)}%</small>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem; border-bottom: 1px solid rgba(124,58,237,0.3); padding-bottom: 0.5rem;">
+                                <i class="fas fa-chart-line"></i> Tendencia de Facturación
+                            </h4>
+                            
+                            <div style="height: 250px; position: relative;">
+                                <canvas id="facturacionChart"></canvas>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                                ${datos.tendencia.map(item => `
+                                    <div style="text-align: center;">
+                                        <div style="color: var(--secondary); font-weight: 600;">${item.mes}</div>
+                                        <div style="color: white;">Bs. ${Number(item.facturacion).toLocaleString('es-BO')}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                            <div style="background: rgba(0,255,65,0.1); padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
+                                <div style="color: var(--success); font-size: 1.2rem; font-weight: 600;">Empresas Activas</div>
+                                <div style="color: white; font-size: 2rem; font-weight: 700;">${database.empresas.length}</div>
+                            </div>
+                            
+                            <div style="background: rgba(0,170,255,0.1); padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
+                                <div style="color: var(--info); font-size: 1.2rem; font-weight: 600;">Promedio por Empresa</div>
+                                <div style="color: white; font-size: 2rem; font-weight: 700;">Bs. ${(datos.totalFacturado / database.empresas.length).toFixed(0).toLocaleString('es-BO')}</div>
+                            </div>
+                            
+                            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; flex: 1; min-width: 200px;">
+                                <div style="color: var(--primary); font-size: 1.2rem; font-weight: 600;">Crecimiento Mensual</div>
+                                <div style="color: white; font-size: 2rem; font-weight: 700;">+15.5%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('reporteFacturacionContenido').innerHTML = contenido;
+            
+            // Crear gráfico
+            setTimeout(() => {
+                crearGraficoFacturacion(datos.tendencia);
+            }, 100);
+        }
+
+        // FUNCIÓN: Crear gráfico de facturación
+        function crearGraficoFacturacion(tendencia) {
+            const ctx = document.getElementById('facturacionChart').getContext('2d');
+            
+            if (window.facturacionChart) {
+                window.facturacionChart.destroy();
+            }
+            
+            window.facturacionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: tendencia.map(item => item.mes),
+                    datasets: [{
+                        label: 'Facturación Mensual',
+                        data: tendencia.map(item => item.facturacion),
+                        borderColor: '#7c3aed',
+                        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#fff'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#fff',
+                                callback: function(value) {
+                                    return 'Bs. ' + value.toLocaleString('es-BO');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // =============================================
+        // MÓDULO: FUNCIÓN PARA "REPORTES GLOBALES"
+        // =============================================
+
+        // FUNCIÓN: Cargar reportes globales (para el menú)
+        function loadSuperReportes() {
+            document.getElementById('pageTitle').textContent = 'Reportes Globales - Super Admin';
+            
+            document.getElementById('viewSuper').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Facturación Mes Actual</div>
+                            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        </div>
+                        <div class="stat-value" id="facturacionActual">Bs. 0</div>
+                        <div class="stat-change positive" id="cambioFacturacion">
+                            <i class="fas fa-arrow-up"></i> Cargando...
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Empresas Activas</div>
+                            <div class="stat-icon"><i class="fas fa-building"></i></div>
+                        </div>
+                        <div class="stat-value">${database.empresas.length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-chart-line"></i> Registradas
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Crecimiento Mensual</div>
+                            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                        </div>
+                        <div class="stat-value" id="crecimientoMensual">0%</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> Vs. mes anterior
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Proyección Anual</div>
+                            <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
+                        </div>
+                        <div class="stat-value" id="proyeccionAnual">Bs. 0</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-calendar-alt"></i> Estimado
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3 class="table-title">Reportes de Facturación Detallados</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="cargarReporteFacturacionMensual()">
+                                <i class="fas fa-sync-alt"></i> Actualizar Datos
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportarReporteExcel()">
+                                <i class="fas fa-file-excel"></i> Exportar a Excel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <div id="reporteGlobalContenido" style="padding: 1rem;">
+                            <!-- El contenido se cargará automáticamente -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Cargar datos iniciales
+            setTimeout(() => {
+                cargarReporteFacturacionMensual();
+            }, 500);
+        }
+
+        // FUNCIÓN: Exportar a Excel (simulada)
+        function exportarReporteExcel() {
+            showNotification('info', 'Exportar Reporte', 'Función de exportación a Excel en desarrollo');
+        }
+
     </script>
 </body>
 </html>
