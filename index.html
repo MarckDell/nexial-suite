@@ -362,6 +362,12 @@
             cursor: pointer;
         }
         
+        .form-group input {
+            background-image: none;
+            padding-right: 1rem;
+            cursor: text;
+        }
+        
         /* Estilos específicos para select - VISIBLE Y NÍTIDO */
         .form-group select option {
             background: rgba(15, 15, 35, 1) !important;
@@ -378,6 +384,7 @@
             color: var(--secondary) !important;
         }
         
+        .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: var(--primary);
