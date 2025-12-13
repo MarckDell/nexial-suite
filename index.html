@@ -1389,19 +1389,9 @@
                 
             } catch (error) {
                 console.error('Error en registro:', error);
-                // Si hay error de conexión, simular éxito para pruebas
-                if (error.message.includes('Failed to fetch')) {
-                    alert('Nota: Error de conexión con el servidor. En modo de prueba, se simula registro exitoso.');
-                    showSuccessModal({
-                        success: true,
-                        empresa_id: 'EMP-' + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                        message: 'Registro completado (modo prueba)'
-                    });
-                } else {
-                    alert('Error de conexión con el servidor. Por favor intente nuevamente.');
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }
+                alert('Error de conexión con el servidor. Por favor intente nuevamente.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
         }
         
