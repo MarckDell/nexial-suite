@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexial Suite - Panel de Control Corporativo</title>
+    <title>Nexial Suite - Panel de Control</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="manifest" href="pwa-manifest.json">
     <style>
         /* ============================================= */
-        /* REGIÓN: VARIABLES CSS */
+        /* VARIABLES CSS */
         /* ============================================= */
         :root {
             --primary: #7c3aed;
@@ -25,18 +23,10 @@
             --darker: #070710;
             --card-bg: rgba(15, 15, 35, 0.8);
             --glass: rgba(255, 255, 255, 0.05);
-            
-            /* Colores por rol */
-            --super-admin: #ff0055;
-            --jefe: #00ff41;
-            --comercial: #ffaa00;
-            --admin: #00aaff;
-            --vendedor: #7c3aed;
-            --almacen: #ff5500;
         }
         
         /* ============================================= */
-        /* MÓDULO: RESET Y BASE */
+        /* RESET Y BASE */
         /* ============================================= */
         * {
             margin: 0;
@@ -49,42 +39,6 @@
             background: var(--darker);
             color: #fff;
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0, 245, 255, 0.05) 0%, transparent 20%);
-        }
-        
-        /* ============================================= */
-        /* ANIMACIONES PRINCIPALES */
-        /* ============================================= */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideInLeft {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
         
         /* ============================================= */
@@ -93,7 +47,6 @@
         #dashboardScreen {
             display: block;
             min-height: 100vh;
-            animation: fadeIn 0.5s ease-out;
         }
         
         .dashboard-container {
@@ -102,7 +55,7 @@
         }
         
         /* ============================================= */
-        /* COMPONENTE: SIDEBAR */
+        /* SIDEBAR */
         /* ============================================= */
         .sidebar {
             width: 280px;
@@ -113,7 +66,6 @@
             position: fixed;
             height: 100vh;
             z-index: 100;
-            animation: slideInLeft 0.5s ease-out;
         }
         
         .sidebar-header {
@@ -142,15 +94,10 @@
             font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            animation: pulse 2s infinite;
         }
         
-        .user-badge.super-admin { background: var(--super-admin); }
-        .user-badge.jefe { background: var(--jefe); }
-        .user-badge.comercial { background: var(--comercial); }
-        .user-badge.admin { background: var(--admin); }
-        .user-badge.vendedor { background: var(--vendedor); }
-        .user-badge.almacen { background: var(--almacen); }
+        .user-badge.super-admin { background: var(--danger); }
+        .user-badge.jefe { background: var(--success); }
         
         .user-name {
             font-size: 1.1rem;
@@ -199,29 +146,11 @@
             text-decoration: none;
             border-radius: 8px;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.1), transparent);
-            transition: 0.5s;
-        }
-        
-        .nav-link:hover::before {
-            left: 100%;
         }
         
         .nav-link:hover {
             background: rgba(124, 58, 237, 0.1);
             color: white;
-            transform: translateX(5px);
         }
         
         .nav-link.active {
@@ -249,11 +178,10 @@
         
         .logout-btn:hover {
             background: rgba(255, 0, 85, 0.2);
-            transform: translateY(-2px);
         }
         
         /* ============================================= */
-        /* COMPONENTE: CONTENIDO PRINCIPAL */
+        /* CONTENIDO PRINCIPAL */
         /* ============================================= */
         .main-content {
             flex: 1;
@@ -290,12 +218,6 @@
             font-size: 1.2rem;
             cursor: pointer;
             padding: 0.5rem;
-            transition: all 0.3s;
-        }
-        
-        .notification-btn:hover {
-            color: var(--secondary);
-            transform: rotate(15deg);
         }
         
         .notification-badge {
@@ -311,11 +233,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: pulse 1.5s infinite;
         }
         
         /* ============================================= */
-        /* COMPONENTE: TARJETAS DE ESTADÍSTICAS */
+        /* TARJETAS DE ESTADÍSTICAS */
         /* ============================================= */
         .stats-grid {
             display: grid;
@@ -331,15 +252,7 @@
             border: 1px solid rgba(124, 58, 237, 0.2);
             position: relative;
             overflow: hidden;
-            transition: all 0.3s;
-            animation: fadeInUp 0.6s ease-out forwards;
-            opacity: 0;
         }
-        
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; }
         
         .stat-card::before {
             content: '';
@@ -349,11 +262,6 @@
             width: 5px;
             height: 100%;
             background: linear-gradient(to bottom, var(--primary), var(--secondary));
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
         }
         
         .stat-header {
@@ -384,68 +292,8 @@
             -webkit-text-fill-color: transparent;
         }
         
-        .stat-change {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        
-        .stat-change.positive { color: var(--success); }
-        .stat-change.negative { color: var(--danger); }
-        
         /* ============================================= */
-        /* COMPONENTE: GRÁFICOS */
-        /* ============================================= */
-        .charts-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .chart-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid rgba(124, 58, 237, 0.2);
-        }
-        
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .chart-title {
-            color: var(--secondary);
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        
-        .chart-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .chart-btn {
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(124, 58, 237, 0.2);
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
-        .chart-btn.active {
-            background: rgba(124, 58, 237, 0.3);
-            border-color: var(--primary);
-        }
-        
-        /* ============================================= */
-        /* COMPONENTE: TABLAS DE DATOS */
+        /* TABLAS DE DATOS */
         /* ============================================= */
         .table-card {
             background: var(--card-bg);
@@ -496,15 +344,6 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .data-table tr {
-            transition: all 0.3s;
-        }
-        
-        .data-table tr:hover {
-            background: rgba(124, 58, 237, 0.05);
-            transform: translateX(5px);
-        }
-        
         .status-badge {
             display: inline-block;
             padding: 0.3rem 0.8rem;
@@ -531,77 +370,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
         }
         
         .action-btn.edit { background: rgba(0, 170, 255, 0.1); color: var(--info); }
         .action-btn.delete { background: rgba(255, 0, 85, 0.1); color: var(--danger); }
         .action-btn.view { background: rgba(0, 255, 65, 0.1); color: var(--success); }
         
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
-        
         /* ============================================= */
-        /* COMPONENTE: PESTAÑAS */
-        /* ============================================= */
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(124, 58, 237, 0.3);
-            padding-bottom: 0.5rem;
-        }
-        
-        .tab {
-            padding: 0.5rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            border-radius: 6px 6px 0 0;
-            transition: all 0.3s;
-            position: relative;
-        }
-        
-        .tab::after {
-            content: '';
-            position: absolute;
-            bottom: -0.5rem;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--primary);
-            transform: scaleX(0);
-            transition: transform 0.3s;
-        }
-        
-        .tab:hover {
-            color: white;
-            background: rgba(124, 58, 237, 0.1);
-        }
-        
-        .tab.active {
-            color: var(--secondary);
-            background: rgba(124, 58, 237, 0.2);
-        }
-        
-        .tab.active::after {
-            transform: scaleX(1);
-        }
-        
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* ============================================= */
-        /* COMPONENTE: MODALES */
+        /* MODALES */
         /* ============================================= */
         .modal-overlay {
             position: fixed;
@@ -610,12 +386,10 @@
             right: 0;
             bottom: 0;
             background: rgba(7, 7, 16, 0.95);
-            backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            animation: fadeIn 0.3s ease-out;
         }
         
         .modal {
@@ -627,18 +401,6 @@
             max-height: 90vh;
             overflow-y: auto;
             border: 1px solid rgba(124, 58, 237, 0.3);
-            animation: modalSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
         }
         
         .modal-header {
@@ -661,17 +423,10 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            opacity: 0.7;
-            transition: all 0.3s;
-        }
-        
-        .modal-close:hover {
-            opacity: 1;
-            transform: rotate(90deg);
         }
         
         /* ============================================= */
-        /* COMPONENTE: VISTAS POR ROL */
+        /* VISTAS POR ROL */
         /* ============================================= */
         .role-view {
             display: none;
@@ -682,7 +437,7 @@
         }
         
         /* ============================================= */
-        /* COMPONENTE: DIÁLOGO DE CONFIRMACIÓN */
+        /* DIÁLOGO DE CONFIRMACIÓN */
         /* ============================================= */
         .confirmation-dialog {
             position: fixed;
@@ -691,7 +446,6 @@
             right: 0;
             bottom: 0;
             background: rgba(7, 7, 16, 0.95);
-            backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -716,7 +470,7 @@
         }
         
         /* ============================================= */
-        /* COMPONENTE: LOADING SPINNER */
+        /* LOADING SPINNER */
         /* ============================================= */
         .loading-spinner {
             display: none;
@@ -726,7 +480,6 @@
             right: 0;
             bottom: 0;
             background: rgba(7, 7, 16, 0.95);
-            backdrop-filter: blur(10px);
             align-items: center;
             justify-content: center;
             z-index: 2000;
@@ -738,11 +491,15 @@
             border: 5px solid rgba(124, 58, 237, 0.3);
             border-radius: 50%;
             border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         /* ============================================= */
-        /* UTILIDADES DE FORMULARIO */
+        /* FORMULARIOS */
         /* ============================================= */
         .form-group {
             margin-bottom: 1.5rem;
@@ -765,7 +522,6 @@
             border-radius: 6px;
             color: white;
             font-size: 1rem;
-            transition: all 0.3s;
         }
         
         .form-group input:focus,
@@ -773,23 +529,14 @@
         .form-group textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
         }
-
-        /* Estilos para opciones de select */
-        .form-group select option {
-            background: var(--dark);
-            color: white;
-            padding: 10px;
-        }
-
+        
         .btn {
             padding: 0.8rem 1.5rem;
             border-radius: 8px;
             border: none;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -806,45 +553,14 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
         }
         
         /* ============================================= */
-        /* RESPONSIVE DESIGN */
+        /* RESPONSIVE */
         /* ============================================= */
-        @media (max-width: 1200px) {
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                width: 80px;
-            }
-            
-            .main-content {
-                margin-left: 80px;
-            }
-            
-            .company-logo span,
-            .user-name,
-            .user-role,
-            .nav-title,
-            .nav-link span {
-                display: none;
-            }
-            
-            .nav-link {
-                justify-content: center;
-                padding: 1rem;
-            }
-            
-            .sidebar-footer button span {
-                display: none;
-            }
-        }
-        
         @media (max-width: 768px) {
             .main-content {
                 padding: 1rem;
@@ -893,74 +609,51 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .table-actions {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
         }
         
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 1rem 0.5rem;
-            }
-            
-            .top-bar {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-            
-            .page-title {
-                font-size: 1.4rem;
-            }
-            
-            .modal {
-                padding: 1rem;
-                width: 95%;
-            }
-        }
-
-        /* Estilos para selects en modales */
-        .modal select {
-            width: 100%;
-            padding: 0.8rem;
-            background: var(--dark);
-            border: 1px solid rgba(124, 58, 237, 0.3);
-            border-radius: 6px;
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 20px;
+        /* ============================================= */
+        /* TOAST NOTIFICATIONS */
+        /* ============================================= */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 8px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
         }
         
-        .modal select option {
-            background: var(--dark);
-            color: white;
+        .toast.success {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--success);
         }
         
-        .modal input {
-            background: var(--dark);
-            color: white;
+        .toast.error {
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid var(--danger);
         }
         
-        .modal input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
     </style>
 </head>
 <body>
     <!-- ============================================= -->
-    <!-- ESTRUCTURA PRINCIPAL DEL DASHBOARD -->
+    <!-- ESTRUCTURA PRINCIPAL -->
     <!-- ============================================= -->
     <div id="dashboardScreen">
         <div class="dashboard-container">
-            <!-- BLOQUE: SIDEBAR -->
+            <!-- SIDEBAR -->
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-header">
                     <div class="company-logo">
@@ -971,12 +664,12 @@
                 
                 <div class="user-info">
                     <div class="user-badge super-admin" id="userBadge">SUPER ADMIN</div>
-                    <div class="user-name" id="userName">Marcelo Daniel Condori</div>
-                    <div class="user-role" id="userRole">Control Total Sistema</div>
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role" id="userRole">Conectando...</div>
                 </div>
                 
                 <nav class="nav-menu" id="navMenu">
-                    <!-- Menú dinámico por rol -->
+                    <!-- Menú dinámico -->
                 </nav>
                 
                 <div class="sidebar-footer">
@@ -986,48 +679,31 @@
                 </div>
             </aside>
 
-            <!-- BLOQUE: CONTENIDO PRINCIPAL -->
+            <!-- CONTENIDO PRINCIPAL -->
             <main class="main-content">
-                <!-- BLOQUE: BARRA SUPERIOR -->
+                <!-- BARRA SUPERIOR -->
                 <div class="top-bar">
-                    <h1 class="page-title" id="pageTitle">Panel de Control Corporativo</h1>
+                    <h1 class="page-title" id="pageTitle">Panel de Control</h1>
                     
                     <div class="top-actions">
+                        <button class="btn btn-secondary btn-small" onclick="refreshAllData()">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
                         <button class="notification-btn" onclick="toggleNotifications()">
                             <i class="fas fa-bell"></i>
-                            <span class="notification-badge">0</span>
+                            <span class="notification-badge" id="notificationBadge">0</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- BLOQUE: VISTA SUPER USUARIO -->
+                <!-- VISTA SUPER USUARIO -->
                 <div id="viewSuper" class="role-view active">
-                    <!-- Contenido dinámico para Super Usuario -->
+                    <!-- Contenido dinámico -->
                 </div>
 
-                <!-- BLOQUE: VISTA JEFE EMPRESA -->
+                <!-- VISTA JEFE EMPRESA -->
                 <div id="viewJefe" class="role-view">
-                    <!-- Contenido dinámico para Jefe de Empresa -->
-                </div>
-
-                <!-- BLOQUE: VISTA DIRECCIÓN COMERCIAL -->
-                <div id="viewComercial" class="role-view">
-                    <!-- Contenido dinámico para Dirección Comercial -->
-                </div>
-
-                <!-- BLOQUE: VISTA ADMINISTRACIÓN Y FINANZAS -->
-                <div id="viewAdmin" class="role-view">
-                    <!-- Contenido dinámico para Administración y Finanzas -->
-                </div>
-
-                <!-- BLOQUE: VISTA VENDEDOR APP -->
-                <div id="viewVendedor" class="role-view">
-                    <!-- Contenido dinámico para Vendedor App -->
-                </div>
-
-                <!-- BLOQUE: VISTA ALMACÉN APP -->
-                <div id="viewAlmacen" class="role-view">
-                    <!-- Contenido dinámico para Almacén App -->
+                    <!-- Contenido dinámico -->
                 </div>
             </main>
         </div>
@@ -1036,29 +712,28 @@
     <!-- ============================================= -->
     <!-- COMPONENTES GLOBALES -->
     <!-- ============================================= -->
-
-    <!-- COMPONENTE: LOADING SPINNER -->
+    <!-- LOADING SPINNER -->
     <div class="loading-spinner" id="loadingSpinner">
         <div class="spinner"></div>
     </div>
 
-    <!-- COMPONENTE: MODAL GENÉRICO -->
+    <!-- MODAL GENÉRICO -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Título del Modal</h3>
+                <h3 class="modal-title" id="modalTitle">Título</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div id="modalContent">
-                Contenido del modal...
+                <!-- Contenido dinámico -->
             </div>
         </div>
     </div>
 
-    <!-- COMPONENTE: DIÁLOGO DE CONFIRMACIÓN -->
+    <!-- DIÁLOGO DE CONFIRMACIÓN -->
     <div class="confirmation-dialog" id="confirmationDialog">
         <div class="confirmation-content">
-            <h3 style="color: var(--secondary); margin-bottom: 1rem;" id="confirmationTitle">¿Estás seguro?</h3>
+            <h3 style="color: var(--secondary); margin-bottom: 1rem;" id="confirmationTitle">¿Confirmar?</h3>
             <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;" id="confirmationMessage"></p>
             <div class="confirmation-buttons">
                 <button class="btn btn-secondary" onclick="hideConfirmation()">
@@ -1073,7 +748,7 @@
 
     <script>
         // =============================================
-        // REGIÓN: CONFIGURACIÓN GLOBAL
+        // CONFIGURACIÓN GLOBAL
         // =============================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbwrFOz0gKxzixORDHZZFi36ryjRSJKRRKqqZA26de3mzr3AHZwQv4IWdr3Z2iOyqLPZ0A/exec';
         
@@ -1081,25 +756,18 @@
         // VARIABLES GLOBALES
         // =============================================
         let currentUser = null;
-        let currentRole = 'super';
-        let currentCompany = null;
-        let notifications = [];
-        
-        // Base de datos local (cache)
-        const database = {
+        let database = {
             empresas: [],
             usuarios: [],
             empleados: [],
             productos: [],
-            clientes: [],
-            ventas: [],
-            facturas: []
+            clientes: []
         };
+        let notifications = [];
         
         // =============================================
-        // MÓDULO: FUNCIONES DE LOADING
+        // FUNCIONES DE LOADING
         // =============================================
-        
         function showLoading() {
             document.getElementById('loadingSpinner').style.display = 'flex';
         }
@@ -1109,13 +777,10 @@
         }
         
         // =============================================
-        // MÓDULO: FUNCIONES DE API - SIN DEMO
+        // FUNCIONES DE API
         // =============================================
-        
         async function fetchFromAPI(action, params = {}) {
             try {
-                console.log(`🔍 Conectando a API: ${action}`, params);
-                
                 let url = `${API_URL}?action=${encodeURIComponent(action)}`;
                 
                 Object.keys(params).forEach(key => {
@@ -1126,44 +791,29 @@
                 
                 url += `&_t=${Date.now()}`;
                 
-                console.log(`📤 URL completa: ${url}`);
-                
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
-                
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' },
                     cache: 'no-cache',
-                    mode: 'cors',
-                    signal: controller.signal
+                    mode: 'cors'
                 });
                 
-                clearTimeout(timeoutId);
-                
-                console.log(`📥 Respuesta recibida, status: ${response.status}`);
-                
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
-                const result = await response.json();
-                console.log(`✅ Resultado API ${action}:`, result);
-                
-                return result;
+                return await response.json();
                 
             } catch (error) {
-                console.error(`❌ Error fetchFromAPI (${action}):`, error);
-                showNotification('error', 'Error de conexión', 'No se pudo conectar al servidor. Verifica tu conexión a internet.');
+                console.error(`Error API (${action}):`, error);
+                showToast('error', 'Error de conexión', 'No se pudo conectar al servidor');
                 throw error;
             }
         }
-
+        
         async function postToAPI(action, data = {}) {
             try {
                 showLoading();
-                
-                console.log(`📤 Enviando POST a API: ${action}`, data);
                 
                 const requestData = {
                     action: action,
@@ -1171,29 +821,20 @@
                     timestamp: Date.now()
                 };
                 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
-                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify(requestData),
-                    signal: controller.signal
+                    body: JSON.stringify(requestData)
                 });
                 
-                clearTimeout(timeoutId);
-                
-                console.log(`📥 Respuesta status: ${response.status}`);
-                
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const result = await response.json();
-                console.log(`✅ Respuesta API ${action}:`, result);
                 
                 hideLoading();
                 
@@ -1204,83 +845,57 @@
                 }
                 
             } catch (error) {
-                console.error('❌ Error en API POST:', error);
+                console.error('Error API POST:', error);
                 hideLoading();
-                
-                let errorMessage = error.message;
-                if (error.name === 'AbortError') {
-                    errorMessage = 'Timeout: El servidor tardó demasiado en responder';
-                } else if (error.message.includes('Failed to fetch')) {
-                    errorMessage = 'Error de conexión. Verifica tu internet.';
-                }
-                
-                showNotification('error', 'Error de API', errorMessage);
+                showToast('error', 'Error', error.message);
                 throw error;
             }
         }
         
         // =============================================
-        // MÓDULO: CARGA DE DATOS DESDE GOOGLE SHEETS
+        // CARGA DE DATOS
         // =============================================
-        
         async function loadEmpresasFromAPI() {
-            showLoading();
             try {
                 const result = await fetchFromAPI('getEmpresas');
-                
-                if (result && result.success && result.empresas) {
-                    database.empresas = result.empresas;
-                    console.log(`✅ Empresas cargadas: ${result.empresas.length}`);
+                if (result && result.success) {
+                    database.empresas = result.empresas || [];
                     return true;
-                } else {
-                    console.warn('⚠️ No se pudieron cargar empresas:', result?.error);
-                    return false;
                 }
+                return false;
             } catch (error) {
                 console.error('Error cargando empresas:', error);
                 return false;
-            } finally {
-                hideLoading();
             }
         }
         
         async function loadUsuariosFromAPI(empresaId = null) {
-            showLoading();
             try {
                 const params = empresaId ? { empresa_id: empresaId } : {};
                 const result = await fetchFromAPI('getUsuarios', params);
-                if (result && result.success && result.usuarios) {
-                    database.usuarios = result.usuarios;
-                    console.log(`✅ Usuarios cargados: ${result.usuarios.length}`);
+                if (result && result.success) {
+                    database.usuarios = result.usuarios || [];
                     return true;
                 }
-                console.warn('⚠️ No se pudieron cargar usuarios');
                 return false;
             } catch (error) {
                 console.error('Error cargando usuarios:', error);
                 return false;
-            } finally {
-                hideLoading();
             }
         }
         
         async function loadEmpleadosFromAPI(empresaId = null) {
-            showLoading();
             try {
                 const params = empresaId ? { empresa_id: empresaId } : {};
                 const result = await fetchFromAPI('getEmpleados', params);
-                if (result && result.success && result.empleados) {
-                    database.empleados = result.empleados;
-                    console.log(`✅ Empleados cargados: ${result.empleados.length}`);
+                if (result && result.success) {
+                    database.empleados = result.empleados || [];
                     return true;
                 }
-                console.warn('⚠️ No se pudieron cargar empleados');
                 return false;
             } catch (error) {
                 console.error('Error cargando empleados:', error);
                 return false;
-            } finally {
-                hideLoading();
             }
         }
         
@@ -1292,7 +907,6 @@
                     loadUsuariosFromAPI(),
                     loadEmpleadosFromAPI()
                 ]);
-                console.log('✅ Todos los datos cargados exitosamente desde Google Sheets');
                 return true;
             } catch (error) {
                 console.error('Error cargando datos:', error);
@@ -1302,46 +916,64 @@
             }
         }
         
-        // =============================================
-        // MÓDULO: CONFIGURACIÓN DE INTERFAZ POR ROL
-        // =============================================
+        async function refreshAllData() {
+            showLoading();
+            try {
+                await loadAllData();
+                showToast('success', 'Datos actualizados', 'Los datos se han actualizado correctamente');
+                
+                // Recargar la vista actual
+                if (currentUser.role === 'super') {
+                    loadSuperDashboard();
+                } else if (currentUser.role === 'jefe') {
+                    loadJefeDashboard();
+                }
+            } catch (error) {
+                console.error('Error actualizando datos:', error);
+            } finally {
+                hideLoading();
+            }
+        }
         
+        // =============================================
+        // CONFIGURACIÓN DE INTERFAZ
+        // =============================================
         function configureInterface() {
-            console.log('🎨 Configurando interfaz para rol:', currentUser.role);
+            if (!currentUser) return;
             
             const roleConfigs = {
                 'super': {
                     badgeClass: 'super-admin',
                     badgeText: 'SUPER ADMIN',
-                    userName: currentUser.nombre || 'Administrador Corporativo',
+                    userName: currentUser.nombre || 'Administrador',
                     userRole: 'Control Total Sistema',
                     viewId: 'viewSuper',
                     navMenu: `
                     <div class="nav-section">
                         <div class="nav-title">CORPORATIVO</div>
                         <ul class="nav-links">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Panel de Control Corporativo</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
-                            <i class="fas fa-building"></i>
-                            <span>Gestión de Empresas</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="loadGestionPersonal()">
-                            <i class="fas fa-users-cog"></i>
-                            <span>Gestión de Personal</span>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Panel de Control</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
+                                    <i class="fas fa-building"></i>
+                                    <span>Gestión de Empresas</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" onclick="loadGestionPersonal()">
+                                    <i class="fas fa-users-cog"></i>
+                                    <span>Gestión de Personal</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     `,
-                    pageTitle: 'Panel de Control Corporativo - Super Usuario'
+                    pageTitle: 'Panel de Control - Super Admin'
                 },
                 'jefe': {
                     badgeClass: 'jefe',
@@ -1353,22 +985,22 @@
                     <div class="nav-section">
                         <div class="nav-title">EMPRESA</div>
                         <ul class="nav-links">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active" onclick="loadJefeDashboard()">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Dashboard Empresa</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" onclick="loadUsuariosEmpresa()">
-                            <i class="fas fa-users"></i>
-                            <span>Gestión de Usuarios</span>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" onclick="loadJefeDashboard()">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Dashboard Empresa</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" onclick="loadUsuariosEmpresa()">
+                                    <i class="fas fa-users"></i>
+                                    <span>Gestión de Usuarios</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     `,
-                    pageTitle: 'Dashboard Empresa - Jefe'
+                    pageTitle: 'Dashboard Empresa'
                 }
             };
             
@@ -1395,14 +1027,11 @@
             } else if (currentUser.role === 'jefe') {
                 loadJefeDashboard();
             }
-            
-            console.log('✅ Interfaz configurada exitosamente');
         }
         
         // =============================================
-        // MÓDULO: DASHBOARD SUPER USUARIO
+        // DASHBOARD SUPER USUARIO
         // =============================================
-        
         function loadSuperDashboard() {
             const empresasCount = database.empresas.length;
             const usuariosCount = database.usuarios.length;
@@ -1416,9 +1045,6 @@
                             <div class="stat-icon"><i class="fas fa-building"></i></div>
                         </div>
                         <div class="stat-value">${empresasCount}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> Total registradas
-                        </div>
                     </div>
                     
                     <div class="stat-card">
@@ -1427,9 +1053,6 @@
                             <div class="stat-icon"><i class="fas fa-users"></i></div>
                         </div>
                         <div class="stat-value">${usuariosCount}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> En sistema
-                        </div>
                     </div>
                     
                     <div class="stat-card">
@@ -1438,20 +1061,14 @@
                             <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
                         </div>
                         <div class="stat-value">${empleadosCount}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-user-plus"></i> Registrados
-                        </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Sistema Activo</div>
+                            <div class="stat-title">Sistema</div>
                             <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         </div>
                         <div class="stat-value">100%</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-chart-line"></i> Operativo
-                        </div>
                     </div>
                 </div>
                 
@@ -1461,279 +1078,10 @@
                     </p>
                 </div>
             `;
-            
-            document.getElementById('pageTitle').textContent = 'Panel de Control Corporativo';
-        }
-        
-        function loadJefeDashboard() {
-            const empresaId = currentUser.empresa_id;
-            const empresa = database.empresas.find(e => e.ID === empresaId) || {};
-            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
-            const empleadosEmpresa = database.empleados.filter(e => e.EmpresaID === empresaId);
-            
-            document.getElementById('viewJefe').innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Usuarios Activos</div>
-                            <div class="stat-icon"><i class="fas fa-users"></i></div>
-                        </div>
-                        <div class="stat-value">${usuariosEmpresa.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-user-check"></i> En tu empresa
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Empleados</div>
-                            <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
-                        </div>
-                        <div class="stat-value">${empleadosEmpresa.length}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-user-plus"></i> Registrados
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Empresa</div>
-                            <div class="stat-icon"><i class="fas fa-building"></i></div>
-                        </div>
-                        <div class="stat-value" style="font-size: 1.5rem;">${empresa.Nombre || 'Mi Empresa'}</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-check-circle"></i> ${empresa.Estado || 'Activa'}
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">Sistema</div>
-                            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-                        </div>
-                        <div class="stat-value">100%</div>
-                        <div class="stat-change positive">
-                            <i class="fas fa-bolt"></i> Operativo
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div class="table-card">
-                        <div class="table-header">
-                            <h3 class="table-title">Usuarios de la Empresa</h3>
-                        </div>
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Rol</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${usuariosEmpresa.map(usuario => `
-                                        <tr>
-                                            <td>${usuario.Nombre}</td>
-                                            <td>
-                                                <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
-                                                    ${getRoleName(usuario.Role)}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
-                                                    ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                    ${usuariosEmpresa.length === 0 ? `
-                                        <tr>
-                                            <td colspan="3" style="text-align: center; padding: 1rem; color: rgba(255,255,255,0.5);">
-                                                No hay usuarios registrados
-                                            </td>
-                                        </tr>
-                                    ` : ''}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="table-card">
-                        <div class="table-header">
-                            <h3 class="table-title">Información de la Empresa</h3>
-                        </div>
-                        <div style="padding: 1rem;">
-                            <p><strong>RUC/NIT:</strong> ${empresa.RUC || 'No registrado'}</p>
-                            <p><strong>Contacto:</strong> ${empresa.Contacto || 'No registrado'}</p>
-                            <p><strong>Email:</strong> ${empresa.Email || 'No registrado'}</p>
-                            <p><strong>Teléfono:</strong> ${empresa.Teléfono || 'No registrado'}</p>
-                            <p><strong>Industria:</strong> ${empresa.Industria || 'No especificada'}</p>
-                            <p><strong>Dirección:</strong> ${empresa.Dirección || 'No registrada'}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 2rem; text-align: center;">
-                    <button class="btn btn-primary" onclick="loadUsuariosEmpresa()" style="margin-right: 1rem;">
-                        <i class="fas fa-users-cog"></i> Gestionar Usuarios
-                    </button>
-                    <button class="btn btn-secondary" onclick="editarInformacionEmpresa()">
-                        <i class="fas fa-edit"></i> Editar Información
-                    </button>
-                </div>
-            `;
-            
-            document.getElementById('pageTitle').textContent = `Dashboard - ${empresa.Nombre || 'Mi Empresa'}`;
-        }
-
-        function loadUsuariosEmpresa() {
-            const empresaId = currentUser.empresa_id;
-            const empresa = database.empresas.find(e => e.ID === empresaId);
-            
-            showModal(`Gestión de Usuarios - ${empresa.Nombre}`, `
-                <div style="max-width: 800px;">
-                    <div style="margin-bottom: 1.5rem;">
-                        <button class="btn btn-primary" onclick="showNuevoUsuarioParaEmpresa('${empresaId}')">
-                            <i class="fas fa-user-plus"></i> Agregar Usuario
-                        </button>
-                    </div>
-                    
-                    <div class="table-wrapper">
-                        <table class="data-table" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Rol</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${database.usuarios.filter(u => u.EmpresaID === empresaId).map(usuario => `
-                                    <tr>
-                                        <td>${usuario.Nombre}</td>
-                                        <td>${usuario.Email}</td>
-                                        <td>
-                                            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
-                                                ${getRoleName(usuario.Role)}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
-                                                ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="action-btn delete" onclick="confirmarEliminarUsuario('${usuario.ID}', '${usuario.Nombre}')" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                                ${database.usuarios.filter(u => u.EmpresaID === empresaId).length === 0 ? `
-                                    <tr>
-                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay usuarios en esta empresa
-                                        </td>
-                                    </tr>
-                                ` : ''}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `);
-        }
-
-        function editarInformacionEmpresa() {
-            const empresaId = currentUser.empresa_id;
-            const empresa = database.empresas.find(e => e.ID === empresaId);
-            
-            showModal(`Editar Empresa: ${empresa.Nombre}`, `
-                <div style="max-width: 700px;">
-                    <input type="hidden" id="editEmpresaId" value="${empresa.ID || ''}">
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Razón Social *</label>
-                            <input type="text" id="editEmpresaNombre" value="${empresa.Nombre || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">RUC/NIT *</label>
-                            <input type="text" id="editEmpresaRUC" value="${empresa.RUC || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Industria *</label>
-                            <select id="editEmpresaIndustria" required>
-                                <option value="">Seleccionar industria</option>
-                                <option value="Tecnología" ${empresa.Industria === 'Tecnología' ? 'selected' : ''}>Tecnología</option>
-                                <option value="Comercio" ${empresa.Industria === 'Comercio' ? 'selected' : ''}>Comercio</option>
-                                <option value="Manufactura" ${empresa.Industria === 'Manufactura' ? 'selected' : ''}>Manufactura</option>
-                                <option value="Servicios" ${empresa.Industria === 'Servicios' ? 'selected' : ''}>Servicios</option>
-                                <option value="Alimentos" ${empresa.Industria === 'Alimentos' ? 'selected' : ''}>Alimentos</option>
-                                <option value="Construcción" ${empresa.Industria === 'Construcción' ? 'selected' : ''}>Construcción</option>
-                                <option value="Otros" ${empresa.Industria === 'Otros' ? 'selected' : ''}>Otros</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Contacto *</label>
-                            <input type="text" id="editEmpresaContacto" value="${empresa.Contacto || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Email *</label>
-                            <input type="email" id="editEmpresaEmail" value="${empresa.Email || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Teléfono *</label>
-                            <input type="text" id="editEmpresaTelefono" value="${empresa.Teléfono || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Dirección</label>
-                            <input type="text" id="editEmpresaDireccion" value="${empresa.Dirección || ''}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Ciudad</label>
-                            <input type="text" id="editEmpresaCiudad" value="${empresa.Ciudad || ''}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Estado *</label>
-                            <select id="editEmpresaEstado" required>
-                                <option value="Activa" ${empresa.Estado === 'Activa' ? 'selected' : ''}>Activa</option>
-                                <option value="Inactiva" ${empresa.Estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                            Cancelar
-                        </button>
-                        <button class="btn btn-primary" onclick="guardarEdicionEmpresaCompleta('${empresaId}')" style="flex: 1;">
-                            <i class="fas fa-save"></i> Guardar Cambios
-                        </button>
-                    </div>
-                </div>
-            `);
         }
         
         function loadEmpresasManagement() {
-            document.getElementById('pageTitle').textContent = 'Gestión de Empresas - Super Admin';
+            document.getElementById('pageTitle').textContent = 'Gestión de Empresas';
             
             document.getElementById('viewSuper').innerHTML = `
                 <div class="table-card">
@@ -1744,7 +1092,7 @@
                                 <i class="fas fa-plus"></i> Nueva Empresa
                             </button>
                             <button class="btn btn-secondary" onclick="loadSuperDashboard()">
-                                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                                <i class="fas fa-arrow-left"></i> Volver
                             </button>
                         </div>
                     </div>
@@ -1753,7 +1101,6 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th style="display: none;">ID</th>
                                     <th>Empresa</th>
                                     <th>Industria</th>
                                     <th>Contacto</th>
@@ -1767,9 +1114,8 @@
                                     const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresa.ID);
                                     return `
                                         <tr>
-                                            <td style="display: none;" data-id="${empresa.ID || 'N/A'}">${empresa.ID || 'N/A'}</td>
                                             <td>
-                                                <strong>${empresa.Nombre}</strong>
+                                                <strong>${empresa.Nombre || 'Sin nombre'}</strong>
                                                 <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">
                                                     ${empresa.RUC || ''}
                                                 </div>
@@ -1784,17 +1130,14 @@
                                             <td>${usuariosEmpresa.length}</td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.ID}')" title="Ver Detalles">
+                                                    <button class="action-btn view" onclick="viewEmpresaCompleta('${empresa.ID}')" title="Ver">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button class="action-btn edit" onclick="editEmpresaCompleta('${empresa.ID}')" title="Editar Todo">
+                                                    <button class="action-btn edit" onclick="editEmpresaCompleta('${empresa.ID}')" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="action-btn delete" onclick="confirmarEliminarEmpresa('${empresa.ID}', '${empresa.Nombre}')" title="Eliminar">
+                                                    <button class="action-btn delete" onclick="confirmarEliminarEmpresa('${empresa.ID}', '${empresa.Nombre || empresa.ID}')" title="Eliminar">
                                                         <i class="fas fa-trash"></i>
-                                                    </button>
-                                                    <button class="action-btn view" onclick="manageUsuariosEmpresa('${empresa.ID}')" title="Usuarios">
-                                                        <i class="fas fa-users"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -1803,7 +1146,7 @@
                                 }).join('')}
                                 ${database.empresas.length === 0 ? `
                                     <tr>
-                                        <td colspan="7" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                        <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                                             <i class="fas fa-building" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
                                             No hay empresas registradas
                                         </td>
@@ -1817,13 +1160,9 @@
         }
         
         function loadGestionPersonal() {
-            document.getElementById('pageTitle').textContent = 'Gestión de Personal - Super Admin';
+            document.getElementById('pageTitle').textContent = 'Gestión de Personal';
             
-            const usuariosParaMostrar = database.usuarios.filter(u => 
-                u.ID && u.ID !== '' && 
-                u.Role !== 'super' && 
-                !u.Email.includes('marcelodanielcc')
-            );
+            const usuariosParaMostrar = database.usuarios.filter(u => u.ID && u.ID !== '');
             
             document.getElementById('viewSuper').innerHTML = `
                 <div class="table-card">
@@ -1834,7 +1173,7 @@
                                 <i class="fas fa-user-plus"></i> Nuevo Usuario
                             </button>
                             <button class="btn btn-secondary" onclick="loadSuperDashboard()">
-                                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                                <i class="fas fa-arrow-left"></i> Volver
                             </button>
                         </div>
                     </div>
@@ -1854,16 +1193,19 @@
                             <tbody>
                                 ${usuariosParaMostrar.map(usuario => {
                                     const empresa = database.empresas.find(e => e.ID === usuario.EmpresaID);
+                                    const roleNames = {
+                                        'super': 'Super Admin',
+                                        'jefe': 'Jefe Empresa',
+                                        'admin': 'Administración',
+                                        'vendedor': 'Vendedor',
+                                        'almacen': 'Almacén'
+                                    };
                                     
                                     return `
                                         <tr>
-                                            <td><strong>${usuario.Nombre}</strong></td>
-                                            <td>${usuario.Email}</td>
-                                            <td>
-                                                <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
-                                                    ${getRoleName(usuario.Role)}
-                                                </span>
-                                            </td>
+                                            <td><strong>${usuario.Nombre || 'Sin nombre'}</strong></td>
+                                            <td>${usuario.Email || ''}</td>
+                                            <td>${roleNames[usuario.Role] || usuario.Role}</td>
                                             <td>${empresa ? empresa.Nombre : 'Sin empresa'}</td>
                                             <td>
                                                 <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
@@ -1875,7 +1217,7 @@
                                                     <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="action-btn delete" onclick="confirmarEliminarUsuario('${usuario.ID}', '${usuario.Nombre}')" title="Eliminar">
+                                                    <button class="action-btn delete" onclick="confirmarEliminarUsuario('${usuario.ID}', '${usuario.Nombre || usuario.ID}')" title="Eliminar">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -1887,7 +1229,7 @@
                                     <tr>
                                         <td colspan="6" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                                             <i class="fas fa-user-tie" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                            No hay usuarios registrados (excepto super admin)
+                                            No hay usuarios registrados
                                         </td>
                                     </tr>
                                 ` : ''}
@@ -1899,448 +1241,112 @@
         }
         
         // =============================================
-        // MÓDULO: FUNCIONES AUXILIARES
+        // DASHBOARD JEFE EMPRESA
         // =============================================
-        
-        function getRoleName(role) {
-            const roles = {
-                'super': 'Super Admin',
-                'jefe': 'Jefe Empresa',
-                'comercial': 'Dirección Comercial',
-                'admin': 'Administración',
-                'vendedor': 'Vendedor',
-                'almacen': 'Almacén'
-            };
-            return roles[role] || role;
-        }
-        
-        function getRoleColor(role) {
-            switch(role) {
-                case 'super': return 'rgba(255,0,85,0.2)';
-                case 'jefe': return 'rgba(0,255,65,0.2)';
-                case 'comercial': return 'rgba(255,170,0,0.2)';
-                case 'admin': return 'rgba(0,170,255,0.2)';
-                case 'vendedor': return 'rgba(124,58,237,0.2)';
-                case 'almacen': return 'rgba(255,85,0,0.2)';
-                default: return 'rgba(255,255,255,0.1)';
-            }
-        }
-        
-        // =============================================
-        // MÓDULO: MODALES PARA EMPRESAS
-        // =============================================
-        
-        function showNuevaEmpresaModal() {
-            showModal('Nueva Empresa', `
-                <div style="max-width: 600px;">
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Razón Social *</label>
-                        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa S.A.">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">País *</label>
-                        <select id="nuevaEmpresaPais" onchange="actualizarTipoDocumento()" required>
-                            <option value="">Seleccionar país</option>
-                            <option value="Bolivia">Bolivia</option>
-                            <option value="Perú">Perú</option>
-                            <option value="Argentina">Argentina</option>
-                            <option value="Chile">Chile</option>
-                            <option value="Colombia">Colombia</option>
-                            <option value="Ecuador">Ecuador</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);" id="labelDocumento">Documento *</label>
-                        <input type="text" id="nuevaEmpresaDocumento" placeholder="Ingrese el número">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Industria *</label>
-                        <select id="nuevaEmpresaIndustria">
-                            <option value="">Seleccionar industria</option>
-                            <option value="Tecnología">Tecnología</option>
-                            <option value="Comercio">Comercio</option>
-                            <option value="Manufactura">Manufactura</option>
-                            <option value="Servicios">Servicios</option>
-                            <option value="Alimentos">Alimentos</option>
-                            <option value="Construcción">Construcción</option>
-                            <option value="Otros">Otros</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Contacto Principal *</label>
-                        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Teléfono/Celular *</label>
-                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+000 00000000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label style="color: var(--secondary);">Contraseña Jefe *</label>
-                        <input type="password" id="nuevaEmpresaPassword" value="12345678">
-                        <small style="color: rgba(255,255,255,0.6);">Contraseña para el usuario jefe</small>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                            Cancelar
-                        </button>
-                        <button class="btn btn-primary" onclick="crearNuevaEmpresa()" style="flex: 1;">
-                            <i class="fas fa-plus"></i> Crear Empresa
-                        </button>
-                    </div>
-                </div>
-            `);
-            
-            document.getElementById('nuevaEmpresaPais').value = 'Bolivia';
-            actualizarTipoDocumento();
-        }
-        
-        function actualizarTipoDocumento() {
-            const pais = document.getElementById('nuevaEmpresaPais').value;
-            const label = document.getElementById('labelDocumento');
-            
-            if (pais === 'Bolivia') {
-                label.textContent = 'NIT *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '1234567890123';
-            } else if (pais === 'Argentina') {
-                label.textContent = 'CUIT *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '20-12345678-9';
-            } else if (pais === 'Chile') {
-                label.textContent = 'RUT *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '12.345.678-9';
-            } else if (pais === 'Perú') {
-                label.textContent = 'RUC *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '12345678901';
-            } else if (pais === 'Colombia') {
-                label.textContent = 'NIT *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '123.456.789-0';
-            } else if (pais === 'Ecuador') {
-                label.textContent = 'RUC *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = '1234567890001';
-            } else {
-                label.textContent = 'Número Fiscal *';
-                document.getElementById('nuevaEmpresaDocumento').placeholder = 'Ingrese número fiscal';
-            }
-        }
-        
-        async function crearNuevaEmpresa() {
-            showLoading();
-            
-            const empresaData = {
-                nombre: document.getElementById('nuevaEmpresaNombre').value,
-                pais: document.getElementById('nuevaEmpresaPais').value,
-                documento: document.getElementById('nuevaEmpresaDocumento').value,
-                industria: document.getElementById('nuevaEmpresaIndustria').value,
-                contacto: document.getElementById('nuevaEmpresaContacto').value,
-                email: document.getElementById('nuevaEmpresaEmail').value,
-                telefono: document.getElementById('nuevaEmpresaTelefono').value,
-                password: document.getElementById('nuevaEmpresaPassword').value,
-                estado: 'Activa'
-            };
-            
-            const required = ['nombre', 'pais', 'documento', 'contacto', 'email', 'telefono', 'password'];
-            for (const field of required) {
-                if (!empresaData[field]) {
-                    showNotification('error', 'Error', `Complete el campo: ${field}`);
-                    hideLoading();
-                    return;
-                }
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(empresaData.email)) {
-                showNotification('error', 'Error', 'Ingrese un email válido');
-                hideLoading();
-                return;
-            }
-            
-            try {
-                const result = await postToAPI('registerCompany', empresaData);
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
-                    
-                    await loadEmpresasFromAPI();
-                    await loadUsuariosFromAPI();
-                    
-                    closeModal();
-                    loadEmpresasManagement();
-                } else {
-                    showNotification('error', 'Error', result?.error || 'Error al crear empresa');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        function viewEmpresaCompleta(empresaId) {
-            const empresa = database.empresas.find(e => e.ID === empresaId);
-            if (!empresa) {
-                showNotification('error', 'Error', 'Empresa no encontrada');
-                return;
-            }
-            
+        function loadJefeDashboard() {
+            const empresaId = currentUser.empresa_id;
+            const empresa = database.empresas.find(e => e.ID === empresaId) || {};
             const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
             const empleadosEmpresa = database.empleados.filter(e => e.EmpresaID === empresaId);
             
-            showModal(`Empresa: ${empresa.Nombre}`, `
-                <div style="max-width: 800px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                        <div>
-                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
-                            <p><strong>RUC/NIT:</strong> ${empresa.RUC || 'No registrado'}</p>
-                            <p><strong>Industria:</strong> ${empresa.Industria || 'No especificada'}</p>
-                            <p><strong>Contacto:</strong> ${empresa.Contacto || 'No registrado'}</p>
-                            <p><strong>Email:</strong> ${empresa.Email || 'No registrado'}</p>
-                            <p><strong>Teléfono:</strong> ${empresa.Teléfono || 'No registrado'}</p>
-                            <p><strong>Estado:</strong> ${empresa.Estado || 'Inactiva'}</p>
+            document.getElementById('viewJefe').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Usuarios Activos</div>
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
                         </div>
-                        
-                        <div>
-                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Ubicación</h4>
-                            <p><strong>Dirección:</strong> ${empresa.Dirección || 'No registrada'}</p>
-                            <p><strong>Ciudad:</strong> ${empresa.Ciudad || 'No registrada'}</p>
-                            <p><strong>Tarjeta:</strong> ${empresa.TarjetaRegistrada || 'No'}</p>
-                            <p><strong>Fecha Registro:</strong> ${formatDate(empresa.FechaRegistro)}</p>
-                        </div>
+                        <div class="stat-value">${usuariosEmpresa.length}</div>
                     </div>
                     
-                    <div style="margin-top: 2rem;">
-                        <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px;">
-                                <div style="color: var(--secondary); font-size: 0.9rem;">Usuarios</div>
-                                <div style="font-size: 2rem; font-weight: 700;">${usuariosEmpresa.length}</div>
-                            </div>
-                            <div style="background: rgba(0,245,255,0.1); padding: 1rem; border-radius: 8px;">
-                                <div style="color: var(--secondary); font-size: 0.9rem;">Empleados</div>
-                                <div style="font-size: 2rem; font-weight: 700;">${empleadosEmpresa.length}</div>
-                            </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Empleados</div>
+                            <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
                         </div>
+                        <div class="stat-value">${empleadosEmpresa.length}</div>
                     </div>
                     
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="editEmpresaCompleta('${empresaId}')" style="flex: 1;">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-primary" onclick="accessAsJefeEmpresa('${empresaId}')" style="flex: 1;">
-                            <i class="fas fa-sign-in-alt"></i> Acceder como Jefe
-                        </button>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Empresa</div>
+                            <div class="stat-icon"><i class="fas fa-building"></i></div>
+                        </div>
+                        <div class="stat-value" style="font-size: 1.5rem;">${empresa.Nombre || 'Mi Empresa'}</div>
                     </div>
                 </div>
-            `);
-        }
-        
-        function formatDate(dateString) {
-            if (!dateString) return 'No disponible';
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-            } catch (e) {
-                return dateString;
-            }
-        }
-        
-        function editEmpresaCompleta(empresaId) {
-            const empresa = database.empresas.find(e => e.ID === empresaId);
-            if (!empresa) {
-                showNotification('error', 'Error', 'Empresa no encontrada');
-                return;
-            }
-            
-            showModal(`Editar Empresa: ${empresa.Nombre}`, `
-                <div style="max-width: 700px;">
-                    <input type="hidden" id="editEmpresaId" value="${empresa.ID || ''}">
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Razón Social *</label>
-                            <input type="text" id="editEmpresaNombre" value="${empresa.Nombre || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">RUC/NIT *</label>
-                            <input type="text" id="editEmpresaRUC" value="${empresa.RUC || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Industria *</label>
-                            <select id="editEmpresaIndustria" required>
-                                <option value="">Seleccionar industria</option>
-                                <option value="Tecnología" ${empresa.Industria === 'Tecnología' ? 'selected' : ''}>Tecnología</option>
-                                <option value="Comercio" ${empresa.Industria === 'Comercio' ? 'selected' : ''}>Comercio</option>
-                                <option value="Manufactura" ${empresa.Industria === 'Manufactura' ? 'selected' : ''}>Manufactura</option>
-                                <option value="Servicios" ${empresa.Industria === 'Servicios' ? 'selected' : ''}>Servicios</option>
-                                <option value="Alimentos" ${empresa.Industria === 'Alimentos' ? 'selected' : ''}>Alimentos</option>
-                                <option value="Construcción" ${empresa.Industria === 'Construcción' ? 'selected' : ''}>Construcción</option>
-                                <option value="Otros" ${empresa.Industria === 'Otros' ? 'selected' : ''}>Otros</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Contacto *</label>
-                            <input type="text" id="editEmpresaContacto" value="${empresa.Contacto || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Email *</label>
-                            <input type="email" id="editEmpresaEmail" value="${empresa.Email || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Teléfono *</label>
-                            <input type="text" id="editEmpresaTelefono" value="${empresa.Teléfono || ''}" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Dirección</label>
-                            <input type="text" id="editEmpresaDireccion" value="${empresa.Dirección || ''}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Ciudad</label>
-                            <input type="text" id="editEmpresaCiudad" value="${empresa.Ciudad || ''}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Estado *</label>
-                            <select id="editEmpresaEstado" required>
-                                <option value="Activa" ${empresa.Estado === 'Activa' ? 'selected' : ''}>Activa</option>
-                                <option value="Inactiva" ${empresa.Estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
-                                <option value="Pendiente" ${empresa.Estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Tarjeta Registrada</label>
-                            <select id="editEmpresaTarjeta">
-                                <option value="Sí" ${empresa.TarjetaRegistrada === 'Sí' ? 'selected' : ''}>Sí</option>
-                                <option value="No" ${empresa.TarjetaRegistrada === 'No' ? 'selected' : ''}>No</option>
-                            </select>
+                
+                <div class="table-card" style="margin-top: 2rem;">
+                    <div class="table-header">
+                        <h3 class="table-title">Usuarios de la Empresa</h3>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="showNuevoUsuarioParaEmpresa('${empresaId}')">
+                                <i class="fas fa-user-plus"></i> Agregar Usuario
+                            </button>
                         </div>
                     </div>
                     
-                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                        <p style="color: var(--secondary); margin: 0;">
-                            <i class="fas fa-info-circle"></i> ID de la empresa: <strong>${empresa.ID || 'N/A'}</strong>
-                        </p>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                            Cancelar
-                        </button>
-                        <button class="btn btn-primary" onclick="guardarEdicionEmpresaCompleta('${empresaId}')" style="flex: 1;">
-                            <i class="fas fa-save"></i> Guardar Cambios
-                        </button>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${usuariosEmpresa.map(usuario => {
+                                    const roleNames = {
+                                        'jefe': 'Jefe Empresa',
+                                        'admin': 'Administración',
+                                        'vendedor': 'Vendedor',
+                                        'almacen': 'Almacén'
+                                    };
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${usuario.Nombre || ''}</td>
+                                            <td>${usuario.Email || ''}</td>
+                                            <td>${roleNames[usuario.Role] || usuario.Role}</td>
+                                            <td>
+                                                <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                    ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                                ${usuariosEmpresa.length === 0 ? `
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            No hay usuarios en esta empresa
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            `);
-        }
-
-        async function guardarEdicionEmpresaCompleta(empresaId) {
-            showLoading();
+            `;
             
-            const empresaData = {
-                id: empresaId,
-                nombre: document.getElementById('editEmpresaNombre').value,
-                documento: document.getElementById('editEmpresaRUC').value,
-                industria: document.getElementById('editEmpresaIndustria').value,
-                contacto: document.getElementById('editEmpresaContacto').value,
-                email: document.getElementById('editEmpresaEmail').value,
-                telefono: document.getElementById('editEmpresaTelefono').value,
-                direccion: document.getElementById('editEmpresaDireccion').value,
-                ciudad: document.getElementById('editEmpresaCiudad').value,
-                estado: document.getElementById('editEmpresaEstado').value,
-                tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value
-            };
-            
-            const required = ['nombre', 'documento', 'industria', 'contacto', 'email', 'telefono', 'estado'];
-            for (const field of required) {
-                if (!empresaData[field]) {
-                    showNotification('error', 'Error', `Complete el campo: ${field}`);
-                    hideLoading();
-                    return;
-                }
-            }
-            
-            try {
-                const result = await postToAPI('updateEmpresaCompleta', empresaData);
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Empresa actualizada completamente');
-                    
-                    await loadEmpresasFromAPI();
-                    
-                    closeModal();
-                    loadEmpresasManagement();
-                } else {
-                    showNotification('error', 'Error', result?.error || 'Error al actualizar');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
-            } finally {
-                hideLoading();
-            }
+            document.getElementById('pageTitle').textContent = `Dashboard - ${empresa.Nombre || 'Mi Empresa'}`;
         }
-
-        function confirmarEliminarEmpresa(empresaId, empresaNombre) {
-            showConfirmation(
-                'Eliminar Empresa',
-                `¿Estás seguro de eliminar la empresa "${empresaNombre}"?<br><br><small style="color: var(--danger);">Esta acción eliminará TODOS los usuarios de esta empresa y NO se puede deshacer.</small>`,
-                function() {
-                    eliminarEmpresa(empresaId);
-                }
-            );
-        }
-
-        async function eliminarEmpresa(empresaId) {
-            showLoading();
-            
-            try {
-                const result = await postToAPI('deleteEmpresa', { id: empresaId });
-                
-                if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Empresa eliminada correctamente');
-                    
-                    await loadEmpresasFromAPI();
-                    await loadUsuariosFromAPI();
-                    
-                    loadEmpresasManagement();
-                } else {
-                    showNotification('error', 'Error', result?.error || 'Error al eliminar');
-                }
-            } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function manageUsuariosEmpresa(empresaId) {
+        
+        function loadUsuariosEmpresa() {
+            const empresaId = currentUser.empresa_id;
             const empresa = database.empresas.find(e => e.ID === empresaId);
-            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
             
-            showModal(`Usuarios de: ${empresa.Nombre}`, `
+            showModal(`Usuarios - ${empresa.Nombre}`, `
                 <div style="max-width: 800px;">
                     <div style="margin-bottom: 1.5rem;">
                         <button class="btn btn-primary" onclick="showNuevoUsuarioParaEmpresa('${empresaId}')">
@@ -2360,33 +1366,37 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${usuariosEmpresa.map(usuario => `
-                                    <tr>
-                                        <td>${usuario.Nombre}</td>
-                                        <td>${usuario.Email}</td>
-                                        <td>
-                                            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
-                                                ${getRoleName(usuario.Role)}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
-                                                ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                                ${usuariosEmpresa.length === 0 ? `
+                                ${database.usuarios.filter(u => u.EmpresaID === empresaId).map(usuario => {
+                                    const roleNames = {
+                                        'jefe': 'Jefe Empresa',
+                                        'admin': 'Administración',
+                                        'vendedor': 'Vendedor',
+                                        'almacen': 'Almacén'
+                                    };
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${usuario.Nombre}</td>
+                                            <td>${usuario.Email}</td>
+                                            <td>${roleNames[usuario.Role] || usuario.Role}</td>
+                                            <td>
+                                                <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                    ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                                ${database.usuarios.filter(u => u.EmpresaID === empresaId).length === 0 ? `
                                     <tr>
                                         <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                                            <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
                                             No hay usuarios en esta empresa
                                         </td>
                                     </tr>
@@ -2397,16 +1407,286 @@
                 </div>
             `);
         }
-
+        
         // =============================================
-        // MÓDULO: FUNCIONES DE USUARIOS
+        // MODALES DE EMPRESAS
         // =============================================
-
+        function showNuevaEmpresaModal() {
+            showModal('Nueva Empresa', `
+                <div style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>Razón Social *</label>
+                        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa S.A." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Documento *</label>
+                        <input type="text" id="nuevaEmpresaDocumento" placeholder="RUC/NIT" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Industria *</label>
+                        <input type="text" id="nuevaEmpresaIndustria" placeholder="Tecnología" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contacto Principal *</label>
+                        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono *</label>
+                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+000 00000000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contraseña Jefe *</label>
+                        <input type="password" id="nuevaEmpresaPassword" value="12345678" required>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="crearNuevaEmpresa()" style="flex: 1;">
+                            <i class="fas fa-plus"></i> Crear Empresa
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+        
+        async function crearNuevaEmpresa() {
+            showLoading();
+            
+            const empresaData = {
+                nombre: document.getElementById('nuevaEmpresaNombre').value,
+                documento: document.getElementById('nuevaEmpresaDocumento').value,
+                industria: document.getElementById('nuevaEmpresaIndustria').value,
+                contacto: document.getElementById('nuevaEmpresaContacto').value,
+                email: document.getElementById('nuevaEmpresaEmail').value,
+                telefono: document.getElementById('nuevaEmpresaTelefono').value,
+                password: document.getElementById('nuevaEmpresaPassword').value,
+                estado: 'Activa'
+            };
+            
+            try {
+                const result = await postToAPI('registerCompany', empresaData);
+                
+                if (result && result.success) {
+                    showToast('success', 'Éxito', `Empresa "${empresaData.nombre}" creada`);
+                    
+                    await loadEmpresasFromAPI();
+                    await loadUsuariosFromAPI();
+                    
+                    closeModal();
+                    loadEmpresasManagement();
+                } else {
+                    showToast('error', 'Error', result?.error || 'Error al crear empresa');
+                }
+            } catch (error) {
+                showToast('error', 'Error', 'Error de conexión');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function viewEmpresaCompleta(empresaId) {
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            if (!empresa) {
+                showToast('error', 'Error', 'Empresa no encontrada');
+                return;
+            }
+            
+            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
+            
+            showModal(`Empresa: ${empresa.Nombre}`, `
+                <div style="max-width: 800px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
+                            <p><strong>RUC/NIT:</strong> ${empresa.RUC || 'No registrado'}</p>
+                            <p><strong>Industria:</strong> ${empresa.Industria || 'No especificada'}</p>
+                            <p><strong>Contacto:</strong> ${empresa.Contacto || 'No registrado'}</p>
+                            <p><strong>Email:</strong> ${empresa.Email || 'No registrado'}</p>
+                            <p><strong>Teléfono:</strong> ${empresa.Teléfono || 'No registrado'}</p>
+                            <p><strong>Estado:</strong> ${empresa.Estado || 'Inactiva'}</p>
+                        </div>
+                        
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Ubicación</h4>
+                            <p><strong>Dirección:</strong> ${empresa.Dirección || 'No registrada'}</p>
+                            <p><strong>Ciudad:</strong> ${empresa.Ciudad || 'No registrada'}</p>
+                            <p><strong>Tarjeta:</strong> ${empresa.TarjetaRegistrada || 'No'}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h4 style="color: var(--secondary); margin-bottom: 1rem;">Estadísticas</h4>
+                        <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px;">
+                            <div style="color: var(--secondary); font-size: 0.9rem;">Usuarios</div>
+                            <div style="font-size: 2rem; font-weight: 700;">${usuariosEmpresa.length}</div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+        
+        function editEmpresaCompleta(empresaId) {
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            if (!empresa) {
+                showToast('error', 'Error', 'Empresa no encontrada');
+                return;
+            }
+            
+            showModal(`Editar Empresa: ${empresa.Nombre}`, `
+                <div style="max-width: 700px;">
+                    <input type="hidden" id="editEmpresaId" value="${empresa.ID || ''}">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Razón Social *</label>
+                            <input type="text" id="editEmpresaNombre" value="${empresa.Nombre || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>RUC/NIT *</label>
+                            <input type="text" id="editEmpresaRUC" value="${empresa.RUC || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Industria *</label>
+                            <input type="text" id="editEmpresaIndustria" value="${empresa.Industria || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Contacto *</label>
+                            <input type="text" id="editEmpresaContacto" value="${empresa.Contacto || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="editEmpresaEmail" value="${empresa.Email || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Teléfono *</label>
+                            <input type="text" id="editEmpresaTelefono" value="${empresa.Teléfono || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Dirección</label>
+                            <input type="text" id="editEmpresaDireccion" value="${empresa.Dirección || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Ciudad</label>
+                            <input type="text" id="editEmpresaCiudad" value="${empresa.Ciudad || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Estado *</label>
+                            <select id="editEmpresaEstado" required>
+                                <option value="Activa" ${empresa.Estado === 'Activa' ? 'selected' : ''}>Activa</option>
+                                <option value="Inactiva" ${empresa.Estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="guardarEdicionEmpresaCompleta('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+        
+        async function guardarEdicionEmpresaCompleta(empresaId) {
+            showLoading();
+            
+            const empresaData = {
+                id: empresaId,
+                nombre: document.getElementById('editEmpresaNombre').value,
+                documento: document.getElementById('editEmpresaRUC').value,
+                industria: document.getElementById('editEmpresaIndustria').value,
+                contacto: document.getElementById('editEmpresaContacto').value,
+                email: document.getElementById('editEmpresaEmail').value,
+                telefono: document.getElementById('editEmpresaTelefono').value,
+                direccion: document.getElementById('editEmpresaDireccion').value,
+                ciudad: document.getElementById('editEmpresaCiudad').value,
+                estado: document.getElementById('editEmpresaEstado').value
+            };
+            
+            try {
+                const result = await postToAPI('updateEmpresaCompleta', empresaData);
+                
+                if (result && result.success) {
+                    showToast('success', 'Éxito', 'Empresa actualizada');
+                    
+                    await loadEmpresasFromAPI();
+                    
+                    closeModal();
+                    loadEmpresasManagement();
+                } else {
+                    showToast('error', 'Error', result?.error || 'Error al actualizar');
+                }
+            } catch (error) {
+                showToast('error', 'Error', 'Error de conexión');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function confirmarEliminarEmpresa(empresaId, empresaNombre) {
+            showConfirmation(
+                'Eliminar Empresa',
+                `¿Eliminar la empresa "${empresaNombre}"? Esta acción no se puede deshacer.`,
+                function() {
+                    eliminarEmpresa(empresaId);
+                }
+            );
+        }
+        
+        async function eliminarEmpresa(empresaId) {
+            showLoading();
+            
+            try {
+                const result = await postToAPI('deleteEmpresa', { id: empresaId });
+                
+                if (result && result.success) {
+                    showToast('success', 'Éxito', 'Empresa eliminada');
+                    
+                    await loadEmpresasFromAPI();
+                    await loadUsuariosFromAPI();
+                    
+                    loadEmpresasManagement();
+                } else {
+                    showToast('error', 'Error', result?.error || 'Error al eliminar');
+                }
+            } catch (error) {
+                showToast('error', 'Error', 'Error de conexión');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // =============================================
+        // MODALES DE USUARIOS
+        // =============================================
         function showNuevoUsuarioModalAvanzado() {
             showModal('Nuevo Usuario', `
                 <div style="max-width: 700px;">
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Empresa *</label>
+                        <label>Empresa *</label>
                         <select id="nuevoUsuarioEmpresaAvanzado" required>
                             <option value="">Seleccionar empresa</option>
                             ${database.empresas.map(empresa => `
@@ -2416,39 +1696,33 @@
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Nombres Completos *</label>
+                        <label>Nombres Completos *</label>
                         <input type="text" id="nuevoUsuarioNombres" placeholder="Juan Carlos Pérez Gómez" required>
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Email *</label>
+                        <label>Email *</label>
                         <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required>
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Password *</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="flex: 1;">
-                            <button type="button" onclick="generarPasswordNuevoUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
-                                <i class="fas fa-random"></i> Generar
-                            </button>
-                        </div>
+                        <label>Password *</label>
+                        <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
-                            <label style="color: var(--secondary);">Rol *</label>
+                            <label>Rol *</label>
                             <select id="nuevoUsuarioRolAvanzado" required>
                                 <option value="jefe">Jefe Empresa</option>
-                                <option value="comercial">Dirección Comercial</option>
-                                <option value="admin">Administración y Finanzas</option>
-                                <option value="vendedor">Vendedor App</option>
-                                <option value="almacen">Almacén App</option>
+                                <option value="admin">Administración</option>
+                                <option value="vendedor">Vendedor</option>
+                                <option value="almacen">Almacén</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label style="color: var(--secondary);">Estado *</label>
+                            <label>Estado *</label>
                             <select id="nuevoUsuarioActivoAvanzado" required>
                                 <option value="Sí">Activo</option>
                                 <option value="No">Inactivo</option>
@@ -2467,7 +1741,7 @@
                 </div>
             `);
         }
-
+        
         function showNuevoUsuarioParaEmpresa(empresaId) {
             const empresa = database.empresas.find(e => e.ID === empresaId);
             
@@ -2476,39 +1750,32 @@
                     <input type="hidden" id="nuevoUsuarioEmpresaEspecifica" value="${empresaId}">
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Nombres Completos *</label>
+                        <label>Nombres Completos *</label>
                         <input type="text" id="nuevoUsuarioNombresEspecifico" placeholder="Juan Carlos Pérez Gómez" required>
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Email *</label>
+                        <label>Email *</label>
                         <input type="email" id="nuevoUsuarioEmailEspecifico" placeholder="usuario@${empresa.Email?.split('@')[1] || 'empresa.com'}" required>
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Password *</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="text" id="nuevoUsuarioPasswordEspecifico" value="12345678" required style="flex: 1;">
-                            <button type="button" onclick="generarPasswordNuevoUsuarioEspecifico()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
-                                <i class="fas fa-random"></i> Generar
-                            </button>
-                        </div>
+                        <label>Password *</label>
+                        <input type="text" id="nuevoUsuarioPasswordEspecifico" value="12345678" required>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
-                            <label style="color: var(--secondary);">Rol *</label>
+                            <label>Rol *</label>
                             <select id="nuevoUsuarioRolEspecifico" required>
-                                <option value="jefe">Jefe Empresa</option>
-                                <option value="comercial">Dirección Comercial</option>
-                                <option value="admin">Administración y Finanzas</option>
-                                <option value="vendedor">Vendedor App</option>
-                                <option value="almacen">Almacén App</option>
+                                <option value="admin">Administración</option>
+                                <option value="vendedor">Vendedor</option>
+                                <option value="almacen">Almacén</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label style="color: var(--secondary);">Estado *</label>
+                            <label>Estado *</label>
                             <select id="nuevoUsuarioActivoEspecifico" required>
                                 <option value="Sí">Activo</option>
                                 <option value="No">Inactivo</option>
@@ -2527,132 +1794,75 @@
                 </div>
             `);
         }
-
-        function generarPasswordNuevoUsuario() {
-            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';
-            let password = '';
-            for (let i = 0; i < 10; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('nuevoUsuarioPasswordAvanzado').value = password;
-        }
-
-        function generarPasswordNuevoUsuarioEspecifico() {
-            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';
-            let password = '';
-            for (let i = 0; i < 10; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('nuevoUsuarioPasswordEspecifico').value = password;
-        }
-
+        
         async function crearNuevoUsuarioAvanzado() {
             showLoading();
             
-            const nombresCompletos = document.getElementById('nuevoUsuarioNombres').value.trim();
-            const email = document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase();
-            const password = document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim();
-            const role = document.getElementById('nuevoUsuarioRolAvanzado').value;
-            const activo = document.getElementById('nuevoUsuarioActivoAvanzado').value;
-            const empresaId = document.getElementById('nuevoUsuarioEmpresaAvanzado').value;
-            
             const usuarioData = {
-                nombre: nombresCompletos,
-                email: email,
-                password: password,
-                role: role,
-                activo: activo,
-                empresa_id: empresaId
+                nombre: document.getElementById('nuevoUsuarioNombres').value.trim(),
+                email: document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase(),
+                password: document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim(),
+                role: document.getElementById('nuevoUsuarioRolAvanzado').value,
+                activo: document.getElementById('nuevoUsuarioActivoAvanzado').value,
+                empresa_id: document.getElementById('nuevoUsuarioEmpresaAvanzado').value
             };
-            
-            if (!nombresCompletos || !email || !empresaId) {
-                showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
-                hideLoading();
-                return;
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showNotification('error', 'Error', 'Ingrese un email válido');
-                hideLoading();
-                return;
-            }
             
             try {
                 const result = await postToAPI('addUsuario', usuarioData);
                 
                 if (result && result.success) {
-                    showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
+                    showToast('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado`);
                     
                     await loadUsuariosFromAPI();
                     
                     closeModal();
                     loadGestionPersonal();
                 } else {
-                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
+                    showToast('error', 'Error', result?.error || 'Error al crear usuario');
                 }
             } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+                showToast('error', 'Error', 'Error de conexión');
             } finally {
                 hideLoading();
             }
         }
-
+        
         async function crearNuevoUsuarioParaEmpresaEspecifica(empresaId) {
             showLoading();
             
-            const nombresCompletos = document.getElementById('nuevoUsuarioNombresEspecifico').value.trim();
-            const email = document.getElementById('nuevoUsuarioEmailEspecifico').value.trim().toLowerCase();
-            const password = document.getElementById('nuevoUsuarioPasswordEspecifico').value.trim();
-            const role = document.getElementById('nuevoUsuarioRolEspecifico').value;
-            const activo = document.getElementById('nuevoUsuarioActivoEspecifico').value;
-            
             const usuarioData = {
-                nombre: nombresCompletos,
-                email: email,
-                password: password,
-                role: role,
-                activo: activo,
+                nombre: document.getElementById('nuevoUsuarioNombresEspecifico').value.trim(),
+                email: document.getElementById('nuevoUsuarioEmailEspecifico').value.trim().toLowerCase(),
+                password: document.getElementById('nuevoUsuarioPasswordEspecifico').value.trim(),
+                role: document.getElementById('nuevoUsuarioRolEspecifico').value,
+                activo: document.getElementById('nuevoUsuarioActivoEspecifico').value,
                 empresa_id: empresaId
             };
-            
-            if (!nombresCompletos || !email) {
-                showNotification('error', 'Error', 'Complete los campos obligatorios');
-                hideLoading();
-                return;
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showNotification('error', 'Error', 'Ingrese un email válido');
-                hideLoading();
-                return;
-            }
             
             try {
                 const result = await postToAPI('addUsuario', usuarioData);
                 
                 if (result && result.success) {
-                    showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
+                    showToast('success', 'Éxito', `Usuario "${usuarioData.nombre}" creado`);
                     
                     await loadUsuariosFromAPI();
                     
                     closeModal();
-                    manageUsuariosEmpresa(empresaId);
+                    loadJefeDashboard();
                 } else {
-                    showNotification('error', 'Error', result?.error || 'Error al crear usuario');
+                    showToast('error', 'Error', result?.error || 'Error al crear usuario');
                 }
             } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+                showToast('error', 'Error', 'Error de conexión');
             } finally {
                 hideLoading();
             }
         }
-
+        
         function editUsuarioCompleto(usuarioId) {
             const usuario = database.usuarios.find(u => u.ID === usuarioId);
             if (!usuario) {
-                showNotification('error', 'Error', 'Usuario no encontrado');
+                showToast('error', 'Error', 'Usuario no encontrado');
                 return;
             }
             
@@ -2661,49 +1871,33 @@
                     <input type="hidden" id="editUsuarioId" value="${usuario.ID || ''}">
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Nombres Completos *</label>
+                        <label>Nombres Completos *</label>
                         <input type="text" id="editUsuarioNombres" value="${usuario.Nombre || ''}" required>
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Email *</label>
+                        <label>Email *</label>
                         <input type="email" id="editUsuarioEmail" value="${usuario.Email || ''}" required>
                     </div>
                     
                     <div class="form-group">
-                        <label style="color: var(--secondary);">Password *</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="text" id="editUsuarioPassword" value="${usuario.Password || '12345678'}" required style="flex: 1;">
-                            <button type="button" onclick="generarPasswordUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
-                                <i class="fas fa-random"></i> Generar
-                            </button>
-                        </div>
+                        <label>Password *</label>
+                        <input type="text" id="editUsuarioPassword" value="${usuario.Password || '12345678'}" required>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
-                            <label style="color: var(--secondary);">Rol *</label>
+                            <label>Rol *</label>
                             <select id="editUsuarioRol" required>
                                 <option value="jefe" ${usuario.Role === 'jefe' ? 'selected' : ''}>Jefe Empresa</option>
-                                <option value="comercial" ${usuario.Role === 'comercial' ? 'selected' : ''}>Dirección Comercial</option>
-                                <option value="admin" ${usuario.Role === 'admin' ? 'selected' : ''}>Administración y Finanzas</option>
-                                <option value="vendedor" ${usuario.Role === 'vendedor' ? 'selected' : ''}>Vendedor App</option>
-                                <option value="almacen" ${usuario.Role === 'almacen' ? 'selected' : ''}>Almacén App</option>
+                                <option value="admin" ${usuario.Role === 'admin' ? 'selected' : ''}>Administración</option>
+                                <option value="vendedor" ${usuario.Role === 'vendedor' ? 'selected' : ''}>Vendedor</option>
+                                <option value="almacen" ${usuario.Role === 'almacen' ? 'selected' : ''}>Almacén</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label style="color: var(--secondary);">Empresa *</label>
-                            <select id="editUsuarioEmpresa" required>
-                                <option value="">Seleccionar empresa</option>
-                                ${database.empresas.map(emp => `
-                                    <option value="${emp.ID}" ${usuario.EmpresaID === emp.ID ? 'selected' : ''}>${emp.Nombre}</option>
-                                `).join('')}
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label style="color: var(--secondary);">Estado *</label>
+                            <label>Estado *</label>
                             <select id="editUsuarioActivo" required>
                                 <option value="Sí" ${usuario.Activo === 'Sí' ? 'selected' : ''}>Activo</option>
                                 <option value="No" ${usuario.Activo === 'No' ? 'selected' : ''}>Inactivo</option>
@@ -2711,89 +1905,60 @@
                         </div>
                     </div>
                     
-                    <div style="background: rgba(124,58,237,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                        <p style="color: var(--secondary); margin: 0;">
-                            <i class="fas fa-info-circle"></i> ID del usuario: <strong>${usuario.ID || 'N/A'}</strong>
-                        </p>
-                    </div>
-                    
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                         <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
                             Cancelar
                         </button>
                         <button class="btn btn-primary" onclick="guardarUsuarioCompleto('${usuarioId}')" style="flex: 1;">
-                            <i class="fas fa-save"></i> Guardar Cambios
+                            <i class="fas fa-save"></i> Guardar
                         </button>
                     </div>
                 </div>
             `);
         }
-
-        function generarPasswordUsuario() {
-            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
-            let password = '';
-            for (let i = 0; i < 10; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('editUsuarioPassword').value = password;
-        }
-
+        
         async function guardarUsuarioCompleto(usuarioId) {
             showLoading();
             
-            const nombresCompletos = document.getElementById('editUsuarioNombres').value.trim();
-            const email = document.getElementById('editUsuarioEmail').value.trim().toLowerCase();
-            const password = document.getElementById('editUsuarioPassword').value.trim();
-            const role = document.getElementById('editUsuarioRol').value;
-            const activo = document.getElementById('editUsuarioActivo').value;
-            const empresaId = document.getElementById('editUsuarioEmpresa').value;
-            
             const usuarioData = {
                 id: usuarioId,
-                nombre: nombresCompletos,
-                email: email,
-                password: password,
-                role: role,
-                activo: activo,
-                empresa_id: empresaId
+                nombre: document.getElementById('editUsuarioNombres').value.trim(),
+                email: document.getElementById('editUsuarioEmail').value.trim().toLowerCase(),
+                password: document.getElementById('editUsuarioPassword').value.trim(),
+                role: document.getElementById('editUsuarioRol').value,
+                activo: document.getElementById('editUsuarioActivo').value
             };
-            
-            if (!nombresCompletos || !email || !empresaId) {
-                showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
-                hideLoading();
-                return;
-            }
             
             try {
                 const result = await postToAPI('updateUsuario', usuarioData);
                 
                 if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Usuario guardado correctamente');
+                    showToast('success', 'Éxito', 'Usuario guardado');
                     
                     await loadUsuariosFromAPI();
                     
                     closeModal();
                     loadGestionPersonal();
                 } else {
-                    showNotification('error', 'Error', result?.error || 'Error al guardar usuario');
+                    showToast('error', 'Error', result?.error || 'Error al guardar');
                 }
             } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+                showToast('error', 'Error', 'Error de conexión');
             } finally {
                 hideLoading();
             }
         }
-
+        
         function confirmarEliminarUsuario(usuarioId, usuarioNombre) {
             showConfirmation(
                 'Eliminar Usuario',
-                `¿Estás seguro de eliminar al usuario "${usuarioNombre}"?<br><br><small style="color: var(--danger);">Esta acción NO se puede deshacer.</small>`,
+                `¿Eliminar al usuario "${usuarioNombre}"? Esta acción no se puede deshacer.`,
                 function() {
                     eliminarUsuario(usuarioId);
                 }
             );
         }
-
+        
         async function eliminarUsuario(usuarioId) {
             showLoading();
             
@@ -2801,52 +1966,24 @@
                 const result = await postToAPI('deleteUsuario', { id: usuarioId });
                 
                 if (result && result.success) {
-                    showNotification('success', 'Éxito', 'Usuario eliminado correctamente');
+                    showToast('success', 'Éxito', 'Usuario eliminado');
                     
                     await loadUsuariosFromAPI();
                     
                     loadGestionPersonal();
                 } else {
-                    showNotification('error', 'Error', result?.error || 'Error al eliminar');
+                    showToast('error', 'Error', result?.error || 'Error al eliminar');
                 }
             } catch (error) {
-                showNotification('error', 'Error', 'Error de conexión: ' + error.message);
+                showToast('error', 'Error', 'Error de conexión');
             } finally {
                 hideLoading();
             }
         }
         
         // =============================================
-        // MÓDULO: FUNCIONES DE ACCESO
+        // FUNCIONES DE MODALES
         // =============================================
-        
-        function accessAsJefeEmpresa(empresaId) {
-            const empresa = database.empresas.find(e => e.ID === empresaId);
-            if (!empresa) {
-                showNotification('error', 'Error', 'Empresa no encontrada');
-                return;
-            }
-            
-            showConfirmation(
-                'Acceder como Jefe',
-                `¿Acceder a la empresa "${empresa.Nombre}" como jefe?<br><br><small>Podrás ver y gestionar esta empresa como si fueras su jefe.</small>`,
-                function() {
-                    currentUser.role = 'jefe';
-                    currentUser.empresa = empresa.Nombre;
-                    currentUser.empresa_id = empresaId;
-                    currentCompany = empresa;
-                    
-                    configureInterface();
-                    
-                    showNotification('success', 'Modo Jefe', `Ahora eres jefe de ${empresa.Nombre}`);
-                }
-            );
-        }
-        
-        // =============================================
-        // MÓDULO: FUNCIONES DE MODALES
-        // =============================================
-        
         function showModal(title, content) {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalContent').innerHTML = content;
@@ -2874,49 +2011,14 @@
         }
         
         // =============================================
-        // MÓDULO: NOTIFICACIONES
+        // NOTIFICACIONES
         // =============================================
-        
-        function showNotification(type, title, message) {
-            const notification = {
-                id: Date.now(),
-                type: type,
-                title: title,
-                message: message,
-                time: 'Ahora',
-                read: false
-            };
-            
-            notifications.unshift(notification);
-            
-            const unread = notifications.filter(n => !n.read).length;
-            document.querySelector('.notification-badge').textContent = unread;
-            
-            showToast(type, title, message);
-        }
-        
         function showToast(type, title, message) {
             const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? 'rgba(0,255,65,0.1)' : type === 'error' ? 'rgba(255,0,85,0.1)' : 'rgba(124,58,237,0.1)'};
-                border: 1px solid ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--primary)'};
-                color: white;
-                padding: 1rem;
-                border-radius: 8px;
-                min-width: 300px;
-                max-width: 400px;
-                z-index: 10000;
-                animation: slideIn 0.3s ease-out;
-            `;
-            
+            toast.className = `toast ${type}`;
             toast.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                    <strong style="color: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--primary)'}">
-                        ${title}
-                    </strong>
+                    <strong>${title}</strong>
                     <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; cursor: pointer;">
                         <i class="fas fa-times"></i>
                     </button>
@@ -2938,11 +2040,9 @@
             showModal('Notificaciones', `
                 <div style="max-height: 400px; overflow-y: auto;">
                     ${notifications.map(notif => `
-                        <div style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); background: ${notif.read ? 'transparent' : 'rgba(124,58,237,0.05)'};">
+                        <div style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <strong style="color: ${notif.type === 'warning' ? 'var(--warning)' : notif.type === 'error' ? 'var(--danger)' : 'var(--secondary)'}">
-                                    ${notif.title}
-                                </strong>
+                                <strong>${notif.title}</strong>
                                 <small style="color: rgba(255,255,255,0.5);">${notif.time}</small>
                             </div>
                             <p style="color: rgba(255,255,255,0.7); margin: 0;">${notif.message}</p>
@@ -2951,35 +2051,16 @@
                     
                     ${notifications.length === 0 ? `
                         <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                            <i class="fas fa-bell-slash" style="font-size: 3rem; margin-bottom: 1rem;"></i>
                             <p>No hay notificaciones</p>
                         </div>
                     ` : ''}
                 </div>
-                
-                ${notifications.length > 0 ? `
-                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-                        <button class="btn btn-secondary" onclick="markAllAsRead()">
-                            <i class="fas fa-check-double"></i> Marcar todas como leídas
-                        </button>
-                        <button class="btn btn-primary" onclick="closeModal()">
-                            Cerrar
-                        </button>
-                    </div>
-                ` : ''}
             `);
         }
         
-        function markAllAsRead() {
-            notifications.forEach(n => n.read = true);
-            document.querySelector('.notification-badge').textContent = '0';
-            closeModal();
-        }
-        
         // =============================================
-        // MÓDULO: SESIÓN Y LOGOUT
+        // SESIÓN Y LOGOUT
         // =============================================
-        
         function showLogoutConfirmation() {
             showConfirmation(
                 'Cerrar Sesión',
@@ -2994,23 +2075,18 @@
         }
         
         // =============================================
-        // MÓDULO: INICIALIZACIÓN
+        // INICIALIZACIÓN
         // =============================================
-        
         async function startSession() {
-            console.log('🔄 Iniciando sesión...');
-            
             const savedUser = localStorage.getItem('nexial_user');
             
             if (!savedUser) {
-                console.log('❌ No hay sesión guardada');
                 window.location.href = 'index.html';
                 return;
             }
             
             try {
                 currentUser = JSON.parse(savedUser);
-                console.log('👤 Usuario cargado:', currentUser);
                 
                 configureInterface();
                 
@@ -3018,11 +2094,9 @@
                 await loadAllData();
                 hideLoading();
                 
-                showNotification('success', 'Sistema cargado', 'Datos actualizados correctamente desde Google Sheets');
-                
             } catch (error) {
                 console.error('Error iniciando sesión:', error);
-                showNotification('error', 'Error de sesión', 'Por favor, vuelve a iniciar sesión');
+                showToast('error', 'Error', 'Por favor, vuelve a iniciar sesión');
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 3000);
@@ -3032,21 +2106,7 @@
         // =============================================
         // EVENT LISTENERS
         // =============================================
-        
         document.addEventListener('DOMContentLoaded', function() {
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-            
             document.getElementById('modalOverlay').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeModal();
@@ -3060,13 +2120,7 @@
             });
             
             startSession();
-            
-            console.log('🚀 Nexial Suite Panel de Control inicializado');
-            console.log('📊 Sistema Corporativo Multiempresa v3.1');
-            console.log('🔗 API URL:', API_URL);
-            console.log('📁 Conectado a Google Sheets');
         });
-
     </script>
 </body>
 </html>
