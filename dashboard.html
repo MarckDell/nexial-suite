@@ -1093,38 +1093,37 @@
         // MÓDULO: FUNCIONES DE API
         // =============================================
         
-        // FUNCIÓN: Fetch GET a la API (VERSIÓN CORREGIDA)
+        // FUNCIÓN: Fetch GET a la API (VERSIÓN COMPLETAMENTE CORREGIDA)
         async function fetchFromAPI(action, params = {}) {
             try {
                 console.log(`🔍 Conectando a API: ${action}`, params);
                 
-                // Construir URL con parámetros
-                const url = new URL(API_URL);
-                url.searchParams.append('action', action);
+                // Construir URL con parámetros CORRECTAMENTE
+                const url = `${API_URL}?action=${encodeURIComponent(action)}`;
                 
                 // Agregar otros parámetros
                 Object.keys(params).forEach(key => {
-                    if (params[key] !== undefined && params[key] !== null) {
-                        url.searchParams.append(key, params[key]);
+                    if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+                        url += `&${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`;
                     }
                 });
                 
                 // Agregar timestamp para evitar cache
-                url.searchParams.append('_t', Date.now());
+                url += `&_t=${Date.now()}`;
                 
-                console.log(`📤 URL completa: ${url.toString()}`);
+                console.log(`📤 URL completa: ${url}`);
                 
                 // Hacer la petición con timeout
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
                 
-                const response = await fetch(url.toString(), {
+                const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        'Accept': 'application/json'
                     },
                     cache: 'no-cache',
+                    mode: 'cors',
                     signal: controller.signal
                 });
                 
@@ -1478,11 +1477,7 @@
                 
                 console.log('✅ Interfaz configurada exitosamente');
                 
-                // Mostrar notificación de bienvenida
-                setTimeout(() => {
-                    showNotification('success', 'Bienvenido', `Sesión iniciada como ${currentUser.nombre}`);
-                }, 1000);
-                
+                              
             } else {
                 console.log('⚠️ Rol no reconocido:', currentUser.role);
                 showNotification('error', 'Error de rol', `Rol "${currentUser.role}" no reconocido`);
@@ -2907,6 +2902,12 @@
                 currentUser = JSON.parse(savedUser);
                 console.log('👤 Usuario cargado:', currentUser);
                 
+                // Forzar rol super si es super admin (para pruebas)
+                if (currentUser.email === 'marcelodanielcc@gmail.com') {
+                    currentUser.role = 'super';
+                    currentUser.nombre = 'Marcelo Daniel Condori';
+                }
+                
                 // Configurar interfaz inmediatamente
                 configureInterface();
                 
@@ -2921,7 +2922,7 @@
                             loadSuperDashboard();
                         }
                     } catch (error) {
-                        console.log('⚠️ Datos cargados en modo demostración');
+                        console.log('⚠️ Error cargando datos:', error);
                         showNotification('info', 'Modo demostración', 'Usando datos de ejemplo');
                     }
                 }, 500);
@@ -2975,7 +2976,22 @@
             console.log('📊 Sistema Corporativo Multiempresa v3.1');
             console.log('🔗 API URL:', API_URL);
         });
+            // Función de prueba para verificar conexión
+            async function testConnection() {
+                console.log('🧪 Probando conexión con API...');
+                const result = await fetchFromAPI('test');
+                console.log('Resultado test:', result);
+                
+                if (result && result.success) {
+                    console.log('✅ API funcionando correctamente');
+                    // Cargar datos
+                    await loadAllData();
+                    loadSuperDashboard();
+                }
+            }
 
+            // Llamar después de iniciar sesión
+            setTimeout(testConnection, 1000);
     </script>
 </body>
 </html>
