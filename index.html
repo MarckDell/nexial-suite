@@ -351,9 +351,33 @@
             color: white;
             font-size: 1rem;
             transition: all 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 12px;
+            padding-right: 2.5rem;
+            cursor: pointer;
         }
         
-        .form-group input:focus,
+        /* Estilos específicos para select - VISIBLE Y NÍTIDO */
+        .form-group select option {
+            background: rgba(15, 15, 35, 1) !important;
+            color: white !important;
+            padding: 12px !important;
+            font-size: 1rem !important;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.3) !important;
+        }
+        
+        .form-group select option:hover,
+        .form-group select option:focus,
+        .form-group select option:checked {
+            background: rgba(124, 58, 237, 0.4) !important;
+            color: var(--secondary) !important;
+        }
+        
         .form-group select:focus {
             outline: none;
             border-color: var(--primary);
@@ -361,15 +385,16 @@
                         0 0 20px rgba(124, 58, 237, 0.1);
         }
         
-        /* Estilos específicos para select para que se vean las opciones */
-        .form-group select option {
-            background: rgba(15, 15, 35, 0.95);
-            color: white;
-            padding: 10px;
-        }
-        
-        .form-group select:focus option {
-            background: rgba(124, 58, 237, 0.2);
+        /* Firefox */
+        @-moz-document url-prefix() {
+            .form-group select {
+                color: white !important;
+                text-shadow: 0 0 0 white;
+            }
+            .form-group select option {
+                background: rgba(15, 15, 35, 1) !important;
+                color: white !important;
+            }
         }
         
         .password-wrapper {
@@ -386,6 +411,7 @@
             color: var(--secondary);
             cursor: pointer;
             transition: all 0.3s;
+            z-index: 2;
         }
         
         .toggle-password:hover {
@@ -643,11 +669,18 @@
         }
         
         .country-code {
-            flex: 0 0 80px;
+            flex: 0 0 100px;
         }
         
         .phone-number {
             flex: 1;
+        }
+        
+        /* Estilos para grid de 2 columnas */
+        .name-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
         
         /* Estilos para checkbox mejorado */
@@ -706,6 +739,7 @@
             .phone-container { flex-direction: column; }
             .country-code { flex: 1; }
             .checkbox-container { flex-direction: column; }
+            .name-grid { grid-template-columns: 1fr; }
         }
         
         @media (max-width: 480px) {
@@ -960,8 +994,26 @@
                 </div>
                 
                 <div class="form-group">
-                    <label><i class="fas fa-id-card"></i> NIT (Bolivia) *</label>
-                    <input type="text" id="companyNIT" required placeholder="Número de Identificación Tributaria">
+                    <label><i class="fas fa-id-card"></i> Documento de Identificación *</label>
+                    <select id="docType" required>
+                        <option value="">Seleccionar tipo</option>
+                        <option value="NIT">NIT (Bolivia)</option>
+                        <option value="RUC">RUC (Perú)</option>
+                        <option value="RUT">RUT (Chile)</option>
+                        <option value="CUIT">CUIT/CUIL (Argentina)</option>
+                        <option value="CNPJ">CNPJ (Brasil)</option>
+                        <option value="NIE">NIE/DNI (España)</option>
+                        <option value="RFC">RFC (México)</option>
+                        <option value="RIF">RIF (Venezuela)</option>
+                        <option value="NIT">NIT (Colombia)</option>
+                        <option value="EIN">EIN (EE.UU.)</option>
+                        <option value="OTRO">Otro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-hashtag"></i> Número de Documento *</label>
+                    <input type="text" id="companyDocNumber" required placeholder="Ingrese el número de documento">
                 </div>
                 
                 <div class="form-group">
@@ -986,21 +1038,27 @@
                     <input type="text" id="names" required placeholder="Ingrese sus nombres completos">
                 </div>
                 
-                <div class="form-group">
-                    <label><i class="fas fa-user"></i> Apellidos *</label>
-                    <input type="text" id="lastNames" required placeholder="Ingrese sus apellidos completos">
+                <div class="name-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Primer Apellido *</label>
+                        <input type="text" id="firstLastName" required placeholder="Apellido paterno">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Segundo Apellido</label>
+                        <input type="text" id="secondLastName" placeholder="Apellido materno">
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email Corporativo *</label>
-                    <input type="email" id="companyEmail" required placeholder="contacto@empresa.com.bo">
+                    <input type="email" id="companyEmail" required placeholder="contacto@empresa.com">
                 </div>
                 
                 <div class="form-group">
                     <label><i class="fas fa-phone"></i> Teléfono/Celular *</label>
                     <div class="phone-container">
                         <div class="form-group country-code">
-                            <select id="countryCode" required style="width: 100%;">
+                            <select id="countryCode" required>
                                 <option value="+591">+591 (BO)</option>
                                 <option value="+51">+51 (PE)</option>
                                 <option value="+56">+56 (CL)</option>
@@ -1011,6 +1069,9 @@
                                 <option value="+52">+52 (MX)</option>
                                 <option value="+1">+1 (US/CA)</option>
                                 <option value="+34">+34 (ES)</option>
+                                <option value="+49">+49 (DE)</option>
+                                <option value="+33">+33 (FR)</option>
+                                <option value="+44">+44 (UK)</option>
                             </select>
                         </div>
                         <div class="form-group phone-number">
@@ -1042,7 +1103,7 @@
                 <div class="checkbox-container">
                     <input type="checkbox" id="termsCheckbox" required>
                     <label for="termsCheckbox">
-                        Acepto los <a href="#" onclick="showTerms()">términos y condiciones</a> del servicio y autorizo el tratamiento de mis datos según la normativa boliviana.
+                        Acepto los <a href="#" onclick="showTerms()">términos y condiciones</a> del servicio y autorizo el tratamiento de mis datos según la normativa aplicable.
                     </label>
                 </div>
                 
@@ -1160,7 +1221,7 @@
         
         // FUNCIÓN: Mostrar términos y condiciones
         function showTerms() {
-            alert('Términos y condiciones:\n\n1. Uso exclusivo para empresas registradas en Bolivia\n2. Los datos serán tratados conforme a la Ley 548 de Protección de Datos Personales\n3. Período de prueba gratuito de 30 días\n4. Cancelación en cualquier momento desde el panel de control\n\nPara ver los términos completos, contacte a soporte: marcelodanielcc@gmail.com');
+            alert('TÉRMINOS Y CONDICIONES NEXIAL SUITE\n\n1. Uso exclusivo para empresas registradas\n2. Los datos serán tratados conforme a las leyes de protección de datos del país correspondiente\n3. Período de prueba gratuito de 30 días\n4. Cancelación en cualquier momento desde el panel de control\n5. Responsabilidad del usuario sobre la veracidad de los datos proporcionados\n6. Nexial Suite se reserva el derecho de suspender cuentas con información falsa\n\nPara ver los términos completos, contacte a soporte: marcelodanielcc@gmail.com');
             return false;
         }
         
@@ -1168,10 +1229,34 @@
         // MÓDULO: VALIDACIÓN DE FORMULARIOS
         // =============================================
         
-        // FUNCIÓN: Validar NIT boliviano
-        function validateBolivianNIT(nit) {
-            const nitRegex = /^[0-9]{7,15}$/;
-            return nitRegex.test(nit.replace(/\D/g, ''));
+        // FUNCIÓN: Validar documento según tipo
+        function validateDocument(docType, docNumber) {
+            if (!docNumber || docNumber.trim() === '') {
+                return false;
+            }
+            
+            // Validaciones básicas según tipo de documento
+            const cleanDoc = docNumber.replace(/\s/g, '');
+            
+            switch(docType) {
+                case 'NIT': // Bolivia, Colombia
+                    return /^[0-9]{7,15}$/.test(cleanDoc);
+                case 'RUC': // Perú
+                    return /^[0-9]{11}$/.test(cleanDoc);
+                case 'RUT': // Chile
+                    return /^[0-9]{8,9}-[0-9Kk]$/.test(cleanDoc) || /^[0-9]{9}$/.test(cleanDoc);
+                case 'CUIT': // Argentina
+                    return /^[0-9]{2}-[0-9]{8}-[0-9]$/.test(cleanDoc) || /^[0-9]{11}$/.test(cleanDoc);
+                case 'CNPJ': // Brasil
+                    return /^[0-9]{2}\.[0-9]{3}\.[0-9]{3}\/[0-9]{4}-[0-9]{2}$/.test(cleanDoc) || /^[0-9]{14}$/.test(cleanDoc);
+                case 'RFC': // México
+                    return /^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$/.test(cleanDoc);
+                case 'EIN': // EE.UU.
+                    return /^[0-9]{2}-[0-9]{7}$/.test(cleanDoc) || /^[0-9]{9}$/.test(cleanDoc);
+                default:
+                    // Para otros tipos, validación mínima
+                    return cleanDoc.length >= 3;
+            }
         }
         
         // =============================================
@@ -1199,34 +1284,47 @@
             // Recopilar datos
             const countryCode = document.getElementById('countryCode').value;
             const phoneNumber = document.getElementById('companyPhone').value;
+            const docType = document.getElementById('docType').value;
+            const docNumber = document.getElementById('companyDocNumber').value;
             
             registeredCompanyData = {
                 nombre: document.getElementById('companyName').value.trim(),
-                nit: document.getElementById('companyNIT').value.trim(),
+                tipo_documento: docType,
+                numero_documento: docNumber,
                 industria: document.getElementById('companyIndustry').value,
                 nombres: document.getElementById('names').value.trim(),
-                apellidos: document.getElementById('lastNames').value.trim(),
+                primer_apellido: document.getElementById('firstLastName').value.trim(),
+                segundo_apellido: document.getElementById('secondLastName').value.trim() || '',
                 email: document.getElementById('companyEmail').value.trim().toLowerCase(),
                 telefono: `${countryCode} ${phoneNumber}`,
                 password: password,
-                pais: 'Bolivia',
                 fecha_registro: new Date().toISOString().split('T')[0]
             };
             
             // Validar campos requeridos
-            const requiredFields = ['nombre', 'nit', 'industria', 'nombres', 
-                                  'apellidos', 'email', 'telefono'];
+            const requiredFields = ['nombre', 'tipo_documento', 'numero_documento', 'industria', 
+                                  'nombres', 'primer_apellido', 'email', 'telefono'];
             
             for (const field of requiredFields) {
                 if (!registeredCompanyData[field]) {
-                    alert(`Por favor complete el campo: ${field}`);
+                    const fieldNames = {
+                        'nombre': 'Razón Social',
+                        'tipo_documento': 'Tipo de Documento',
+                        'numero_documento': 'Número de Documento',
+                        'industria': 'Tipo de Industria',
+                        'nombres': 'Nombres',
+                        'primer_apellido': 'Primer Apellido',
+                        'email': 'Email Corporativo',
+                        'telefono': 'Teléfono/Celular'
+                    };
+                    alert(`Por favor complete el campo: ${fieldNames[field] || field}`);
                     return;
                 }
             }
             
-            // Validar NIT boliviano
-            if (!validateBolivianNIT(registeredCompanyData.nit)) {
-                alert('Por favor ingrese un NIT válido (solo números, 7-15 dígitos)');
+            // Validar documento según tipo
+            if (!validateDocument(docType, docNumber)) {
+                alert(`Por favor ingrese un ${docType} válido`);
                 return;
             }
             
@@ -1400,7 +1498,7 @@
                         
                         <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; text-align: left;">
                             <p><strong>Empresa:</strong> ${registeredCompanyData.nombre}</p>
-                            <p><strong>NIT:</strong> ${registeredCompanyData.nit}</p>
+                            <p><strong>Documento:</strong> ${registeredCompanyData.tipo_documento}: ${registeredCompanyData.numero_documento}</p>
                             <p><strong>Email Jefe:</strong> ${emailJefe}</p>
                             <p><strong>Contraseña:</strong> La que registró</p>
                             <p><strong>ID Empresa:</strong> ${apiResult?.empresa_id || 'Generado por sistema'}</p>
@@ -1434,9 +1532,9 @@
         // FUNCIÓN: Generar email del jefe
         function generateJefeEmail(companyData) {
             const firstNames = companyData.nombres.toLowerCase().split(' ')[0];
-            const firstLastNames = companyData.apellidos.toLowerCase().split(' ')[0].replace(/\s+/g, '');
-            const domain = companyData.email.split('@')[1] || 'nexialsuite.bo';
-            return `${firstNames}.${firstLastNames}@${domain}`;
+            const firstLastName = companyData.primer_apellido.toLowerCase().replace(/\s+/g, '');
+            const domain = companyData.email.split('@')[1] || 'nexialsuite.com';
+            return `${firstNames}.${firstLastName}@${domain}`;
         }
         
         // FUNCIÓN: Cerrar modal de éxito
@@ -1497,11 +1595,6 @@
             }
         });
         
-        // Formatear NIT (solo números)
-        document.getElementById('companyNIT')?.addEventListener('input', function(e) {
-            this.value = this.value.replace(/\D/g, '');
-        });
-        
         // Formatear teléfono (solo números)
         document.getElementById('companyPhone')?.addEventListener('input', function(e) {
             this.value = this.value.replace(/\D/g, '');
@@ -1536,7 +1629,6 @@
             
             console.log('🚀 Nexial Suite - Página de Inicio cargada');
             console.log('📊 Sistema Corporativo Multiempresa v3.0');
-            console.log('🇧🇴 Adaptado para Bolivia');
             console.log('🔗 API URL:', API_URL);
             
             // Verificar si ya hay usuario logueado
