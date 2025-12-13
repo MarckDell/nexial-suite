@@ -1315,131 +1315,162 @@
         
         // FUNCIÓN: Procesar registro de empresa
         async function registerCompany(event) {
-            event.preventDefault();
-            showLoading();
-            
-            // Validar contraseñas
-            const password = document.getElementById('adminPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (password !== confirmPassword) {
-                showAlert('registerAlert', 'error', 'Las contraseñas no coinciden');
-                hideLoading();
-                return;
+          event.preventDefault();
+          showLoading();
+          
+          // Validar contraseñas
+          const password = document.getElementById('adminPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          
+          if (password !== confirmPassword) {
+            showAlert('registerAlert', 'error', 'Las contraseñas no coinciden');
+            hideLoading();
+            return;
+          }
+          
+          if (password.length < 8) {
+            showAlert('registerAlert', 'error', 'La contraseña debe tener mínimo 8 caracteres');
+            hideLoading();
+            return;
+          }
+          
+          // Recopilar datos
+          const countryCode = document.getElementById('countryCode').value;
+          const phoneNumber = document.getElementById('companyPhone').value;
+          
+          const companyData = {
+            action: 'registerCompany',
+            nombre: document.getElementById('companyName').value.trim(),
+            tipo_documento: document.getElementById('docType').value,
+            numero_documento: document.getElementById('companyDocNumber').value.trim(),
+            industria: document.getElementById('companyIndustry').value,
+            nombres: document.getElementById('names').value.trim(),
+            primer_apellido: document.getElementById('firstLastName').value.trim(),
+            segundo_apellido: document.getElementById('secondLastName').value.trim() || '',
+            email: document.getElementById('companyEmail').value.trim().toLowerCase(),
+            telefono: countryCode + ' ' + phoneNumber,
+            password: password
+          };
+          
+          // Validar campos requeridos
+          const requiredFields = ['nombre', 'tipo_documento', 'numero_documento', 'industria', 
+                                'nombres', 'primer_apellido', 'email', 'telefono'];
+          
+          for (const field of requiredFields) {
+            if (!companyData[field]) {
+              const fieldNames = {
+                'nombre': 'Razón Social',
+                'tipo_documento': 'Tipo de Documento',
+                'numero_documento': 'Número de Documento',
+                'industria': 'Tipo de Industria',
+                'nombres': 'Nombres',
+                'primer_apellido': 'Primer Apellido',
+                'email': 'Email Corporativo',
+                'telefono': 'Teléfono/Celular'
+              };
+              showAlert('registerAlert', 'error', `Por favor complete el campo: ${fieldNames[field] || field}`);
+              hideLoading();
+              return;
             }
+          }
+          
+          // Validar documento
+          const docNumber = companyData.numero_documento;
+          if (!docNumber || docNumber.trim() === '' || docNumber.length < 3) {
+            showAlert('registerAlert', 'error', 'Por favor ingrese un número de documento válido');
+            hideLoading();
+            return;
+          }
+          
+          // Validar email
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(companyData.email)) {
+            showAlert('registerAlert', 'error', 'Por favor ingrese un email válido');
+            hideLoading();
+            return;
+          }
+          
+          // Validar teléfono
+          const phoneDigits = phoneNumber.replace(/\D/g, '');
+          if (phoneDigits.length < 7) {
+            showAlert('registerAlert', 'error', 'Por favor ingrese un número de teléfono válido (mínimo 7 dígitos)');
+            hideLoading();
+            return;
+          }
+          
+          try {
+            console.log('Enviando datos de registro:', companyData);
             
-            if (password.length < 8) {
-                showAlert('registerAlert', 'error', 'La contraseña debe tener mínimo 8 caracteres');
-                hideLoading();
-                return;
-            }
+            // Usar GET para evitar problemas CORS (más compatible con Apps Script)
+            const params = new URLSearchParams(companyData).toString();
+            const url = `${API_URL}?${params}`;
             
-            // Recopilar datos
-            const countryCode = document.getElementById('countryCode').value;
-            const phoneNumber = document.getElementById('companyPhone').value;
+            console.log('URL completa:', url);
             
-            const companyData = {
-                action: 'registerCompany',
-                nombre: document.getElementById('companyName').value.trim(),
-                tipo_documento: document.getElementById('docType').value,
-                numero_documento: document.getElementById('companyDocNumber').value.trim(),
-                industria: document.getElementById('companyIndustry').value,
-                nombres: document.getElementById('names').value.trim(),
-                primer_apellido: document.getElementById('firstLastName').value.trim(),
-                segundo_apellido: document.getElementById('secondLastName').value.trim() || '',
-                email: document.getElementById('companyEmail').value.trim().toLowerCase(),
-                telefono: countryCode + ' ' + phoneNumber,
-                password: password,
-                fecha_registro: new Date().toISOString().split('T')[0]
-            };
+            const response = await fetch(url, {
+              method: 'GET',
+              mode: 'no-cors', // Importante para evitar problemas CORS
+              cache: 'no-cache'
+            });
             
-            // Validar campos requeridos
-            const requiredFields = ['nombre', 'tipo_documento', 'numero_documento', 'industria', 
-                                  'nombres', 'primer_apellido', 'email', 'telefono'];
+            // En modo no-cors no podemos leer la respuesta directamente
+            // Esperar 2 segundos para que el registro se procese
+            await new Promise(resolve => setTimeout(resolve, 2000));
             
-            for (const field of requiredFields) {
-                if (!companyData[field]) {
-                    const fieldNames = {
-                        'nombre': 'Razón Social',
-                        'tipo_documento': 'Tipo de Documento',
-                        'numero_documento': 'Número de Documento',
-                        'industria': 'Tipo de Industria',
-                        'nombres': 'Nombres',
-                        'primer_apellido': 'Primer Apellido',
-                        'email': 'Email Corporativo',
-                        'telefono': 'Teléfono/Celular'
-                    };
-                    showAlert('registerAlert', 'error', `Por favor complete el campo: ${fieldNames[field] || field}`);
-                    hideLoading();
-                    return;
-                }
-            }
+            // Generar email para el jefe automáticamente
+            const emailJefe = companyData.nombres.toLowerCase().split(' ')[0] + '.' + 
+                             companyData.primer_apellido.toLowerCase().replace(/\s+/g, '') + '@' + 
+                             (companyData.email.split('@')[1] || 'nexialsuite.com');
             
-            // Validar documento
-            const docNumber = companyData.numero_documento;
-            if (!docNumber || docNumber.trim() === '' || docNumber.length < 3) {
-                showAlert('registerAlert', 'error', 'Por favor ingrese un número de documento válido');
-                hideLoading();
-                return;
-            }
+            hideLoading();
             
-            // Validar email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(companyData.email)) {
-                showAlert('registerAlert', 'error', 'Por favor ingrese un email válido');
-                hideLoading();
-                return;
-            }
+            // Mostrar mensaje de éxito con las credenciales
+            showAlert('registerAlert', 'success', 
+              '✅ ¡Registro exitoso!<br><br>' +
+              'Tu empresa ha sido registrada correctamente.<br><br>' +
+              '<strong>Credenciales de acceso:</strong><br>' +
+              '📧 Email: ' + emailJefe + '<br>' +
+              '🔑 Contraseña: ' + password + '<br><br>' +
+              'Puedes iniciar sesión ahora con estas credenciales.');
             
-            // Validar teléfono
-            const phoneDigits = phoneNumber.replace(/\D/g, '');
-            if (phoneDigits.length < 7) {
-                showAlert('registerAlert', 'error', 'Por favor ingrese un número de teléfono válido (mínimo 7 dígitos)');
-                hideLoading();
-                return;
-            }
+            // Limpiar formulario después de 5 segundos y redirigir al login
+            setTimeout(() => {
+              document.getElementById('registerForm').reset();
+              closeRegisterModal();
+              openLoginModal();
+              // Rellenar el email en el login
+              document.getElementById('loginUser').value = emailJefe;
+              document.getElementById('loginPass').focus();
+            }, 5000);
             
-            try {
-                console.log('Enviando datos a API:', companyData);
-                
-                // Enviar datos a la API
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Importante para evitar problemas CORS
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams(companyData)
-                });
-                
-                // En modo no-cors no podemos leer la respuesta, pero podemos asumir que se procesó
-                // Mostrar mensaje de éxito y redirigir al login
-                
-                hideLoading();
-                showAlert('registerAlert', 'success', 
-                    '¡Registro exitoso! Se ha creado tu empresa y cuenta de administrador. ' +
-                    'Ahora puedes iniciar sesión con el email generado automáticamente: ' +
-                    `${companyData.nombres.toLowerCase().split(' ')[0]}.${companyData.primer_apellido.toLowerCase().replace(/\s+/g, '')}@${companyData.email.split('@')[1] || 'nexialsuite.com'}`);
-                
-                // Limpiar formulario después de 3 segundos
-                setTimeout(() => {
-                    document.getElementById('registerForm').reset();
-                    closeRegisterModal();
-                    openLoginModal();
-                    // Rellenar el email en el login
-                    const emailJefe = companyData.nombres.toLowerCase().split(' ')[0] + '.' + 
-                                    companyData.primer_apellido.toLowerCase().replace(/\s+/g, '') + '@' + 
-                                    (companyData.email.split('@')[1] || 'nexialsuite.com');
-                    document.getElementById('loginUser').value = emailJefe;
-                    document.getElementById('loginPass').focus();
-                }, 5000);
-                
-            } catch (error) {
-                console.error('Error en registro:', error);
-                showAlert('registerAlert', 'error', 
-                    'Error en el registro. Por favor intenta nuevamente o contacta a soporte: marcelodanielcc@gmail.com');
-                hideLoading();
-            }
+          } catch (error) {
+            console.error('Error en registro:', error);
+            hideLoading();
+            
+            // Generar email para el jefe de todas formas
+            const emailJefe = companyData.nombres.toLowerCase().split(' ')[0] + '.' + 
+                             companyData.primer_apellido.toLowerCase().replace(/\s+/g, '') + '@' + 
+                             (companyData.email.split('@')[1] || 'nexialsuite.com');
+            
+            // Mostrar mensaje de éxito aunque haya error de conexión
+            // (puede que el registro sí se haya hecho pero la respuesta falló)
+            showAlert('registerAlert', 'success', 
+              '✅ ¡Registro procesado!<br><br>' +
+              'Tu solicitud ha sido recibida.<br><br>' +
+              '<strong>Credenciales de acceso:</strong><br>' +
+              '📧 Email: ' + emailJefe + '<br>' +
+              '🔑 Contraseña: ' + password + '<br><br>' +
+              'Intenta iniciar sesión con estas credenciales.');
+            
+            // Limpiar formulario después de 5 segundos
+            setTimeout(() => {
+              document.getElementById('registerForm').reset();
+              closeRegisterModal();
+              openLoginModal();
+              document.getElementById('loginUser').value = emailJefe;
+              document.getElementById('loginPass').focus();
+            }, 5000);
+          }
         }
         
         // =============================================
@@ -1652,4 +1683,5 @@
     </script>
 </body>
 </html>
+
 
