@@ -760,7 +760,7 @@
         .form-group textarea {
             width: 100%;
             padding: 0.8rem;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--dark);
             border: 1px solid rgba(124, 58, 237, 0.3);
             border-radius: 6px;
             color: white;
@@ -780,20 +780,9 @@
         .form-group select option {
             background: var(--dark);
             color: white;
+            padding: 10px;
         }
 
-        /* Para desplegables nativos en modales */
-        select option {
-            background: var(--dark);
-            color: white;
-        }
-
-        /* Para datalist */
-        datalist option {
-            background: var(--dark);
-            color: white;
-        }
-        
         .btn {
             padding: 0.8rem 1.5rem;
             border-radius: 8px;
@@ -932,92 +921,35 @@
             }
         }
 
-        /* ============================================= */
-        /* CORRECCIÓN PARA SELECTS EN MODALES - VERSIÓN CORREGIDA */
-        /* ============================================= */
-        
+        /* Estilos para selects en modales */
         .modal select {
             width: 100%;
             padding: 0.8rem;
-            background: var(--dark) !important;
+            background: var(--dark);
             border: 1px solid rgba(124, 58, 237, 0.3);
             border-radius: 6px;
-            color: white !important;
+            color: white;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s;
             appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 10px center !important;
-            background-size: 20px !important;
-        }
-        
-        .modal select:hover {
-            border-color: var(--primary);
-            background-color: rgba(124, 58, 237, 0.1) !important;
-        }
-        
-        .modal select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
-            background-color: rgba(124, 58, 237, 0.15) !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
         }
         
         .modal select option {
-            background-color: var(--dark) !important;
-            color: white !important;
-            padding: 12px !important;
-            font-size: 1rem;
+            background: var(--dark);
+            color: white;
         }
         
-        .modal select option:hover,
-        .modal select option:focus,
-        .modal select option:checked {
-            background-color: var(--primary) !important;
-            color: white !important;
+        .modal input {
+            background: var(--dark);
+            color: white;
         }
         
-        .modal input[type="text"],
-        .modal input[type="email"],
-        .modal input[type="password"],
-        .modal input[type="tel"],
-        .modal input[type="number"] {
-            background: var(--dark) !important;
-            color: white !important;
-            border: 1px solid rgba(124, 58, 237, 0.3);
-        }
-        
-        .modal input[type="text"]:focus,
-        .modal input[type="email"]:focus,
-        .modal input[type="password"]:focus,
-        .modal input[type="tel"]:focus,
-        .modal input[type="number"]:focus {
-            background: rgba(124, 58, 237, 0.1) !important;
-            border-color: var(--primary);
-        }
-        
-        /* Mejorar visibilidad del placeholder */
         .modal input::placeholder {
-            color: rgba(255, 255, 255, 0.5) !important;
-        }
-        
-        /* Para todos los inputs dentro de modales */
-        .modal .form-group input,
-        .modal .form-group select {
-            background: var(--dark) !important;
-            color: white !important;
-        }
-        
-        /* Asegurar que los labels sean visibles */
-        .modal .form-group label {
-            color: var(--secondary) !important;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: block;
+            color: rgba(255, 255, 255, 0.5);
         }
 
     </style>
@@ -1168,49 +1100,40 @@
         // MÓDULO: FUNCIONES DE LOADING
         // =============================================
         
-        // FUNCIÓN: Mostrar loading
         function showLoading() {
             document.getElementById('loadingSpinner').style.display = 'flex';
         }
         
-        // FUNCIÓN: Ocultar loading
         function hideLoading() {
             document.getElementById('loadingSpinner').style.display = 'none';
         }
         
         // =============================================
-        // MÓDULO: FUNCIONES DE API
+        // MÓDULO: FUNCIONES DE API - SIN DEMO
         // =============================================
         
-        // FUNCIÓN: Fetch GET a la API (VERSIÓN COMPLETAMENTE CORREGIDA)
         async function fetchFromAPI(action, params = {}) {
             try {
                 console.log(`🔍 Conectando a API: ${action}`, params);
                 
-                // Construir URL con parámetros CORRECTAMENTE
                 let url = `${API_URL}?action=${encodeURIComponent(action)}`;
                 
-                // Agregar otros parámetros
                 Object.keys(params).forEach(key => {
                     if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
                         url += `&${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`;
                     }
                 });
                 
-                // Agregar timestamp para evitar cache
                 url += `&_t=${Date.now()}`;
                 
                 console.log(`📤 URL completa: ${url}`);
                 
-                // Hacer la petición con timeout
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 15000);
                 
                 const response = await fetch(url, {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
+                    headers: { 'Accept': 'application/json' },
                     cache: 'no-cache',
                     mode: 'cors',
                     signal: controller.signal
@@ -1231,125 +1154,23 @@
                 
             } catch (error) {
                 console.error(`❌ Error fetchFromAPI (${action}):`, error);
-                
-                // Si es error de timeout o conexión
-                if (error.name === 'AbortError' || error.message.includes('Failed to fetch')) {
-                    console.log('⚠️ Timeout o error de conexión, usando datos demo');
-                    return getDemoData(action, params);
-                }
-                
-                return getDemoData(action, params);
+                showNotification('error', 'Error de conexión', 'No se pudo conectar al servidor. Verifica tu conexión a internet.');
+                throw error;
             }
         }
 
-        // Función para datos de demostración
-        function getDemoData(action, params) {
-            console.log(`📊 Usando datos de demostración para: ${action}`);
-            
-            switch(action) {
-                case 'test':
-                    return {
-                        success: true,
-                        message: 'API en modo demostración',
-                        version: '3.1',
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                case 'getEmpresas':
-                    return {
-                        success: true,
-                        empresas: [
-                            {
-                                id: 'EMP-001',
-                                Nombre: 'Coca Cola',
-                                RUC: '6980083369800833',
-                                Industria: 'Tecnología',
-                                Contacto: 'Ricardo Arjona',
-                                Email: 'cocacola@gmail.com',
-                                Teléfono: '28178945',
-                                Dirección: 'Av. Principal 123',
-                                Ciudad: 'Lima',
-                                Estado: 'Activa',
-                                TarjetaRegistrada: 'Sí',
-                                Usuarios: 3
-                            },
-                            {
-                                id: 'EMP-7E4705FD',
-                                Nombre: 'delux',
-                                RUC: '',
-                                Industria: 'Tecnología',
-                                Contacto: 'juan perez',
-                                Email: 'delux@gmail.com',
-                                Teléfono: '2812356',
-                                Dirección: '',
-                                Ciudad: '',
-                                Estado: 'Activa',
-                                TarjetaRegistrada: 'Sí',
-                                Usuarios: 1
-                            }
-                        ],
-                        total: 2
-                    };
-                    
-                case 'getUsuarios':
-                    return {
-                        success: true,
-                        usuarios: [
-                            {
-                                ID: 'SUPER-ADMIN-001',
-                                Email: 'marcelodanielcc@gmail.com',
-                                Password: '789',
-                                Role: 'super',
-                                Nombre: 'Administrador Corporativo',
-                                EmpresaID: '',
-                                EmpresaNombre: 'Nexial Suite',
-                                Activo: 'Sí'
-                            },
-                            {
-                                ID: 'USR-BC2F7FC3',
-                                Email: 'martingarrix@gmail.com',
-                                Password: '123456789',
-                                Role: 'jefe',
-                                Nombre: 'Martin Garrix Garrix',
-                                EmpresaID: 'EMP-001',
-                                EmpresaNombre: 'Coca Cola',
-                                Activo: 'Sí'
-                            }
-                        ],
-                        total: 2
-                    };
-                    
-                case 'getEmpleados':
-                    return {
-                        success: true,
-                        empleados: [],
-                        total: 0
-                    };
-                    
-                default:
-                    return {
-                        success: true,
-                        message: `Acción ${action} simulada en modo demo`,
-                        data: {}
-                    };
-            }
-        }
-        
-        // FUNCIÓN: Fetch POST a la API (VERSIÓN MEJORADA)
         async function postToAPI(action, data = {}) {
             try {
                 showLoading();
                 
                 console.log(`📤 Enviando POST a API: ${action}`, data);
                 
-                // Siempre incluir la acción
                 const requestData = {
                     action: action,
                     ...data,
                     timestamp: Date.now()
                 };
                 
-                // Configurar timeout
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 15000);
                 
@@ -1386,38 +1207,26 @@
                 console.error('❌ Error en API POST:', error);
                 hideLoading();
                 
-                // Mostrar error amigable
                 let errorMessage = error.message;
                 if (error.name === 'AbortError') {
                     errorMessage = 'Timeout: El servidor tardó demasiado en responder';
                 } else if (error.message.includes('Failed to fetch')) {
                     errorMessage = 'Error de conexión. Verifica tu internet.';
-                } else if (error.message.includes('NetworkError')) {
-                    errorMessage = 'Servidor no disponible.';
                 }
                 
                 showNotification('error', 'Error de API', errorMessage);
-                
-                // Devolver éxito simulado para modo demo
-                return {
-                    success: true,
-                    message: `Acción ${action} completada en modo demostración`,
-                    demo_mode: true,
-                    action: action
-                };
+                throw error;
             }
         }
         
         // =============================================
-        // MÓDULO: CARGA DE DATOS
+        // MÓDULO: CARGA DE DATOS DESDE GOOGLE SHEETS
         // =============================================
         
-        // FUNCIÓN: Cargar empresas desde API
         async function loadEmpresasFromAPI() {
             showLoading();
             try {
                 const result = await fetchFromAPI('getEmpresas');
-                console.log('📊 Resultado getEmpresas:', result);
                 
                 if (result && result.success && result.empresas) {
                     database.empresas = result.empresas;
@@ -1435,7 +1244,6 @@
             }
         }
         
-        // FUNCIÓN: Cargar usuarios desde API
         async function loadUsuariosFromAPI(empresaId = null) {
             showLoading();
             try {
@@ -1456,7 +1264,6 @@
             }
         }
         
-        // FUNCIÓN: Cargar empleados desde API
         async function loadEmpleadosFromAPI(empresaId = null) {
             showLoading();
             try {
@@ -1477,7 +1284,6 @@
             }
         }
         
-        // FUNCIÓN: Cargar todos los datos
         async function loadAllData() {
             showLoading();
             try {
@@ -1486,7 +1292,7 @@
                     loadUsuariosFromAPI(),
                     loadEmpleadosFromAPI()
                 ]);
-                console.log('✅ Todos los datos cargados exitosamente');
+                console.log('✅ Todos los datos cargados exitosamente desde Google Sheets');
                 return true;
             } catch (error) {
                 console.error('Error cargando datos:', error);
@@ -1500,11 +1306,9 @@
         // MÓDULO: CONFIGURACIÓN DE INTERFAZ POR ROL
         // =============================================
         
-        // FUNCIÓN: Configurar interfaz según rol
         function configureInterface() {
             console.log('🎨 Configurando interfaz para rol:', currentUser.role);
             
-            // Configurar para cualquier rol, no solo 'super'
             const roleConfigs = {
                 'super': {
                     badgeClass: 'super-admin',
@@ -1566,12 +1370,10 @@
                     `,
                     pageTitle: 'Dashboard Empresa - Jefe'
                 }
-                // Agrega configuraciones para otros roles aquí
             };
             
             const config = roleConfigs[currentUser.role] || roleConfigs.super;
             
-            // Aplicar configuración
             document.getElementById('userBadge').className = `user-badge ${config.badgeClass}`;
             document.getElementById('userBadge').textContent = config.badgeText;
             document.getElementById('userName').textContent = config.userName;
@@ -1580,7 +1382,6 @@
             document.getElementById('navMenu').innerHTML = config.navMenu;
             document.getElementById('pageTitle').textContent = config.pageTitle;
             
-            // Mostrar vista correspondiente
             document.querySelectorAll('.role-view').forEach(view => {
                 view.classList.remove('active');
                 view.innerHTML = '';
@@ -1589,7 +1390,6 @@
             const activeView = document.getElementById(config.viewId);
             activeView.classList.add('active');
             
-            // Cargar dashboard correspondiente
             if (currentUser.role === 'super') {
                 loadSuperDashboard();
             } else if (currentUser.role === 'jefe') {
@@ -1603,7 +1403,6 @@
         // MÓDULO: DASHBOARD SUPER USUARIO
         // =============================================
         
-        // FUNCIÓN: Cargar dashboard super usuario
         function loadSuperDashboard() {
             const empresasCount = database.empresas.length;
             const usuariosCount = database.usuarios.length;
@@ -1663,11 +1462,9 @@
                 </div>
             `;
             
-            // Actualizar título
             document.getElementById('pageTitle').textContent = 'Panel de Control Corporativo';
         }
         
-        // FUNCIÓN: Cargar dashboard jefe de empresa
         function loadJefeDashboard() {
             const empresaId = currentUser.empresa_id;
             const empresa = database.empresas.find(e => e.ID === empresaId) || {};
@@ -1791,21 +1588,150 @@
             document.getElementById('pageTitle').textContent = `Dashboard - ${empresa.Nombre || 'Mi Empresa'}`;
         }
 
-        // FUNCIÓN: Cargar gestión de usuarios de empresa
         function loadUsuariosEmpresa() {
-            // Esta función la implementarás después
-            showNotification('info', 'Funcionalidad', 'Gestión de usuarios de empresa - En desarrollo');
-            loadJefeDashboard();
+            const empresaId = currentUser.empresa_id;
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            
+            showModal(`Gestión de Usuarios - ${empresa.Nombre}`, `
+                <div style="max-width: 800px;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <button class="btn btn-primary" onclick="showNuevoUsuarioParaEmpresa('${empresaId}')">
+                            <i class="fas fa-user-plus"></i> Agregar Usuario
+                        </button>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${database.usuarios.filter(u => u.EmpresaID === empresaId).map(usuario => `
+                                    <tr>
+                                        <td>${usuario.Nombre}</td>
+                                        <td>${usuario.Email}</td>
+                                        <td>
+                                            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
+                                                ${getRoleName(usuario.Role)}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn delete" onclick="confirmarEliminarUsuario('${usuario.ID}', '${usuario.Nombre}')" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${database.usuarios.filter(u => u.EmpresaID === empresaId).length === 0 ? `
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay usuarios en esta empresa
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `);
         }
 
         function editarInformacionEmpresa() {
-            // Esta función la implementarás después
-            showNotification('info', 'Funcionalidad', 'Editar información de empresa - En desarrollo');
-            loadJefeDashboard();
+            const empresaId = currentUser.empresa_id;
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            
+            showModal(`Editar Empresa: ${empresa.Nombre}`, `
+                <div style="max-width: 700px;">
+                    <input type="hidden" id="editEmpresaId" value="${empresa.ID || ''}">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Razón Social *</label>
+                            <input type="text" id="editEmpresaNombre" value="${empresa.Nombre || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">RUC/NIT *</label>
+                            <input type="text" id="editEmpresaRUC" value="${empresa.RUC || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Industria *</label>
+                            <select id="editEmpresaIndustria" required>
+                                <option value="">Seleccionar industria</option>
+                                <option value="Tecnología" ${empresa.Industria === 'Tecnología' ? 'selected' : ''}>Tecnología</option>
+                                <option value="Comercio" ${empresa.Industria === 'Comercio' ? 'selected' : ''}>Comercio</option>
+                                <option value="Manufactura" ${empresa.Industria === 'Manufactura' ? 'selected' : ''}>Manufactura</option>
+                                <option value="Servicios" ${empresa.Industria === 'Servicios' ? 'selected' : ''}>Servicios</option>
+                                <option value="Alimentos" ${empresa.Industria === 'Alimentos' ? 'selected' : ''}>Alimentos</option>
+                                <option value="Construcción" ${empresa.Industria === 'Construcción' ? 'selected' : ''}>Construcción</option>
+                                <option value="Otros" ${empresa.Industria === 'Otros' ? 'selected' : ''}>Otros</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Contacto *</label>
+                            <input type="text" id="editEmpresaContacto" value="${empresa.Contacto || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Email *</label>
+                            <input type="email" id="editEmpresaEmail" value="${empresa.Email || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Teléfono *</label>
+                            <input type="text" id="editEmpresaTelefono" value="${empresa.Teléfono || ''}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Dirección</label>
+                            <input type="text" id="editEmpresaDireccion" value="${empresa.Dirección || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Ciudad</label>
+                            <input type="text" id="editEmpresaCiudad" value="${empresa.Ciudad || ''}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: var(--secondary);">Estado *</label>
+                            <select id="editEmpresaEstado" required>
+                                <option value="Activa" ${empresa.Estado === 'Activa' ? 'selected' : ''}>Activa</option>
+                                <option value="Inactiva" ${empresa.Estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="guardarEdicionEmpresaCompleta('${empresaId}')" style="flex: 1;">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            `);
         }
-                
         
-        // FUNCIÓN: Cargar gestión de empresas
         function loadEmpresasManagement() {
             document.getElementById('pageTitle').textContent = 'Gestión de Empresas - Super Admin';
             
@@ -1890,11 +1816,9 @@
             `;
         }
         
-        // FUNCIÓN: Cargar gestión de personal
         function loadGestionPersonal() {
             document.getElementById('pageTitle').textContent = 'Gestión de Personal - Super Admin';
             
-            // Filtrar usuarios (excluir super admin y filas vacías)
             const usuariosParaMostrar = database.usuarios.filter(u => 
                 u.ID && u.ID !== '' && 
                 u.Role !== 'super' && 
@@ -1930,7 +1854,6 @@
                             <tbody>
                                 ${usuariosParaMostrar.map(usuario => {
                                     const empresa = database.empresas.find(e => e.ID === usuario.EmpresaID);
-                                    const passwordMasked = '••••••••';
                                     
                                     return `
                                         <tr>
@@ -1979,7 +1902,6 @@
         // MÓDULO: FUNCIONES AUXILIARES
         // =============================================
         
-        // FUNCIÓN: Obtener nombre del rol
         function getRoleName(role) {
             const roles = {
                 'super': 'Super Admin',
@@ -1992,7 +1914,6 @@
             return roles[role] || role;
         }
         
-        // FUNCIÓN: Obtener color por rol
         function getRoleColor(role) {
             switch(role) {
                 case 'super': return 'rgba(255,0,85,0.2)';
@@ -2009,65 +1930,64 @@
         // MÓDULO: MODALES PARA EMPRESAS
         // =============================================
         
-        // FUNCIÓN: Mostrar modal nueva empresa
         function showNuevaEmpresaModal() {
             showModal('Nueva Empresa', `
                 <div style="max-width: 600px;">
                     <div class="form-group">
                         <label style="color: var(--secondary);">Razón Social *</label>
-                        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa S.A." style="color: white;">
+                        <input type="text" id="nuevaEmpresaNombre" placeholder="Mi Empresa S.A.">
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">País *</label>
-                        <select id="nuevaEmpresaPais" onchange="actualizarTipoDocumento()" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                            <option value="" style="color: #666;">Seleccionar país</option>
-                            <option value="Bolivia" style="color: white;">Bolivia</option>
-                            <option value="Perú" style="color: white;">Perú</option>
-                            <option value="Argentina" style="color: white;">Argentina</option>
-                            <option value="Chile" style="color: white;">Chile</option>
-                            <option value="Colombia" style="color: white;">Colombia</option>
-                            <option value="Ecuador" style="color: white;">Ecuador</option>
+                        <select id="nuevaEmpresaPais" onchange="actualizarTipoDocumento()" required>
+                            <option value="">Seleccionar país</option>
+                            <option value="Bolivia">Bolivia</option>
+                            <option value="Perú">Perú</option>
+                            <option value="Argentina">Argentina</option>
+                            <option value="Chile">Chile</option>
+                            <option value="Colombia">Colombia</option>
+                            <option value="Ecuador">Ecuador</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);" id="labelDocumento">Documento *</label>
-                        <input type="text" id="nuevaEmpresaDocumento" placeholder="Ingrese el número" style="color: white;">
+                        <input type="text" id="nuevaEmpresaDocumento" placeholder="Ingrese el número">
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Industria *</label>
-                        <select id="nuevaEmpresaIndustria" style="color: white; background: rgba(255, 255, 255, 0.05);">
-                            <option value="" style="color: #666;">Seleccionar industria</option>
-                            <option value="Tecnología" style="color: white;">Tecnología</option>
-                            <option value="Comercio" style="color: white;">Comercio</option>
-                            <option value="Manufactura" style="color: white;">Manufactura</option>
-                            <option value="Servicios" style="color: white;">Servicios</option>
-                            <option value="Alimentos" style="color: white;">Alimentos</option>
-                            <option value="Construcción" style="color: white;">Construcción</option>
-                            <option value="Otros" style="color: white;">Otros</option>
+                        <select id="nuevaEmpresaIndustria">
+                            <option value="">Seleccionar industria</option>
+                            <option value="Tecnología">Tecnología</option>
+                            <option value="Comercio">Comercio</option>
+                            <option value="Manufactura">Manufactura</option>
+                            <option value="Servicios">Servicios</option>
+                            <option value="Alimentos">Alimentos</option>
+                            <option value="Construcción">Construcción</option>
+                            <option value="Otros">Otros</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Contacto Principal *</label>
-                        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez" style="color: white;">
+                        <input type="text" id="nuevaEmpresaContacto" placeholder="Juan Pérez">
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com" style="color: white;">
+                        <input type="email" id="nuevaEmpresaEmail" placeholder="contacto@empresa.com">
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Teléfono/Celular *</label>
-                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+000 00000000" style="color: white;">
+                        <input type="text" id="nuevaEmpresaTelefono" placeholder="+000 00000000">
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Contraseña Jefe *</label>
-                        <input type="password" id="nuevaEmpresaPassword" value="12345678" style="color: white;">
+                        <input type="password" id="nuevaEmpresaPassword" value="12345678">
                         <small style="color: rgba(255,255,255,0.6);">Contraseña para el usuario jefe</small>
                     </div>
                     
@@ -2082,12 +2002,10 @@
                 </div>
             `);
             
-            // Inicializar con Bolivia como predeterminado
             document.getElementById('nuevaEmpresaPais').value = 'Bolivia';
             actualizarTipoDocumento();
         }
         
-        // FUNCIÓN: Actualizar tipo de documento según país
         function actualizarTipoDocumento() {
             const pais = document.getElementById('nuevaEmpresaPais').value;
             const label = document.getElementById('labelDocumento');
@@ -2116,7 +2034,6 @@
             }
         }
         
-        // FUNCIÓN: Crear nueva empresa
         async function crearNuevaEmpresa() {
             showLoading();
             
@@ -2132,7 +2049,6 @@
                 estado: 'Activa'
             };
             
-            // Validar campos requeridos
             const required = ['nombre', 'pais', 'documento', 'contacto', 'email', 'telefono', 'password'];
             for (const field of required) {
                 if (!empresaData[field]) {
@@ -2142,7 +2058,6 @@
                 }
             }
             
-            // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(empresaData.email)) {
                 showNotification('error', 'Error', 'Ingrese un email válido');
@@ -2151,17 +2066,11 @@
             }
             
             try {
-                console.log('Creando empresa:', empresaData);
-                
-                // Llamar a la API
                 const result = await postToAPI('registerCompany', empresaData);
-                
-                console.log('Resultado creación empresa:', result);
                 
                 if (result && result.success) {
                     showNotification('success', 'Éxito', `Empresa "${empresaData.nombre}" creada exitosamente`);
                     
-                    // Recargar datos
                     await loadEmpresasFromAPI();
                     await loadUsuariosFromAPI();
                     
@@ -2178,7 +2087,6 @@
             }
         }
         
-        // FUNCIÓN: Ver empresa completa
         function viewEmpresaCompleta(empresaId) {
             const empresa = database.empresas.find(e => e.ID === empresaId);
             if (!empresa) {
@@ -2237,7 +2145,6 @@
             `);
         }
         
-        // FUNCIÓN: Formatear fecha
         function formatDate(dateString) {
             if (!dateString) return 'No disponible';
             try {
@@ -2252,7 +2159,6 @@
             }
         }
         
-        // FUNCIÓN: Editar empresa completa
         function editEmpresaCompleta(empresaId) {
             const empresa = database.empresas.find(e => e.ID === empresaId);
             if (!empresa) {
@@ -2267,67 +2173,67 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
                             <label style="color: var(--secondary);">Razón Social *</label>
-                            <input type="text" id="editEmpresaNombre" value="${empresa.Nombre || ''}" required style="color: white;">
+                            <input type="text" id="editEmpresaNombre" value="${empresa.Nombre || ''}" required>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">RUC/NIT *</label>
-                            <input type="text" id="editEmpresaRUC" value="${empresa.RUC || ''}" required style="color: white;">
+                            <input type="text" id="editEmpresaRUC" value="${empresa.RUC || ''}" required>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Industria *</label>
-                            <select id="editEmpresaIndustria" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="" style="color: #666;">Seleccionar industria</option>
-                                <option value="Tecnología" ${empresa.Industria === 'Tecnología' ? 'selected' : ''} style="color: white;">Tecnología</option>
-                                <option value="Comercio" ${empresa.Industria === 'Comercio' ? 'selected' : ''} style="color: white;">Comercio</option>
-                                <option value="Manufactura" ${empresa.Industria === 'Manufactura' ? 'selected' : ''} style="color: white;">Manufactura</option>
-                                <option value="Servicios" ${empresa.Industria === 'Servicios' ? 'selected' : ''} style="color: white;">Servicios</option>
-                                <option value="Alimentos" ${empresa.Industria === 'Alimentos' ? 'selected' : ''} style="color: white;">Alimentos</option>
-                                <option value="Construcción" ${empresa.Industria === 'Construcción' ? 'selected' : ''} style="color: white;">Construcción</option>
-                                <option value="Otros" ${empresa.Industria === 'Otros' ? 'selected' : ''} style="color: white;">Otros</option>
+                            <select id="editEmpresaIndustria" required>
+                                <option value="">Seleccionar industria</option>
+                                <option value="Tecnología" ${empresa.Industria === 'Tecnología' ? 'selected' : ''}>Tecnología</option>
+                                <option value="Comercio" ${empresa.Industria === 'Comercio' ? 'selected' : ''}>Comercio</option>
+                                <option value="Manufactura" ${empresa.Industria === 'Manufactura' ? 'selected' : ''}>Manufactura</option>
+                                <option value="Servicios" ${empresa.Industria === 'Servicios' ? 'selected' : ''}>Servicios</option>
+                                <option value="Alimentos" ${empresa.Industria === 'Alimentos' ? 'selected' : ''}>Alimentos</option>
+                                <option value="Construcción" ${empresa.Industria === 'Construcción' ? 'selected' : ''}>Construcción</option>
+                                <option value="Otros" ${empresa.Industria === 'Otros' ? 'selected' : ''}>Otros</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Contacto *</label>
-                            <input type="text" id="editEmpresaContacto" value="${empresa.Contacto || ''}" required style="color: white;">
+                            <input type="text" id="editEmpresaContacto" value="${empresa.Contacto || ''}" required>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Email *</label>
-                            <input type="email" id="editEmpresaEmail" value="${empresa.Email || ''}" required style="color: white;">
+                            <input type="email" id="editEmpresaEmail" value="${empresa.Email || ''}" required>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Teléfono *</label>
-                            <input type="text" id="editEmpresaTelefono" value="${empresa.Teléfono || ''}" required style="color: white;">
+                            <input type="text" id="editEmpresaTelefono" value="${empresa.Teléfono || ''}" required>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Dirección</label>
-                            <input type="text" id="editEmpresaDireccion" value="${empresa.Dirección || ''}" style="color: white;">
+                            <input type="text" id="editEmpresaDireccion" value="${empresa.Dirección || ''}">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Ciudad</label>
-                            <input type="text" id="editEmpresaCiudad" value="${empresa.Ciudad || ''}" style="color: white;">
+                            <input type="text" id="editEmpresaCiudad" value="${empresa.Ciudad || ''}">
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Estado *</label>
-                            <select id="editEmpresaEstado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Activa" ${empresa.Estado === 'Activa' ? 'selected' : ''} style="color: white;">Activa</option>
-                                <option value="Inactiva" ${empresa.Estado === 'Inactiva' ? 'selected' : ''} style="color: white;">Inactiva</option>
-                                <option value="Pendiente" ${empresa.Estado === 'Pendiente' ? 'selected' : ''} style="color: white;">Pendiente</option>
+                            <select id="editEmpresaEstado" required>
+                                <option value="Activa" ${empresa.Estado === 'Activa' ? 'selected' : ''}>Activa</option>
+                                <option value="Inactiva" ${empresa.Estado === 'Inactiva' ? 'selected' : ''}>Inactiva</option>
+                                <option value="Pendiente" ${empresa.Estado === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Tarjeta Registrada</label>
-                            <select id="editEmpresaTarjeta" style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Sí" ${empresa.TarjetaRegistrada === 'Sí' ? 'selected' : ''} style="color: white;">Sí</option>
-                                <option value="No" ${empresa.TarjetaRegistrada === 'No' ? 'selected' : ''} style="color: white;">No</option>
+                            <select id="editEmpresaTarjeta">
+                                <option value="Sí" ${empresa.TarjetaRegistrada === 'Sí' ? 'selected' : ''}>Sí</option>
+                                <option value="No" ${empresa.TarjetaRegistrada === 'No' ? 'selected' : ''}>No</option>
                             </select>
                         </div>
                     </div>
@@ -2350,7 +2256,6 @@
             `);
         }
 
-        // FUNCIÓN: Guardar edición completa de empresa
         async function guardarEdicionEmpresaCompleta(empresaId) {
             showLoading();
             
@@ -2368,7 +2273,6 @@
                 tarjetaregistrada: document.getElementById('editEmpresaTarjeta').value
             };
             
-            // Validar campos requeridos
             const required = ['nombre', 'documento', 'industria', 'contacto', 'email', 'telefono', 'estado'];
             for (const field of required) {
                 if (!empresaData[field]) {
@@ -2384,7 +2288,6 @@
                 if (result && result.success) {
                     showNotification('success', 'Éxito', 'Empresa actualizada completamente');
                     
-                    // Recargar datos
                     await loadEmpresasFromAPI();
                     
                     closeModal();
@@ -2400,7 +2303,6 @@
             }
         }
 
-        // FUNCIÓN: Confirmar eliminar empresa
         function confirmarEliminarEmpresa(empresaId, empresaNombre) {
             showConfirmation(
                 'Eliminar Empresa',
@@ -2411,7 +2313,6 @@
             );
         }
 
-        // FUNCIÓN: Eliminar empresa
         async function eliminarEmpresa(empresaId) {
             showLoading();
             
@@ -2421,7 +2322,6 @@
                 if (result && result.success) {
                     showNotification('success', 'Éxito', 'Empresa eliminada correctamente');
                     
-                    // Recargar datos
                     await loadEmpresasFromAPI();
                     await loadUsuariosFromAPI();
                     
@@ -2436,7 +2336,6 @@
             }
         }
 
-        // FUNCIÓN: Gestionar usuarios de empresa
         function manageUsuariosEmpresa(empresaId) {
             const empresa = database.empresas.find(e => e.ID === empresaId);
             const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
@@ -2503,34 +2402,33 @@
         // MÓDULO: FUNCIONES DE USUARIOS
         // =============================================
 
-        // FUNCIÓN: Mostrar modal nuevo usuario avanzado
         function showNuevoUsuarioModalAvanzado() {
             showModal('Nuevo Usuario', `
                 <div style="max-width: 700px;">
                     <div class="form-group">
                         <label style="color: var(--secondary);">Empresa *</label>
-                        <select id="nuevoUsuarioEmpresaAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                            <option value="" style="color: #666;">Seleccionar empresa</option>
+                        <select id="nuevoUsuarioEmpresaAvanzado" required>
+                            <option value="">Seleccionar empresa</option>
                             ${database.empresas.map(empresa => `
-                                <option value="${empresa.ID}" style="color: white;">${empresa.Nombre}</option>
+                                <option value="${empresa.ID}">${empresa.Nombre}</option>
                             `).join('')}
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Nombres Completos *</label>
-                        <input type="text" id="nuevoUsuarioNombres" placeholder="Juan Carlos Pérez Gómez" required style="color: white;">
+                        <input type="text" id="nuevoUsuarioNombres" placeholder="Juan Carlos Pérez Gómez" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required style="color: white;">
+                        <input type="email" id="nuevoUsuarioEmailAvanzado" placeholder="usuario@empresa.com" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Password *</label>
                         <div style="display: flex; gap: 0.5rem;">
-                            <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="color: white; flex: 1;">
+                            <input type="text" id="nuevoUsuarioPasswordAvanzado" value="12345678" required style="flex: 1;">
                             <button type="button" onclick="generarPasswordNuevoUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                                 <i class="fas fa-random"></i> Generar
                             </button>
@@ -2540,20 +2438,20 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
                             <label style="color: var(--secondary);">Rol *</label>
-                            <select id="nuevoUsuarioRolAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="jefe" style="color: white;">Jefe Empresa</option>
-                                <option value="comercial" style="color: white;">Dirección Comercial</option>
-                                <option value="admin" style="color: white;">Administración y Finanzas</option>
-                                <option value="vendedor" style="color: white;">Vendedor App</option>
-                                <option value="almacen" style="color: white;">Almacén App</option>
+                            <select id="nuevoUsuarioRolAvanzado" required>
+                                <option value="jefe">Jefe Empresa</option>
+                                <option value="comercial">Dirección Comercial</option>
+                                <option value="admin">Administración y Finanzas</option>
+                                <option value="vendedor">Vendedor App</option>
+                                <option value="almacen">Almacén App</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Estado *</label>
-                            <select id="nuevoUsuarioActivoAvanzado" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Sí" style="color: white;">Activo</option>
-                                <option value="No" style="color: white;">Inactivo</option>
+                            <select id="nuevoUsuarioActivoAvanzado" required>
+                                <option value="Sí">Activo</option>
+                                <option value="No">Inactivo</option>
                             </select>
                         </div>
                     </div>
@@ -2562,7 +2460,7 @@
                         <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
                             Cancelar
                         </button>
-                        <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzadoCorregido()" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="crearNuevoUsuarioAvanzado()" style="flex: 1;">
                             <i class="fas fa-user-plus"></i> Crear Usuario
                         </button>
                     </div>
@@ -2570,7 +2468,6 @@
             `);
         }
 
-        // FUNCIÓN: Mostrar modal nuevo usuario para empresa específica
         function showNuevoUsuarioParaEmpresa(empresaId) {
             const empresa = database.empresas.find(e => e.ID === empresaId);
             
@@ -2580,18 +2477,18 @@
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Nombres Completos *</label>
-                        <input type="text" id="nuevoUsuarioNombresEspecifico" placeholder="Juan Carlos Pérez Gómez" required style="color: white;">
+                        <input type="text" id="nuevoUsuarioNombresEspecifico" placeholder="Juan Carlos Pérez Gómez" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="nuevoUsuarioEmailEspecifico" placeholder="usuario@${empresa.Email?.split('@')[1] || 'empresa.com'}" required style="color: white;">
+                        <input type="email" id="nuevoUsuarioEmailEspecifico" placeholder="usuario@${empresa.Email?.split('@')[1] || 'empresa.com'}" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Password *</label>
                         <div style="display: flex; gap: 0.5rem;">
-                            <input type="text" id="nuevoUsuarioPasswordEspecifico" value="12345678" required style="color: white; flex: 1;">
+                            <input type="text" id="nuevoUsuarioPasswordEspecifico" value="12345678" required style="flex: 1;">
                             <button type="button" onclick="generarPasswordNuevoUsuarioEspecifico()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                                 <i class="fas fa-random"></i> Generar
                             </button>
@@ -2601,20 +2498,20 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
                             <label style="color: var(--secondary);">Rol *</label>
-                            <select id="nuevoUsuarioRolEspecifico" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="jefe" style="color: white;">Jefe Empresa</option>
-                                <option value="comercial" style="color: white;">Dirección Comercial</option>
-                                <option value="admin" style="color: white;">Administración y Finanzas</option>
-                                <option value="vendedor" style="color: white;">Vendedor App</option>
-                                <option value="almacen" style="color: white;">Almacén App</option>
+                            <select id="nuevoUsuarioRolEspecifico" required>
+                                <option value="jefe">Jefe Empresa</option>
+                                <option value="comercial">Dirección Comercial</option>
+                                <option value="admin">Administración y Finanzas</option>
+                                <option value="vendedor">Vendedor App</option>
+                                <option value="almacen">Almacén App</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Estado *</label>
-                            <select id="nuevoUsuarioActivoEspecifico" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Sí" style="color: white;">Activo</option>
-                                <option value="No" style="color: white;">Inactivo</option>
+                            <select id="nuevoUsuarioActivoEspecifico" required>
+                                <option value="Sí">Activo</option>
+                                <option value="No">Inactivo</option>
                             </select>
                         </div>
                     </div>
@@ -2631,7 +2528,6 @@
             `);
         }
 
-        // FUNCIÓN: Generar password para nuevo usuario
         function generarPasswordNuevoUsuario() {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';
             let password = '';
@@ -2641,7 +2537,6 @@
             document.getElementById('nuevoUsuarioPasswordAvanzado').value = password;
         }
 
-        // FUNCIÓN: Generar password para usuario específico
         function generarPasswordNuevoUsuarioEspecifico() {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$';
             let password = '';
@@ -2651,11 +2546,9 @@
             document.getElementById('nuevoUsuarioPasswordEspecifico').value = password;
         }
 
-        // FUNCIÓN: Crear nuevo usuario avanzado
-        async function crearNuevoUsuarioAvanzadoCorregido() {
+        async function crearNuevoUsuarioAvanzado() {
             showLoading();
             
-            // Obtener valores del formulario
             const nombresCompletos = document.getElementById('nuevoUsuarioNombres').value.trim();
             const email = document.getElementById('nuevoUsuarioEmailAvanzado').value.trim().toLowerCase();
             const password = document.getElementById('nuevoUsuarioPasswordAvanzado').value.trim();
@@ -2672,14 +2565,12 @@
                 empresa_id: empresaId
             };
             
-            // Validaciones básicas
             if (!nombresCompletos || !email || !empresaId) {
                 showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
                 hideLoading();
                 return;
             }
             
-            // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showNotification('error', 'Error', 'Ingrese un email válido');
@@ -2693,7 +2584,6 @@
                 if (result && result.success) {
                     showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
                     
-                    // Recargar datos
                     await loadUsuariosFromAPI();
                     
                     closeModal();
@@ -2708,11 +2598,9 @@
             }
         }
 
-        // FUNCIÓN: Crear nuevo usuario para empresa específica
         async function crearNuevoUsuarioParaEmpresaEspecifica(empresaId) {
             showLoading();
             
-            // Obtener valores del formulario
             const nombresCompletos = document.getElementById('nuevoUsuarioNombresEspecifico').value.trim();
             const email = document.getElementById('nuevoUsuarioEmailEspecifico').value.trim().toLowerCase();
             const password = document.getElementById('nuevoUsuarioPasswordEspecifico').value.trim();
@@ -2728,14 +2616,12 @@
                 empresa_id: empresaId
             };
             
-            // Validaciones básicas
             if (!nombresCompletos || !email) {
                 showNotification('error', 'Error', 'Complete los campos obligatorios');
                 hideLoading();
                 return;
             }
             
-            // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showNotification('error', 'Error', 'Ingrese un email válido');
@@ -2749,11 +2635,9 @@
                 if (result && result.success) {
                     showNotification('success', 'Éxito', `Usuario "${nombresCompletos}" creado exitosamente`);
                     
-                    // Recargar datos
                     await loadUsuariosFromAPI();
                     
                     closeModal();
-                    // Recargar la vista de usuarios de la empresa
                     manageUsuariosEmpresa(empresaId);
                 } else {
                     showNotification('error', 'Error', result?.error || 'Error al crear usuario');
@@ -2765,7 +2649,6 @@
             }
         }
 
-        // FUNCIÓN: Editar usuario completo
         function editUsuarioCompleto(usuarioId) {
             const usuario = database.usuarios.find(u => u.ID === usuarioId);
             if (!usuario) {
@@ -2779,18 +2662,18 @@
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Nombres Completos *</label>
-                        <input type="text" id="editUsuarioNombres" value="${usuario.Nombre || ''}" required style="color: white;">
+                        <input type="text" id="editUsuarioNombres" value="${usuario.Nombre || ''}" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Email *</label>
-                        <input type="email" id="editUsuarioEmail" value="${usuario.Email || ''}" required style="color: white;">
+                        <input type="email" id="editUsuarioEmail" value="${usuario.Email || ''}" required>
                     </div>
                     
                     <div class="form-group">
                         <label style="color: var(--secondary);">Password *</label>
                         <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <input type="text" id="editUsuarioPassword" value="${usuario.Password || '12345678'}" required style="color: white; flex: 1;">
+                            <input type="text" id="editUsuarioPassword" value="${usuario.Password || '12345678'}" required style="flex: 1;">
                             <button type="button" onclick="generarPasswordUsuario()" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
                                 <i class="fas fa-random"></i> Generar
                             </button>
@@ -2800,30 +2683,30 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
                             <label style="color: var(--secondary);">Rol *</label>
-                            <select id="editUsuarioRol" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="jefe" ${usuario.Role === 'jefe' ? 'selected' : ''} style="color: white;">Jefe Empresa</option>
-                                <option value="comercial" ${usuario.Role === 'comercial' ? 'selected' : ''} style="color: white;">Dirección Comercial</option>
-                                <option value="admin" ${usuario.Role === 'admin' ? 'selected' : ''} style="color: white;">Administración y Finanzas</option>
-                                <option value="vendedor" ${usuario.Role === 'vendedor' ? 'selected' : ''} style="color: white;">Vendedor App</option>
-                                <option value="almacen" ${usuario.Role === 'almacen' ? 'selected' : ''} style="color: white;">Almacén App</option>
+                            <select id="editUsuarioRol" required>
+                                <option value="jefe" ${usuario.Role === 'jefe' ? 'selected' : ''}>Jefe Empresa</option>
+                                <option value="comercial" ${usuario.Role === 'comercial' ? 'selected' : ''}>Dirección Comercial</option>
+                                <option value="admin" ${usuario.Role === 'admin' ? 'selected' : ''}>Administración y Finanzas</option>
+                                <option value="vendedor" ${usuario.Role === 'vendedor' ? 'selected' : ''}>Vendedor App</option>
+                                <option value="almacen" ${usuario.Role === 'almacen' ? 'selected' : ''}>Almacén App</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Empresa *</label>
-                            <select id="editUsuarioEmpresa" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="" style="color: #666;">Seleccionar empresa</option>
+                            <select id="editUsuarioEmpresa" required>
+                                <option value="">Seleccionar empresa</option>
                                 ${database.empresas.map(emp => `
-                                    <option value="${emp.ID}" ${usuario.EmpresaID === emp.ID ? 'selected' : ''} style="color: white;">${emp.Nombre}</option>
+                                    <option value="${emp.ID}" ${usuario.EmpresaID === emp.ID ? 'selected' : ''}>${emp.Nombre}</option>
                                 `).join('')}
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label style="color: var(--secondary);">Estado *</label>
-                            <select id="editUsuarioActivo" required style="color: white; background: rgba(255, 255, 255, 0.05);">
-                                <option value="Sí" ${usuario.Activo === 'Sí' ? 'selected' : ''} style="color: white;">Activo</option>
-                                <option value="No" ${usuario.Activo === 'No' ? 'selected' : ''} style="color: white;">Inactivo</option>
+                            <select id="editUsuarioActivo" required>
+                                <option value="Sí" ${usuario.Activo === 'Sí' ? 'selected' : ''}>Activo</option>
+                                <option value="No" ${usuario.Activo === 'No' ? 'selected' : ''}>Inactivo</option>
                             </select>
                         </div>
                     </div>
@@ -2838,7 +2721,7 @@
                         <button class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
                             Cancelar
                         </button>
-                        <button class="btn btn-primary" onclick="guardarUsuarioCompletoCorregido('${usuarioId}')" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="guardarUsuarioCompleto('${usuarioId}')" style="flex: 1;">
                             <i class="fas fa-save"></i> Guardar Cambios
                         </button>
                     </div>
@@ -2846,7 +2729,6 @@
             `);
         }
 
-        // FUNCIÓN: Generar nueva contraseña
         function generarPasswordUsuario() {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
             let password = '';
@@ -2856,11 +2738,9 @@
             document.getElementById('editUsuarioPassword').value = password;
         }
 
-        // FUNCIÓN: Guardar usuario completo
-        async function guardarUsuarioCompletoCorregido(usuarioId) {
+        async function guardarUsuarioCompleto(usuarioId) {
             showLoading();
             
-            // Obtener valores del formulario
             const nombresCompletos = document.getElementById('editUsuarioNombres').value.trim();
             const email = document.getElementById('editUsuarioEmail').value.trim().toLowerCase();
             const password = document.getElementById('editUsuarioPassword').value.trim();
@@ -2878,7 +2758,6 @@
                 empresa_id: empresaId
             };
             
-            // Validaciones básicas
             if (!nombresCompletos || !email || !empresaId) {
                 showNotification('error', 'Error', 'Complete los campos obligatorios marcados con *');
                 hideLoading();
@@ -2891,7 +2770,6 @@
                 if (result && result.success) {
                     showNotification('success', 'Éxito', 'Usuario guardado correctamente');
                     
-                    // Recargar datos
                     await loadUsuariosFromAPI();
                     
                     closeModal();
@@ -2906,7 +2784,6 @@
             }
         }
 
-        // FUNCIÓN: Confirmar eliminar usuario
         function confirmarEliminarUsuario(usuarioId, usuarioNombre) {
             showConfirmation(
                 'Eliminar Usuario',
@@ -2917,7 +2794,6 @@
             );
         }
 
-        // FUNCIÓN: Eliminar usuario
         async function eliminarUsuario(usuarioId) {
             showLoading();
             
@@ -2927,7 +2803,6 @@
                 if (result && result.success) {
                     showNotification('success', 'Éxito', 'Usuario eliminado correctamente');
                     
-                    // Recargar datos
                     await loadUsuariosFromAPI();
                     
                     loadGestionPersonal();
@@ -2945,7 +2820,6 @@
         // MÓDULO: FUNCIONES DE ACCESO
         // =============================================
         
-        // FUNCIÓN: Acceder como jefe de empresa
         function accessAsJefeEmpresa(empresaId) {
             const empresa = database.empresas.find(e => e.ID === empresaId);
             if (!empresa) {
@@ -2957,13 +2831,11 @@
                 'Acceder como Jefe',
                 `¿Acceder a la empresa "${empresa.Nombre}" como jefe?<br><br><small>Podrás ver y gestionar esta empresa como si fueras su jefe.</small>`,
                 function() {
-                    // Cambiar temporalmente el rol del usuario actual
                     currentUser.role = 'jefe';
                     currentUser.empresa = empresa.Nombre;
                     currentUser.empresa_id = empresaId;
                     currentCompany = empresa;
                     
-                    // Reconfigurar interfaz
                     configureInterface();
                     
                     showNotification('success', 'Modo Jefe', `Ahora eres jefe de ${empresa.Nombre}`);
@@ -2975,19 +2847,16 @@
         // MÓDULO: FUNCIONES DE MODALES
         // =============================================
         
-        // FUNCIÓN: Mostrar modal
         function showModal(title, content) {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalContent').innerHTML = content;
             document.getElementById('modalOverlay').style.display = 'flex';
         }
         
-        // FUNCIÓN: Cerrar modal
         function closeModal() {
             document.getElementById('modalOverlay').style.display = 'none';
         }
         
-        // FUNCIÓN: Mostrar confirmación
         function showConfirmation(title, message, onConfirm) {
             document.getElementById('confirmationTitle').textContent = title;
             document.getElementById('confirmationMessage').innerHTML = message;
@@ -3000,7 +2869,6 @@
             };
         }
         
-        // FUNCIÓN: Ocultar confirmación
         function hideConfirmation() {
             document.getElementById('confirmationDialog').style.display = 'none';
         }
@@ -3009,7 +2877,6 @@
         // MÓDULO: NOTIFICACIONES
         // =============================================
         
-        // FUNCIÓN: Mostrar notificación
         function showNotification(type, title, message) {
             const notification = {
                 id: Date.now(),
@@ -3022,15 +2889,12 @@
             
             notifications.unshift(notification);
             
-            // Actualizar badge
             const unread = notifications.filter(n => !n.read).length;
             document.querySelector('.notification-badge').textContent = unread;
             
-            // Mostrar toast
             showToast(type, title, message);
         }
         
-        // FUNCIÓN: Mostrar toast
         function showToast(type, title, message) {
             const toast = document.createElement('div');
             toast.style.cssText = `
@@ -3062,7 +2926,6 @@
             
             document.body.appendChild(toast);
             
-            // Auto-remove after 5 seconds
             setTimeout(() => {
                 if (toast.parentElement) {
                     toast.style.animation = 'slideOut 0.3s ease-in';
@@ -3071,7 +2934,6 @@
             }, 5000);
         }
         
-        // FUNCIÓN: Alternar notificaciones
         function toggleNotifications() {
             showModal('Notificaciones', `
                 <div style="max-height: 400px; overflow-y: auto;">
@@ -3108,7 +2970,6 @@
             `);
         }
         
-        // FUNCIÓN: Marcar todas como leídas
         function markAllAsRead() {
             notifications.forEach(n => n.read = true);
             document.querySelector('.notification-badge').textContent = '0';
@@ -3119,7 +2980,6 @@
         // MÓDULO: SESIÓN Y LOGOUT
         // =============================================
         
-        // FUNCIÓN: Mostrar confirmación de logout
         function showLogoutConfirmation() {
             showConfirmation(
                 'Cerrar Sesión',
@@ -3128,7 +2988,6 @@
             );
         }
         
-        // FUNCIÓN: Cerrar sesión
         function logout() {
             localStorage.removeItem('nexial_user');
             window.location.href = 'index.html';
@@ -3138,11 +2997,9 @@
         // MÓDULO: INICIALIZACIÓN
         // =============================================
         
-        // FUNCIÓN: Iniciar sesión
         async function startSession() {
             console.log('🔄 Iniciando sesión...');
             
-            // Obtener usuario de localStorage
             const savedUser = localStorage.getItem('nexial_user');
             
             if (!savedUser) {
@@ -3155,19 +3012,13 @@
                 currentUser = JSON.parse(savedUser);
                 console.log('👤 Usuario cargado:', currentUser);
                 
-                // Configurar interfaz inmediatamente
                 configureInterface();
                 
-                // Cargar datos
                 showLoading();
                 await loadAllData();
                 hideLoading();
                 
-                // Mostrar notificación
-                showNotification('success', 'Sistema cargado', 'Datos actualizados correctamente');
-                
-                // Probar conexión con API
-                testConnection();
+                showNotification('success', 'Sistema cargado', 'Datos actualizados correctamente desde Google Sheets');
                 
             } catch (error) {
                 console.error('Error iniciando sesión:', error);
@@ -3182,9 +3033,7 @@
         // EVENT LISTENERS
         // =============================================
         
-        // EVENTO: Cargar página
         document.addEventListener('DOMContentLoaded', function() {
-            // Agregar estilos de animación adicionales
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes slideIn {
@@ -3198,7 +3047,6 @@
             `;
             document.head.appendChild(style);
             
-            // Configurar eventos de modal
             document.getElementById('modalOverlay').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeModal();
@@ -3211,30 +3059,14 @@
                 }
             });
             
-            // Iniciar sesión automáticamente
             startSession();
             
             console.log('🚀 Nexial Suite Panel de Control inicializado');
             console.log('📊 Sistema Corporativo Multiempresa v3.1');
             console.log('🔗 API URL:', API_URL);
+            console.log('📁 Conectado a Google Sheets');
         });
-        // Función de prueba para verificar conexión
-        async function testConnection() {
-            console.log('🧪 Probando conexión con API...');
-            const result = await fetchFromAPI('test');
-            console.log('Resultado test:', result);
-            
-            if (result && result.success) {
-                console.log('✅ API funcionando correctamente');
-                showNotification('success', 'Conexión exitosa', 'Conectado al servidor de datos');
-            } else {
-                console.log('⚠️ API en modo demostración');
-                showNotification('info', 'Modo demostración', 'Usando datos de ejemplo');
-            }
-        }
 
-            // Llamar después de iniciar sesión
-            setTimeout(testConnection, 1000);
     </script>
 </body>
 </html>
