@@ -931,6 +931,95 @@
                 width: 95%;
             }
         }
+
+        /* ============================================= */
+        /* CORRECCIÓN PARA SELECTS EN MODALES - VERSIÓN CORREGIDA */
+        /* ============================================= */
+        
+        .modal select {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--dark) !important;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 6px;
+            color: white !important;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            background-size: 20px !important;
+        }
+        
+        .modal select:hover {
+            border-color: var(--primary);
+            background-color: rgba(124, 58, 237, 0.1) !important;
+        }
+        
+        .modal select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+            background-color: rgba(124, 58, 237, 0.15) !important;
+        }
+        
+        .modal select option {
+            background-color: var(--dark) !important;
+            color: white !important;
+            padding: 12px !important;
+            font-size: 1rem;
+        }
+        
+        .modal select option:hover,
+        .modal select option:focus,
+        .modal select option:checked {
+            background-color: var(--primary) !important;
+            color: white !important;
+        }
+        
+        .modal input[type="text"],
+        .modal input[type="email"],
+        .modal input[type="password"],
+        .modal input[type="tel"],
+        .modal input[type="number"] {
+            background: var(--dark) !important;
+            color: white !important;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        
+        .modal input[type="text"]:focus,
+        .modal input[type="email"]:focus,
+        .modal input[type="password"]:focus,
+        .modal input[type="tel"]:focus,
+        .modal input[type="number"]:focus {
+            background: rgba(124, 58, 237, 0.1) !important;
+            border-color: var(--primary);
+        }
+        
+        /* Mejorar visibilidad del placeholder */
+        .modal input::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        /* Para todos los inputs dentro de modales */
+        .modal .form-group input,
+        .modal .form-group select {
+            background: var(--dark) !important;
+            color: white !important;
+        }
+        
+        /* Asegurar que los labels sean visibles */
+        .modal .form-group label {
+            color: var(--secondary) !important;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -1099,7 +1188,7 @@
                 console.log(`🔍 Conectando a API: ${action}`, params);
                 
                 // Construir URL con parámetros CORRECTAMENTE
-                const url = `${API_URL}?action=${encodeURIComponent(action)}`;
+                let url = `${API_URL}?action=${encodeURIComponent(action)}`;
                 
                 // Agregar otros parámetros
                 Object.keys(params).forEach(key => {
@@ -1328,13 +1417,16 @@
             showLoading();
             try {
                 const result = await fetchFromAPI('getEmpresas');
+                console.log('📊 Resultado getEmpresas:', result);
+                
                 if (result && result.success && result.empresas) {
                     database.empresas = result.empresas;
                     console.log(`✅ Empresas cargadas: ${result.empresas.length}`);
                     return true;
+                } else {
+                    console.warn('⚠️ No se pudieron cargar empresas:', result?.error);
+                    return false;
                 }
-                console.warn('⚠️ No se pudieron cargar empresas');
-                return false;
             } catch (error) {
                 console.error('Error cargando empresas:', error);
                 return false;
@@ -1412,76 +1504,99 @@
         function configureInterface() {
             console.log('🎨 Configurando interfaz para rol:', currentUser.role);
             
-            // Mostrar solo la vista de super admin si el rol es super
+            // Configurar para cualquier rol, no solo 'super'
+            const roleConfigs = {
+                'super': {
+                    badgeClass: 'super-admin',
+                    badgeText: 'SUPER ADMIN',
+                    userName: currentUser.nombre || 'Administrador Corporativo',
+                    userRole: 'Control Total Sistema',
+                    viewId: 'viewSuper',
+                    navMenu: `
+                    <div class="nav-section">
+                        <div class="nav-title">CORPORATIVO</div>
+                        <ul class="nav-links">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Panel de Control Corporativo</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
+                            <i class="fas fa-building"></i>
+                            <span>Gestión de Empresas</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadGestionPersonal()">
+                            <i class="fas fa-users-cog"></i>
+                            <span>Gestión de Personal</span>
+                            </a>
+                        </li>
+                        </ul>
+                    </div>
+                    `,
+                    pageTitle: 'Panel de Control Corporativo - Super Usuario'
+                },
+                'jefe': {
+                    badgeClass: 'jefe',
+                    badgeText: 'JEFE EMPRESA',
+                    userName: currentUser.nombre || 'Jefe de Empresa',
+                    userRole: 'Gestión Empresarial',
+                    viewId: 'viewJefe',
+                    navMenu: `
+                    <div class="nav-section">
+                        <div class="nav-title">EMPRESA</div>
+                        <ul class="nav-links">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" onclick="loadJefeDashboard()">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard Empresa</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" onclick="loadUsuariosEmpresa()">
+                            <i class="fas fa-users"></i>
+                            <span>Gestión de Usuarios</span>
+                            </a>
+                        </li>
+                        </ul>
+                    </div>
+                    `,
+                    pageTitle: 'Dashboard Empresa - Jefe'
+                }
+                // Agrega configuraciones para otros roles aquí
+            };
+            
+            const config = roleConfigs[currentUser.role] || roleConfigs.super;
+            
+            // Aplicar configuración
+            document.getElementById('userBadge').className = `user-badge ${config.badgeClass}`;
+            document.getElementById('userBadge').textContent = config.badgeText;
+            document.getElementById('userName').textContent = config.userName;
+            document.getElementById('userRole').textContent = config.userRole;
+            document.getElementById('sidebarCompanyName').textContent = currentUser.empresa || 'NEXIAL SUITE';
+            document.getElementById('navMenu').innerHTML = config.navMenu;
+            document.getElementById('pageTitle').textContent = config.pageTitle;
+            
+            // Mostrar vista correspondiente
+            document.querySelectorAll('.role-view').forEach(view => {
+                view.classList.remove('active');
+                view.innerHTML = '';
+            });
+            
+            const activeView = document.getElementById(config.viewId);
+            activeView.classList.add('active');
+            
+            // Cargar dashboard correspondiente
             if (currentUser.role === 'super') {
-                console.log('👑 Configurando como Super Admin');
-                
-                const roleConfigs = {
-                    'super': {
-                        badgeClass: 'super-admin',
-                        badgeText: 'SUPER ADMIN',
-                        userName: currentUser.nombre,
-                        userRole: 'Control Total Sistema',
-                        viewId: 'viewSuper',
-                        navMenu: `
-                        <div class="nav-section">
-                            <div class="nav-title">CORPORATIVO</div>
-                            <ul class="nav-links">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link active" onclick="loadSuperDashboard()">
-                                <i class="fas fa-tachometer-alt"></i>
-                                <span>Panel de Control Corporativo</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link" onclick="loadEmpresasManagement()">
-                                <i class="fas fa-building"></i>
-                                <span>Gestión de Empresas</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link" onclick="loadGestionPersonal()">
-                                <i class="fas fa-users-cog"></i>
-                                <span>Gestión de Personal</span>
-                                </a>
-                            </li>
-                            </ul>
-                        </div>
-                        `,
-                        pageTitle: 'Panel de Control Corporativo - Super Usuario'
-                    }
-                };
-                
-                const config = roleConfigs[currentUser.role];
-                
-                // Aplicar configuración
-                document.getElementById('userBadge').className = `user-badge ${config.badgeClass}`;
-                document.getElementById('userBadge').textContent = config.badgeText;
-                document.getElementById('userName').textContent = config.userName;
-                document.getElementById('userRole').textContent = config.userRole;
-                document.getElementById('sidebarCompanyName').textContent = 'NEXIAL SUITE';
-                document.getElementById('navMenu').innerHTML = config.navMenu;
-                document.getElementById('pageTitle').textContent = config.pageTitle;
-                
-                // Mostrar vista correspondiente
-                document.querySelectorAll('.role-view').forEach(view => {
-                    view.classList.remove('active');
-                    view.innerHTML = '';
-                });
-                
-                const activeView = document.getElementById(config.viewId);
-                activeView.classList.add('active');
-                
-                // Cargar dashboard de super usuario
                 loadSuperDashboard();
-                
-                console.log('✅ Interfaz configurada exitosamente');
-                
-                              
-            } else {
-                console.log('⚠️ Rol no reconocido:', currentUser.role);
-                showNotification('error', 'Error de rol', `Rol "${currentUser.role}" no reconocido`);
+            } else if (currentUser.role === 'jefe') {
+                loadJefeDashboard();
             }
+            
+            console.log('✅ Interfaz configurada exitosamente');
         }
         
         // =============================================
@@ -1551,6 +1666,144 @@
             // Actualizar título
             document.getElementById('pageTitle').textContent = 'Panel de Control Corporativo';
         }
+        
+        // FUNCIÓN: Cargar dashboard jefe de empresa
+        function loadJefeDashboard() {
+            const empresaId = currentUser.empresa_id;
+            const empresa = database.empresas.find(e => e.ID === empresaId) || {};
+            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
+            const empleadosEmpresa = database.empleados.filter(e => e.EmpresaID === empresaId);
+            
+            document.getElementById('viewJefe').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Usuarios Activos</div>
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="stat-value">${usuariosEmpresa.length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-user-check"></i> En tu empresa
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Empleados</div>
+                            <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                        </div>
+                        <div class="stat-value">${empleadosEmpresa.length}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-user-plus"></i> Registrados
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Empresa</div>
+                            <div class="stat-icon"><i class="fas fa-building"></i></div>
+                        </div>
+                        <div class="stat-value" style="font-size: 1.5rem;">${empresa.Nombre || 'Mi Empresa'}</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-check-circle"></i> ${empresa.Estado || 'Activa'}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">Sistema</div>
+                            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                        </div>
+                        <div class="stat-value">100%</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-bolt"></i> Operativo
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3 class="table-title">Usuarios de la Empresa</h3>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${usuariosEmpresa.map(usuario => `
+                                        <tr>
+                                            <td>${usuario.Nombre}</td>
+                                            <td>
+                                                <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
+                                                    ${getRoleName(usuario.Role)}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                    ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                    ${usuariosEmpresa.length === 0 ? `
+                                        <tr>
+                                            <td colspan="3" style="text-align: center; padding: 1rem; color: rgba(255,255,255,0.5);">
+                                                No hay usuarios registrados
+                                            </td>
+                                        </tr>
+                                    ` : ''}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3 class="table-title">Información de la Empresa</h3>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <p><strong>RUC/NIT:</strong> ${empresa.RUC || 'No registrado'}</p>
+                            <p><strong>Contacto:</strong> ${empresa.Contacto || 'No registrado'}</p>
+                            <p><strong>Email:</strong> ${empresa.Email || 'No registrado'}</p>
+                            <p><strong>Teléfono:</strong> ${empresa.Teléfono || 'No registrado'}</p>
+                            <p><strong>Industria:</strong> ${empresa.Industria || 'No especificada'}</p>
+                            <p><strong>Dirección:</strong> ${empresa.Dirección || 'No registrada'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button class="btn btn-primary" onclick="loadUsuariosEmpresa()" style="margin-right: 1rem;">
+                        <i class="fas fa-users-cog"></i> Gestionar Usuarios
+                    </button>
+                    <button class="btn btn-secondary" onclick="editarInformacionEmpresa()">
+                        <i class="fas fa-edit"></i> Editar Información
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('pageTitle').textContent = `Dashboard - ${empresa.Nombre || 'Mi Empresa'}`;
+        }
+
+        // FUNCIÓN: Cargar gestión de usuarios de empresa
+        function loadUsuariosEmpresa() {
+            // Esta función la implementarás después
+            showNotification('info', 'Funcionalidad', 'Gestión de usuarios de empresa - En desarrollo');
+            loadJefeDashboard();
+        }
+
+        function editarInformacionEmpresa() {
+            // Esta función la implementarás después
+            showNotification('info', 'Funcionalidad', 'Editar información de empresa - En desarrollo');
+            loadJefeDashboard();
+        }
+                
         
         // FUNCIÓN: Cargar gestión de empresas
         function loadEmpresasManagement() {
@@ -2902,30 +3155,19 @@
                 currentUser = JSON.parse(savedUser);
                 console.log('👤 Usuario cargado:', currentUser);
                 
-                // Forzar rol super si es super admin (para pruebas)
-                if (currentUser.email === 'marcelodanielcc@gmail.com') {
-                    currentUser.role = 'super';
-                    currentUser.nombre = 'Marcelo Daniel Condori';
-                }
-                
                 // Configurar interfaz inmediatamente
                 configureInterface();
                 
-                // Cargar datos en segundo plano
-                setTimeout(async () => {
-                    try {
-                        await loadAllData();
-                        showNotification('success', 'Sistema cargado', 'Datos actualizados correctamente');
-                        
-                        // Actualizar dashboard si está activo
-                        if (document.getElementById('viewSuper').classList.contains('active')) {
-                            loadSuperDashboard();
-                        }
-                    } catch (error) {
-                        console.log('⚠️ Error cargando datos:', error);
-                        showNotification('info', 'Modo demostración', 'Usando datos de ejemplo');
-                    }
-                }, 500);
+                // Cargar datos
+                showLoading();
+                await loadAllData();
+                hideLoading();
+                
+                // Mostrar notificación
+                showNotification('success', 'Sistema cargado', 'Datos actualizados correctamente');
+                
+                // Probar conexión con API
+                testConnection();
                 
             } catch (error) {
                 console.error('Error iniciando sesión:', error);
@@ -2976,19 +3218,20 @@
             console.log('📊 Sistema Corporativo Multiempresa v3.1');
             console.log('🔗 API URL:', API_URL);
         });
-            // Función de prueba para verificar conexión
-            async function testConnection() {
-                console.log('🧪 Probando conexión con API...');
-                const result = await fetchFromAPI('test');
-                console.log('Resultado test:', result);
-                
-                if (result && result.success) {
-                    console.log('✅ API funcionando correctamente');
-                    // Cargar datos
-                    await loadAllData();
-                    loadSuperDashboard();
-                }
+        // Función de prueba para verificar conexión
+        async function testConnection() {
+            console.log('🧪 Probando conexión con API...');
+            const result = await fetchFromAPI('test');
+            console.log('Resultado test:', result);
+            
+            if (result && result.success) {
+                console.log('✅ API funcionando correctamente');
+                showNotification('success', 'Conexión exitosa', 'Conectado al servidor de datos');
+            } else {
+                console.log('⚠️ API en modo demostración');
+                showNotification('info', 'Modo demostración', 'Usando datos de ejemplo');
             }
+        }
 
             // Llamar después de iniciar sesión
             setTimeout(testConnection, 1000);
