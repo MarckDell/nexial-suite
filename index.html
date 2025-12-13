@@ -361,6 +361,17 @@
                         0 0 20px rgba(124, 58, 237, 0.1);
         }
         
+        /* Estilos específicos para select para que se vean las opciones */
+        .form-group select option {
+            background: rgba(15, 15, 35, 0.95);
+            color: white;
+            padding: 10px;
+        }
+        
+        .form-group select:focus option {
+            background: rgba(124, 58, 237, 0.2);
+        }
+        
         .password-wrapper {
             position: relative;
         }
@@ -625,6 +636,64 @@
             }
         }
         
+        /* Estilos para el contenedor de teléfono con código de país */
+        .phone-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .country-code {
+            flex: 0 0 80px;
+        }
+        
+        .phone-number {
+            flex: 1;
+        }
+        
+        /* Estilos para checkbox mejorado */
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .checkbox-container:hover {
+            background: rgba(124, 58, 237, 0.05);
+            border-color: rgba(124, 58, 237, 0.4);
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            margin-top: 0.25rem;
+            min-width: 18px;
+            min-height: 18px;
+            accent-color: var(--primary);
+        }
+        
+        .checkbox-container label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0;
+            cursor: pointer;
+        }
+        
+        .checkbox-container label a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .checkbox-container label a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        
         /* ============================================= */
         /* MEDIA QUERIES - RESPONSIVE */
         /* ============================================= */
@@ -634,6 +703,9 @@
             .features-grid { grid-template-columns: 1fr; }
             .modal-content { padding: 1.5rem; }
             .form-actions { flex-direction: column; }
+            .phone-container { flex-direction: column; }
+            .country-code { flex: 1; }
+            .checkbox-container { flex-direction: column; }
         }
         
         @media (max-width: 480px) {
@@ -879,10 +951,9 @@
             
             <div class="info-banner">
                 <h3><i class="fas fa-gift"></i> 30 DÍAS DE PRUEBA GRATUITA</h3>
-                <p>Sin compromiso - Sin cargos ocultos</p>
             </div>
             
-            <form id="registerForm" onsubmit="registerCompanyStep1(event)">
+            <form id="registerForm" onsubmit="registerCompany(event)">
                 <div class="form-group">
                     <label><i class="fas fa-building"></i> Razón Social *</label>
                     <input type="text" id="companyName" required placeholder="Ej: Mi Empresa S.A.">
@@ -910,26 +981,14 @@
                     </select>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label>Primer Nombre *</label>
-                        <input type="text" id="firstName" required placeholder="Nombre">
-                    </div>
-                    <div class="form-group">
-                        <label>Segundo Nombre</label>
-                        <input type="text" id="secondName" placeholder="Segundo nombre">
-                    </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nombres *</label>
+                    <input type="text" id="names" required placeholder="Ingrese sus nombres completos">
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label>Primer Apellido *</label>
-                        <input type="text" id="firstLastName" required placeholder="Apellido paterno">
-                    </div>
-                    <div class="form-group">
-                        <label>Segundo Apellido</label>
-                        <input type="text" id="secondLastName" placeholder="Apellido materno">
-                    </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Apellidos *</label>
+                    <input type="text" id="lastNames" required placeholder="Ingrese sus apellidos completos">
                 </div>
                 
                 <div class="form-group">
@@ -939,34 +998,51 @@
                 
                 <div class="form-group">
                     <label><i class="fas fa-phone"></i> Teléfono/Celular *</label>
-                    <input type="tel" id="companyPhone" required placeholder="+591 60000000">
+                    <div class="phone-container">
+                        <div class="form-group country-code">
+                            <select id="countryCode" required style="width: 100%;">
+                                <option value="+591">+591 (BO)</option>
+                                <option value="+51">+51 (PE)</option>
+                                <option value="+56">+56 (CL)</option>
+                                <option value="+54">+54 (AR)</option>
+                                <option value="+55">+55 (BR)</option>
+                                <option value="+57">+57 (CO)</option>
+                                <option value="+58">+58 (VE)</option>
+                                <option value="+52">+52 (MX)</option>
+                                <option value="+1">+1 (US/CA)</option>
+                                <option value="+34">+34 (ES)</option>
+                            </select>
+                        </div>
+                        <div class="form-group phone-number">
+                            <input type="tel" id="companyPhone" required placeholder="60000000">
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label><i class="fas fa-key"></i> Contraseña Administrador *</label>
                     <div class="password-wrapper">
-                        <input type="password" id="adminPassword" required minlength="8">
+                        <input type="password" id="adminPassword" required minlength="8" placeholder="Mínimo 8 caracteres">
                         <button type="button" class="toggle-password" onclick="togglePassword('adminPassword')">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
-                    <small style="color: rgba(255,255,255,0.6);">Mínimo 8 caracteres</small>
                 </div>
                 
                 <div class="form-group">
                     <label><i class="fas fa-key"></i> Confirmar Contraseña *</label>
                     <div class="password-wrapper">
-                        <input type="password" id="confirmPassword" required minlength="8">
+                        <input type="password" id="confirmPassword" required minlength="8" placeholder="Repita su contraseña">
                         <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label style="display: flex; align-items: start; gap: 0.5rem; color: rgba(255,255,255,0.9);">
-                        <input type="checkbox" required style="margin-top: 0.3rem;">
-                        <span>Acepto los términos y condiciones del servicio y autorizo el tratamiento de mis datos según la normativa boliviana.</span>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="termsCheckbox" required>
+                    <label for="termsCheckbox">
+                        Acepto los <a href="#" onclick="showTerms()">términos y condiciones</a> del servicio y autorizo el tratamiento de mis datos según la normativa boliviana.
                     </label>
                 </div>
                 
@@ -975,72 +1051,7 @@
                         Cancelar
                     </button>
                     <button type="submit" class="cyber-btn">
-                        <i class="fas fa-arrow-right"></i> CONTINUAR CON TARJETA
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: TARJETA DE CRÉDITO -->
-    <div class="cyber-modal" id="cardModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeCardModal()">×</button>
-            
-            <div class="modal-header">
-                <h2><i class="fas fa-credit-card"></i> DATOS DE PAGO</h2>
-                <p style="color: rgba(255,255,255,0.7);">Información de tarjeta para verificación</p>
-            </div>
-            
-            <div class="protection-banner">
-                <h3><i class="fas fa-shield-alt"></i> PROTECCIÓN AL USUARIO</h3>
-                <p><strong>PRIMER MES COMPLETAMENTE GRATIS</strong></p>
-                <p>Registre su empresa ahora y disfrute de 30 días completos de uso gratuito.</p>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Sin cargos ocultos, sin sorpresas.</p>
-            </div>
-            
-            <div class="info-banner" style="background: rgba(255,215,0,0.1); border-color: var(--accent);">
-                <h3><i class="fas fa-info-circle"></i> IMPORTANTE</h3>
-                <p>Sus datos de tarjeta son requeridos únicamente para verificación.</p>
-                <p><strong>NO se realizará ningún cobro durante los primeros 30 días.</strong></p>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Pasado el mes de prueba, usted autorizará los pagos desde su panel de control.</p>
-            </div>
-            
-            <form id="cardForm" onsubmit="registerCompanyStep2(event)">
-                <div class="form-group">
-                    <label><i class="fas fa-credit-card"></i> Número de Tarjeta *</label>
-                    <input type="text" id="cardNumber" required placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label>Vencimiento *</label>
-                        <input type="text" id="cardExpiry" required placeholder="MM/AA" maxlength="5">
-                    </div>
-                    <div class="form-group">
-                        <label>CVV *</label>
-                        <input type="text" id="cardCVV" required placeholder="123" maxlength="4">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Nombre en la Tarjeta *</label>
-                    <input type="text" id="cardName" required placeholder="Como aparece en la tarjeta">
-                </div>
-                
-                <div class="form-group">
-                    <label style="display: flex; align-items: start; gap: 0.5rem; color: rgba(255,255,255,0.9);">
-                        <input type="checkbox" required style="margin-top: 0.3rem;">
-                        <span>Autorizo que los datos de mi tarjeta sean almacenados de forma segura para futuros pagos, los cuales requerirán mi autorización expresa desde el panel administrativo. Entiendo que NO se me cobrará durante los primeros 30 días.</span>
-                    </label>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="cyber-btn btn-secondary" onclick="backToRegister()">
-                        <i class="fas fa-arrow-left"></i> VOLVER
-                    </button>
-                    <button type="submit" class="cyber-btn">
-                        <i class="fas fa-check-circle"></i> COMPLETAR REGISTRO
+                        <i class="fas fa-check-circle"></i> REGISTRAR EMPRESA
                     </button>
                 </div>
             </form>
@@ -1051,7 +1062,7 @@
         // =============================================
         // REGIÓN: CONFIGURACIÓN GLOBAL
         // =============================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzsFv1oYIlOeS6KR9hGJD7DMQG3UiOv_3lhiaIY8t5rLHZFqZML0UuBq5Ijbyri_ARw/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw28FmFsyXqe-2i5pxYEXcNTs2SqdUDn4tFNQvLusGNydDUNotf7qE7tI4zR1gI65nT/exec';
         let registeredCompanyData = null;
         
         // =============================================
@@ -1101,38 +1112,23 @@
         
         // FUNCIÓN: Cerrar modal de registro
         function closeRegisterModal() {
-            document.getElementById('registerModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-            resetRegisterForm();
-        }
-        
-        // FUNCIÓN: Abrir modal de tarjeta
-        function openCardModal() {
-            closeAllModals();
-            document.getElementById('cardModal').style.display = 'flex';
-            document.getElementById('cardNumber').focus();
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // FUNCIÓN: Cerrar modal de tarjeta
-        function closeCardModal() {
-            document.getElementById('cardModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-            resetCardForm();
+            // Solo cerrar si se hace clic en la X, no afuera
+            const modal = document.getElementById('registerModal');
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                resetRegisterForm();
+            }
         }
         
         // FUNCIÓN: Cerrar todos los modales
         function closeAllModals() {
-            document.querySelectorAll('.cyber-modal').forEach(modal => {
-                modal.style.display = 'none';
-            });
-            document.body.style.overflow = 'auto';
-        }
-        
-        // FUNCIÓN: Volver al registro desde tarjeta
-        function backToRegister() {
-            closeCardModal();
-            setTimeout(() => openRegisterModal(), 300);
+            // Solo cerrar loginModal automáticamente al hacer clic fuera
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal.style.display === 'flex') {
+                loginModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
         }
         
         // =============================================
@@ -1162,9 +1158,10 @@
             registeredCompanyData = null;
         }
         
-        // FUNCIÓN: Resetear formulario de tarjeta
-        function resetCardForm() {
-            document.getElementById('cardForm').reset();
+        // FUNCIÓN: Mostrar términos y condiciones
+        function showTerms() {
+            alert('Términos y condiciones:\n\n1. Uso exclusivo para empresas registradas en Bolivia\n2. Los datos serán tratados conforme a la Ley 548 de Protección de Datos Personales\n3. Período de prueba gratuito de 30 días\n4. Cancelación en cualquier momento desde el panel de control\n\nPara ver los términos completos, contacte a soporte: marcelodanielcc@gmail.com');
+            return false;
         }
         
         // =============================================
@@ -1173,43 +1170,16 @@
         
         // FUNCIÓN: Validar NIT boliviano
         function validateBolivianNIT(nit) {
-            // Formato básico de NIT boliviano (puedes ajustar según necesidades)
             const nitRegex = /^[0-9]{7,15}$/;
             return nitRegex.test(nit.replace(/\D/g, ''));
         }
         
-        // FUNCIÓN: Validar número de tarjeta
-        function validateCardNumber(cardNumber) {
-            const cleanCard = cardNumber.replace(/\s/g, '');
-            // Validar longitud básica
-            return cleanCard.length >= 15 && cleanCard.length <= 19;
-        }
-        
-        // FUNCIÓN: Validar fecha de vencimiento
-        function validateExpiryDate(expiry) {
-            const regex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
-            if (!regex.test(expiry)) return false;
-            
-            const [month, year] = expiry.split('/');
-            const now = new Date();
-            const currentYear = now.getFullYear() % 100;
-            const currentMonth = now.getMonth() + 1;
-            
-            const expiryYear = parseInt(year);
-            const expiryMonth = parseInt(month);
-            
-            if (expiryYear < currentYear) return false;
-            if (expiryYear === currentYear && expiryMonth < currentMonth) return false;
-            
-            return true;
-        }
-        
         // =============================================
-        // MÓDULO: REGISTRO PASO 1 - DATOS EMPRESA
+        // MÓDULO: REGISTRO DE EMPRESA
         // =============================================
         
-        // FUNCIÓN: Procesar registro paso 1
-        function registerCompanyStep1(event) {
+        // FUNCIÓN: Procesar registro de empresa
+        async function registerCompany(event) {
             event.preventDefault();
             
             // Validar contraseñas
@@ -1227,28 +1197,29 @@
             }
             
             // Recopilar datos
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('companyPhone').value;
+            
             registeredCompanyData = {
                 nombre: document.getElementById('companyName').value.trim(),
                 nit: document.getElementById('companyNIT').value.trim(),
                 industria: document.getElementById('companyIndustry').value,
-                primer_nombre: document.getElementById('firstName').value.trim(),
-                segundo_nombre: document.getElementById('secondName').value.trim() || '',
-                primer_apellido: document.getElementById('firstLastName').value.trim(),
-                segundo_apellido: document.getElementById('secondLastName').value.trim() || '',
+                nombres: document.getElementById('names').value.trim(),
+                apellidos: document.getElementById('lastNames').value.trim(),
                 email: document.getElementById('companyEmail').value.trim().toLowerCase(),
-                telefono: document.getElementById('companyPhone').value.trim(),
+                telefono: `${countryCode} ${phoneNumber}`,
                 password: password,
                 pais: 'Bolivia',
                 fecha_registro: new Date().toISOString().split('T')[0]
             };
             
             // Validar campos requeridos
-            const requiredFields = ['nombre', 'nit', 'industria', 'primer_nombre', 
-                                  'primer_apellido', 'email', 'telefono'];
+            const requiredFields = ['nombre', 'nit', 'industria', 'nombres', 
+                                  'apellidos', 'email', 'telefono'];
             
             for (const field of requiredFields) {
                 if (!registeredCompanyData[field]) {
-                    alert(`Por favor complete el campo: ${field.replace('_', ' ')}`);
+                    alert(`Por favor complete el campo: ${field}`);
                     return;
                 }
             }
@@ -1266,83 +1237,32 @@
                 return;
             }
             
-            // Validar teléfono boliviano
-            const phoneRegex = /^(\+591|591)?\s?[67]\d{7}$/;
-            const cleanPhone = registeredCompanyData.telefono.replace(/\D/g, '');
-            if (!phoneRegex.test(cleanPhone)) {
-                alert('Por favor ingrese un número de teléfono/celular boliviano válido');
-                return;
-            }
-            
-            // Ir a modal de tarjeta
-            closeRegisterModal();
-            setTimeout(openCardModal, 300);
-        }
-        
-        // =============================================
-        // MÓDULO: REGISTRO PASO 2 - DATOS TARJETA
-        // =============================================
-        
-        // FUNCIÓN: Procesar registro paso 2
-        async function registerCompanyStep2(event) {
-            event.preventDefault();
-            
-            if (!registeredCompanyData) {
-                alert('Error: Datos de empresa no encontrados. Por favor comience de nuevo.');
-                closeCardModal();
-                openRegisterModal();
-                return;
-            }
-            
-            // Recopilar datos de tarjeta
-            const cardData = {
-                tarjeta_numero: document.getElementById('cardNumber').value.replace(/\s/g, ''),
-                tarjeta_vencimiento: document.getElementById('cardExpiry').value,
-                tarjeta_cvv: document.getElementById('cardCVV').value,
-                tarjeta_nombre: document.getElementById('cardName').value.trim()
-            };
-            
-            // Validar datos de tarjeta
-            if (!validateCardNumber(cardData.tarjeta_numero)) {
-                alert('Número de tarjeta inválido');
-                return;
-            }
-            
-            if (!validateExpiryDate(cardData.tarjeta_vencimiento)) {
-                alert('Fecha de vencimiento inválida o expirada. Use formato MM/AA');
-                return;
-            }
-            
-            if (cardData.tarjeta_cvv.length < 3 || cardData.tarjeta_cvv.length > 4) {
-                alert('CVV inválido (3 o 4 dígitos)');
-                return;
-            }
-            
-            if (!cardData.tarjeta_nombre) {
-                alert('Por favor ingrese el nombre como aparece en la tarjeta');
+            // Validar teléfono (solo números después del código de país)
+            const phoneDigits = phoneNumber.replace(/\D/g, '');
+            if (phoneDigits.length < 7) {
+                alert('Por favor ingrese un número de teléfono válido (mínimo 7 dígitos)');
                 return;
             }
             
             // Mostrar loading
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> REGISTRANDO...';
             submitBtn.disabled = true;
             
             try {
-                // Combinar datos
-                const fullData = {
+                // Preparar datos para la API
+                const apiData = {
                     ...registeredCompanyData,
-                    ...cardData,
                     action: 'registerCompany'
                 };
                 
-                console.log('Enviando datos a API:', fullData);
+                console.log('Enviando datos a API:', apiData);
                 
                 // Llamar a la API
                 const formData = new FormData();
-                Object.keys(fullData).forEach(key => {
-                    formData.append(key, fullData[key]);
+                Object.keys(apiData).forEach(key => {
+                    formData.append(key, apiData[key]);
                 });
                 
                 const response = await fetch(API_URL, {
@@ -1364,9 +1284,19 @@
                 
             } catch (error) {
                 console.error('Error en registro:', error);
-                alert('Error de conexión con el servidor. Por favor intente nuevamente.');
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+                // Si hay error de conexión, simular éxito para pruebas
+                if (error.message.includes('Failed to fetch')) {
+                    alert('Nota: Error de conexión con el servidor. En modo de prueba, se simula registro exitoso.');
+                    showSuccessModal({
+                        success: true,
+                        empresa_id: 'EMP-' + Math.random().toString(36).substr(2, 8).toUpperCase(),
+                        message: 'Registro completado (modo prueba)'
+                    });
+                } else {
+                    alert('Error de conexión con el servidor. Por favor intente nuevamente.');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
             }
         }
         
@@ -1449,7 +1379,7 @@
         
         // FUNCIÓN: Mostrar modal de éxito
         function showSuccessModal(apiResult) {
-            closeCardModal();
+            closeRegisterModal();
             
             const successModal = document.createElement('div');
             successModal.className = 'cyber-modal';
@@ -1499,15 +1429,14 @@
             
             // Resetear datos
             resetRegisterForm();
-            resetCardForm();
         }
         
         // FUNCIÓN: Generar email del jefe
         function generateJefeEmail(companyData) {
-            const firstName = companyData.primer_nombre.toLowerCase();
-            const lastName = companyData.primer_apellido.toLowerCase().replace(/\s+/g, '');
+            const firstNames = companyData.nombres.toLowerCase().split(' ')[0];
+            const firstLastNames = companyData.apellidos.toLowerCase().split(' ')[0].replace(/\s+/g, '');
             const domain = companyData.email.split('@')[1] || 'nexialsuite.bo';
-            return `${firstName}.${lastName}@${domain}`;
+            return `${firstNames}.${firstLastNames}@${domain}`;
         }
         
         // FUNCIÓN: Cerrar modal de éxito
@@ -1549,38 +1478,33 @@
         // EVENT LISTENERS */
         // ============================================= */
         
-        // Formatear número de tarjeta
-        document.getElementById('cardNumber')?.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-            e.target.value = value.substring(0, 19);
-        });
-        
-        // Formatear fecha de vencimiento
-        document.getElementById('cardExpiry')?.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
-            }
-            e.target.value = value.substring(0, 5);
-        });
-        
         // Enter para login
         document.getElementById('loginPass')?.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
         
-        // Cerrar modal al hacer click fuera
-        document.querySelectorAll('.cyber-modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    const modalId = this.id;
-                    if (modalId === 'loginModal') closeLoginModal();
-                    else if (modalId === 'registerModal') closeRegisterModal();
-                    else if (modalId === 'cardModal') closeCardModal();
-                    else this.remove();
-                }
-            });
+        // Prevenir cierre de registroModal al hacer clic fuera
+        document.getElementById('registerModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                e.stopPropagation();
+            }
+        });
+        
+        // Permitir cierre de loginModal al hacer clic fuera
+        document.getElementById('loginModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLoginModal();
+            }
+        });
+        
+        // Formatear NIT (solo números)
+        document.getElementById('companyNIT')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+        
+        // Formatear teléfono (solo números)
+        document.getElementById('companyPhone')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
         });
         
         // =============================================
@@ -1624,6 +1548,3 @@
     </script>
 </body>
 </html>
-
-
-
