@@ -1204,61 +1204,70 @@
             try {
                 showLoading();
                 
-                console.log(`📤 Enviando POST a API: ${action}`, data);
+                console.log(`📤 Enviando a API: ${action}`, data);
                 
-                const requestData = {
-                    action: action,
-                    ...data,
-                    timestamp: Date.now()
-                };
+                // Construir URL con parámetros GET (más confiable para Apps Script)
+                let url = `${API_URL}?action=${encodeURIComponent(action)}`;
+                
+                // Agregar todos los parámetros
+                Object.keys(data).forEach(key => {
+                if (data[key] !== undefined && data[key] !== null && data[key] !== '') {
+                    url += `&${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`;
+                }
+                });
+                
+                // Añadir timestamp para evitar cache
+                url += `&_t=${Date.now()}`;
+                
+                console.log(`📤 URL: ${url.substring(0, 100)}...`);
                 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 15000);
                 
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(requestData),
-                    signal: controller.signal
+                // Usar GET en lugar de POST (más compatible con Apps Script)
+                const response = await fetch(url, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' },
+                mode: 'cors',
+                signal: controller.signal
                 });
                 
                 clearTimeout(timeoutId);
                 
-                console.log(`📥 Respuesta status: ${response.status}`);
+                console.log(`📥 Status: ${response.status}`);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const result = await response.json();
-                console.log(`✅ Respuesta API ${action}:`, result);
+                console.log(`✅ Resultado ${action}:`, result);
                 
                 hideLoading();
                 
                 if (result.success) {
-                    return result;
+                return result;
                 } else {
-                    throw new Error(result.error || 'Error en la API');
+                throw new Error(result.error || 'Error en la API');
                 }
                 
             } catch (error) {
-                console.error('❌ Error en API POST:', error);
+                console.error('❌ Error API:', error);
                 hideLoading();
                 
                 let errorMessage = error.message;
                 if (error.name === 'AbortError') {
-                    errorMessage = 'Timeout: El servidor tardó demasiado en responder';
+                errorMessage = 'Timeout: El servidor tardó demasiado en responder';
                 } else if (error.message.includes('Failed to fetch')) {
-                    errorMessage = 'Error de conexión. Verifica tu internet.';
+                errorMessage = 'Error de conexión. Verifica tu internet y la URL de la API.';
+                } else if (error.message.includes('CORS')) {
+                errorMessage = 'Error CORS. La API no permite solicitudes desde este dominio.';
                 }
                 
                 showNotification('error', 'Error de API', errorMessage);
                 throw error;
             }
-        }
+            }
         
         // =============================================
         // MÓDULO: CARGA DE DATOS DESDE GOOGLE SHEETS
@@ -3123,5 +3132,3 @@
     </script>
 </body>
 </html>
-
-
