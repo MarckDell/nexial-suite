@@ -965,6 +965,19 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
+        .protection-banner {
+            background: rgba(124, 58, 237, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+        }
+        
+        .protection-banner i {
+            color: var(--secondary);
+            margin-right: 0.5rem;
+        }
+
     </style>
 </head>
 <body>
@@ -1017,7 +1030,7 @@
                 </div>
 
                 <!-- BLOQUE: VISTA SUPER USUARIO -->
-                <div id="viewSuper" class="role-view">
+                <div id="viewSuper" class="role-view active">
                     <!-- Contenido dinámico para Super Usuario -->
                 </div>
 
@@ -1288,14 +1301,13 @@
                 showNotification('error', 'Error de API', errorMessage);
                 throw error;
             }
-            }
+        }
         
         // =============================================
         // MÓDULO: CARGA DE DATOS FILTRADA POR ROL/EMPRESA
         // =============================================
         
         async function loadEmpresasFromAPI() {
-            showLoading();
             try {
                 const result = await fetchFromAPI('getEmpresas');
                 
@@ -1319,13 +1331,10 @@
             } catch (error) {
                 console.error('Error cargando empresas:', error);
                 return false;
-            } finally {
-                hideLoading();
             }
         }
         
         async function loadUsuariosFromAPI() {
-            showLoading();
             try {
                 let params = {};
                 
@@ -1341,19 +1350,14 @@
                     return true;
                 }
                 console.warn('⚠️ No se pudieron cargar usuarios');
-                showNotification('error', 'Error', 'No se pudieron cargar los usuarios');
                 return false;
             } catch (error) {
                 console.error('Error cargando usuarios:', error);
-                showNotification('error', 'Error', 'Error cargando usuarios: ' + error.message);
                 return false;
-            } finally {
-                hideLoading();
             }
         }
         
         async function loadEmpleadosFromAPI() {
-            showLoading();
             try {
                 let params = {};
                 
@@ -1373,13 +1377,10 @@
             } catch (error) {
                 console.error('Error cargando empleados:', error);
                 return false;
-            } finally {
-                hideLoading();
             }
         }
         
         async function loadAllData() {
-            showLoading();
             try {
                 // Cargar datos según el rol
                 switch(currentUser.role) {
@@ -1418,8 +1419,6 @@
                 console.error('Error cargando datos:', error);
                 showNotification('error', 'Error', 'Error cargando datos: ' + error.message);
                 return false;
-            } finally {
-                hideLoading();
             }
         }
         
@@ -1624,28 +1623,6 @@
                 activeView.classList.add('active');
             }
             
-            // Cargar dashboard según rol INMEDIATAMENTE
-            switch(currentUser.role) {
-                case 'super':
-                    loadSuperDashboard();
-                    break;
-                case 'jefe':
-                    loadJefeDashboard();
-                    break;
-                case 'comercial':
-                    loadComercialDashboard();
-                    break;
-                case 'admin':
-                    loadAdminDashboard();
-                    break;
-                case 'vendedor':
-                    loadVendedorDashboard();
-                    break;
-                case 'almacen':
-                    loadAlmacenDashboard();
-                    break;
-            }
-                        
             console.log('✅ Interfaz configurada exitosamente');
         }
         
@@ -1661,23 +1638,14 @@
                         <i class="fas fa-sync-alt fa-spin" style="font-size: 3rem; color: var(--secondary); margin-bottom: 1rem;"></i>
                         <h3 style="color: var(--secondary);">Cargando datos...</h3>
                         <p style="color: rgba(255,255,255,0.7);">Obteniendo información de Google Sheets</p>
-                    </div>
-                `;
-                return;
-            }
-            if (database.empresas.length === 0) {
-                document.getElementById('viewSuper').innerHTML = `
-                    <div style="text-align: center; padding: 4rem;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
-                        <h3 style="color: var(--warning);">No se pudieron cargar los datos</h3>
-                        <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Error al conectar con Google Sheets</p>
-                        <button class="btn btn-primary" onclick="refreshData()">
-                            <i class="fas fa-sync-alt"></i> Reintentar
+                        <button class="btn btn-primary" onclick="refreshData()" style="margin-top: 1rem;">
+                            <i class="fas fa-sync-alt"></i> Cargar datos ahora
                         </button>
                     </div>
                 `;
                 return;
             }
+            
             const empresasCount = database.empresas.length;
             const usuariosCount = database.usuarios.length;
             const empleadosCount = database.empleados.length;
@@ -1751,6 +1719,21 @@
             const empresa = database.empresas.find(e => e.ID === empresaId) || {};
             const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
             const empleadosEmpresa = database.empleados.filter(e => e.EmpresaID === empresaId);
+            
+            // Si no hay datos de la empresa, mostrar mensaje
+            if (!empresa.ID && usuariosEmpresa.length === 0) {
+                document.getElementById('viewJefe').innerHTML = `
+                    <div style="text-align: center; padding: 4rem;">
+                        <i class="fas fa-sync-alt fa-spin" style="font-size: 3rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--secondary);">Cargando datos de la empresa...</h3>
+                        <p style="color: rgba(255,255,255,0.7);">Obteniendo información desde Google Sheets</p>
+                        <button class="btn btn-primary" onclick="refreshData()" style="margin-top: 1rem;">
+                            <i class="fas fa-sync-alt"></i> Cargar datos ahora
+                        </button>
+                    </div>
+                `;
+                return;
+            }
             
             document.getElementById('viewJefe').innerHTML = `
                 <div class="stats-grid">
@@ -1883,6 +1866,9 @@
         
         function loadComercialDashboard() {
             const empresaId = currentUser.empresa_id || currentUser.EmpresaID;
+            const usuariosComerciales = database.usuarios.filter(u => 
+                u.EmpresaID === empresaId && (u.Role === 'comercial' || u.Role === 'vendedor')
+            );
             
             document.getElementById('viewComercial').innerHTML = `
                 <div class="stats-grid">
@@ -1902,7 +1888,7 @@
                             <div class="stat-title">Vendedores</div>
                             <div class="stat-icon"><i class="fas fa-users"></i></div>
                         </div>
-                        <div class="stat-value">0</div>
+                        <div class="stat-value">${usuariosComerciales.filter(u => u.Role === 'vendedor').length}</div>
                         <div class="stat-change positive">
                             <i class="fas fa-chart-line"></i> Activos
                         </div>
@@ -2624,9 +2610,7 @@
         async function actualizarDatosEmpresa() {
             showLoading();
             try {
-                await loadEmpresasFromAPI();
-                await loadUsuariosFromAPI();
-                await loadEmpleadosFromAPI();
+                await loadAllData();
                 
                 // Recargar dashboard según rol
                 switch(currentUser.role) {
@@ -2654,7 +2638,7 @@
         }
         
         // =============================================
-        // MÓDULO: FUNCIONES DE MODALES (MANTENIDAS DEL CÓDIGO ORIGINAL)
+        // MÓDULO: FUNCIONES DE MODALES
         // =============================================
         
         function showModal(title, content) {
@@ -2684,7 +2668,306 @@
         }
         
         // =============================================
-        // MÓDULO: NOTIFICACIONES (MANTENIDAS DEL CÓDIGO ORIGINAL)
+        // MÓDULO: FUNCIONES FALTANTES (PLACEHOLDERS)
+        // =============================================
+        
+        function showNuevaEmpresaModal() {
+            showModal('Nueva Empresa', `
+                <div style="max-width: 600px;">
+                    <div class="form-group">
+                        <label>Nombre de la Empresa *</label>
+                        <input type="text" id="newEmpresaNombre" placeholder="Ingresa el nombre de la empresa">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>RUC/NIT *</label>
+                        <input type="text" id="newEmpresaRUC" placeholder="Ingresa el RUC o NIT">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contacto</label>
+                        <input type="text" id="newEmpresaContacto" placeholder="Nombre de contacto">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="newEmpresaEmail" placeholder="email@empresa.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="newEmpresaTelefono" placeholder="Número de teléfono">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Industria</label>
+                        <input type="text" id="newEmpresaIndustria" placeholder="Tipo de industria">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <input type="text" id="newEmpresaDireccion" placeholder="Dirección completa">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ciudad</label>
+                        <input type="text" id="newEmpresaCiudad" placeholder="Ciudad">
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <button class="btn btn-secondary" onclick="closeModal()">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" onclick="crearNuevaEmpresa()">
+                            <i class="fas fa-save"></i> Guardar Empresa
+                        </button>
+                    </div>
+                </div>
+            `);
+        }
+        
+        function crearNuevaEmpresa() {
+            // Esta función debe conectarse con la API
+            showNotification('info', 'Funcionalidad en desarrollo', 'La creación de empresas estará disponible en la próxima actualización');
+            closeModal();
+        }
+        
+        function editarInformacionEmpresa() {
+            showModal('Editar Información de Empresa', `
+                <div style="max-width: 600px; text-align: center; padding: 3rem;">
+                    <i class="fas fa-tools" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--warning);">Funcionalidad en Desarrollo</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">
+                        La edición de información de empresas estará disponible en la próxima actualización.
+                    </p>
+                    <button class="btn btn-primary" onclick="closeModal()">
+                        Entendido
+                    </button>
+                </div>
+            `);
+        }
+        
+        function viewEmpresaCompleta(empresaId) {
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            if (!empresa) return;
+            
+            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
+            
+            showModal(`Detalles de Empresa: ${empresa.Nombre}`, `
+                <div style="max-width: 800px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Información General</h4>
+                            <p><strong>ID:</strong> ${empresa.ID || 'N/A'}</p>
+                            <p><strong>Nombre:</strong> ${empresa.Nombre}</p>
+                            <p><strong>RUC/NIT:</strong> ${empresa.RUC || 'No registrado'}</p>
+                            <p><strong>Industria:</strong> ${empresa.Industria || 'No especificada'}</p>
+                            <p><strong>Estado:</strong> <span class="status-badge ${empresa.Estado === 'Activa' ? 'status-active' : 'status-inactive'}">${empresa.Estado || 'Activa'}</span></p>
+                        </div>
+                        
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">Contacto</h4>
+                            <p><strong>Contacto:</strong> ${empresa.Contacto || 'No registrado'}</p>
+                            <p><strong>Email:</strong> ${empresa.Email || 'No registrado'}</p>
+                            <p><strong>Teléfono:</strong> ${empresa.Teléfono || 'No registrado'}</p>
+                            <p><strong>Dirección:</strong> ${empresa.Dirección || 'No registrada'}</p>
+                            <p><strong>Ciudad:</strong> ${empresa.Ciudad || 'No especificada'}</p>
+                        </div>
+                    </div>
+                    
+                    <h4 style="color: var(--secondary); margin-bottom: 1rem;">Usuarios Asociados (${usuariosEmpresa.length})</h4>
+                    <div class="table-wrapper">
+                        <table class="data-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${usuariosEmpresa.map(usuario => `
+                                    <tr>
+                                        <td>${usuario.Nombre}</td>
+                                        <td>${usuario.Email}</td>
+                                        <td>${getRoleName(usuario.Role)}</td>
+                                        <td>
+                                            <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${usuariosEmpresa.length === 0 ? `
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 1rem; color: rgba(255,255,255,0.5);">
+                                            No hay usuarios en esta empresa
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `);
+        }
+        
+        function editEmpresaCompleta(empresaId) {
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            if (!empresa) return;
+            
+            showModal(`Editar Empresa: ${empresa.Nombre}`, `
+                <div style="max-width: 600px; text-align: center; padding: 3rem;">
+                    <i class="fas fa-tools" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--warning);">Funcionalidad en Desarrollo</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">
+                        La edición completa de empresas estará disponible en la próxima actualización.
+                    </p>
+                    <button class="btn btn-primary" onclick="closeModal()">
+                        Entendido
+                    </button>
+                </div>
+            `);
+        }
+        
+        function confirmarEliminarEmpresa(empresaId, empresaNombre) {
+            showConfirmation(
+                'Eliminar Empresa',
+                `¿Estás seguro de eliminar la empresa <strong>${empresaNombre}</strong>?<br><br>
+                <span style="color: var(--danger); font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Esta acción también eliminará todos los usuarios asociados y no se puede deshacer.
+                </span>`,
+                function() {
+                    showNotification('info', 'Eliminación en desarrollo', 'La eliminación de empresas estará disponible en la próxima actualización');
+                }
+            );
+        }
+        
+        function manageUsuariosEmpresa(empresaId) {
+            const empresa = database.empresas.find(e => e.ID === empresaId);
+            const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
+            
+            showModal(`Gestionar Usuarios: ${empresa?.Nombre || 'Empresa'}`, `
+                <div style="max-width: 800px;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <button class="btn btn-primary" onclick="showNuevoUsuarioParaEmpresa('${empresaId}')">
+                            <i class="fas fa-user-plus"></i> Agregar Usuario
+                        </button>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="data-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${usuariosEmpresa.map(usuario => `
+                                    <tr>
+                                        <td>${usuario.Nombre}</td>
+                                        <td>${usuario.Email}</td>
+                                        <td>${getRoleName(usuario.Role)}</td>
+                                        <td>
+                                            <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
+                                                ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="action-btn edit" onclick="editUsuarioCompleto('${usuario.ID}')" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn delete" onclick="confirmarEliminarUsuario('${usuario.ID}', '${usuario.Nombre}')" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                                ${usuariosEmpresa.length === 0 ? `
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                                            <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                            No hay usuarios en esta empresa
+                                        </td>
+                                    </tr>
+                                ` : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `);
+        }
+        
+        function showNuevoUsuarioModalAvanzado() {
+            showModal('Nuevo Usuario', `
+                <div style="max-width: 600px; text-align: center; padding: 3rem;">
+                    <i class="fas fa-tools" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--warning);">Funcionalidad en Desarrollo</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">
+                        La creación avanzada de usuarios estará disponible en la próxima actualización.
+                    </p>
+                    <button class="btn btn-primary" onclick="closeModal()">
+                        Entendido
+                    </button>
+                </div>
+            `);
+        }
+        
+        function showNuevoUsuarioParaEmpresa(empresaId) {
+            showModal('Agregar Usuario a Empresa', `
+                <div style="max-width: 600px; text-align: center; padding: 3rem;">
+                    <i class="fas fa-tools" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--warning);">Funcionalidad en Desarrollo</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">
+                        La creación de usuarios para empresas estará disponible en la próxima actualización.
+                    </p>
+                    <button class="btn btn-primary" onclick="closeModal()">
+                        Entendido
+                    </button>
+                </div>
+            `);
+        }
+        
+        function editUsuarioCompleto(usuarioId) {
+            const usuario = database.usuarios.find(u => u.ID === usuarioId);
+            if (!usuario) return;
+            
+            showModal(`Editar Usuario: ${usuario.Nombre}`, `
+                <div style="max-width: 600px; text-align: center; padding: 3rem;">
+                    <i class="fas fa-tools" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--warning);">Funcionalidad en Desarrollo</h3>
+                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">
+                        La edición de usuarios estará disponible en la próxima actualización.
+                    </p>
+                    <button class="btn btn-primary" onclick="closeModal()">
+                        Entendido
+                    </button>
+                </div>
+            `);
+        }
+        
+        function confirmarEliminarUsuario(usuarioId, usuarioNombre) {
+            showConfirmation(
+                'Eliminar Usuario',
+                `¿Estás seguro de eliminar al usuario <strong>${usuarioNombre}</strong>?<br><br>
+                <span style="color: var(--danger); font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Esta acción no se puede deshacer.
+                </span>`,
+                function() {
+                    showNotification('info', 'Eliminación en desarrollo', 'La eliminación de usuarios estará disponible en la próxima actualización');
+                }
+            );
+        }
+        
+        // =============================================
+        // MÓDULO: NOTIFICACIONES
         // =============================================
         
         function showNotification(type, title, message) {
@@ -2828,29 +3111,55 @@
                 // Configurar interfaz PRIMERO para mostrar algo
                 configureInterface();
                 
+                // Mostrar vista de carga inicial
+                document.getElementById('viewSuper').innerHTML = `
+                    <div style="text-align: center; padding: 4rem;">
+                        <i class="fas fa-sync-alt fa-spin" style="font-size: 3rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--secondary);">Cargando datos...</h3>
+                        <p style="color: rgba(255,255,255,0.7);">Obteniendo información de Google Sheets</p>
+                        <button class="btn btn-primary" onclick="refreshData()" style="margin-top: 1rem;">
+                            <i class="fas fa-sync-alt"></i> Cargar datos ahora
+                        </button>
+                    </div>
+                `;
+                
                 // Luego cargar datos en segundo plano
                 showLoading();
                 setTimeout(async () => {
                     try {
                         await loadAllData();
                         
-                        // Recargar dashboard con datos actualizados
-                        if (currentUser.role === 'super') {
-                            loadSuperDashboard();
-                        } else if (currentUser.role === 'jefe') {
-                            loadJefeDashboard();
-                        } else if (currentUser.role === 'comercial') {
-                            loadComercialDashboard();
-                        } else if (currentUser.role === 'admin') {
-                            loadAdminDashboard();
+                        // Recargar dashboard con datos actualizados según rol
+                        switch(currentUser.role) {
+                            case 'super':
+                                loadSuperDashboard();
+                                break;
+                            case 'jefe':
+                                loadJefeDashboard();
+                                break;
+                            case 'comercial':
+                                loadComercialDashboard();
+                                break;
+                            case 'admin':
+                                loadAdminDashboard();
+                                break;
+                            case 'vendedor':
+                                loadVendedorDashboard();
+                                break;
+                            case 'almacen':
+                                loadAlmacenDashboard();
+                                break;
                         }
                         
                         hideLoading();
+                        showNotification('success', 'Sesión Iniciada', `Bienvenido ${currentUser.nombre || 'Usuario'}`);
+                        
                     } catch (error) {
                         console.error('Error cargando datos:', error);
                         hideLoading();
+                        showNotification('error', 'Error de carga', 'No se pudieron cargar los datos. Por favor, intenta actualizar.');
                     }
-                }, 100);
+                }, 500);
                 
                 console.log('✅ Sistema inicializado correctamente');
                 
