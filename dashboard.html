@@ -1279,17 +1279,28 @@
                 const result = await fetchFromAPI('getEmpresas');
                 
                 if (result && result.success && result.empresas) {
+                    // Limpiar y actualizar la caché
                     database.empresas = result.empresas;
                     console.log(`✅ Empresas cargadas: ${result.empresas.length}`);
+                    
+                    // Si soy jefe y no tengo mi empresa en caché, forzar recarga
+                    if (currentUser && currentUser.role === 'jefe' && currentUser.empresa_id) {
+                        const miEmpresa = database.empresas.find(e => e.ID === currentUser.empresa_id);
+                        if (!miEmpresa) {
+                            console.log('Empresa del jefe no encontrada en cache, recargando dashboard...');
+                            setTimeout(() => {
+                                loadJefeDashboard();
+                            }, 100);
+                        }
+                    }
+                    
                     return true;
                 } else {
                     console.warn('⚠️ No se pudieron cargar empresas:', result?.error);
-                    showNotification('error', 'Error', 'No se pudieron cargar las empresas');
                     return false;
                 }
             } catch (error) {
                 console.error('Error cargando empresas:', error);
-                showNotification('error', 'Error', 'Error cargando empresas: ' + error.message);
                 return false;
             } finally {
                 hideLoading();
@@ -1448,9 +1459,22 @@
             if (currentUser.role === 'super') {
                 loadSuperDashboard();
             } else if (currentUser.role === 'jefe') {
-                loadJefeDashboard();
+                // Cargar específicamente los datos de la empresa del jefe primero
+                showLoading();
+                Promise.all([
+                    loadEmpresasFromAPI(),
+                    loadUsuariosFromAPI(currentUser.empresa_id),
+                    loadEmpleadosFromAPI(currentUser.empresa_id)
+                ]).then(() => {
+                    loadJefeDashboard();
+                    hideLoading();
+                }).catch(error => {
+                    console.error('Error cargando datos del jefe:', error);
+                    loadJefeDashboard();
+                    hideLoading();
+                });
             }
-            
+                        
             console.log('✅ Interfaz configurada exitosamente');
         }
         
@@ -1525,9 +1549,77 @@
         
         function loadJefeDashboard() {
             const empresaId = currentUser.empresa_id;
-            const empresa = database.empresas.find(e => e.ID === empresaId) || {};
+            console.log('Cargando dashboard jefe para empresa ID:', empresaId);
+            console.log('Base de datos empresas:', database.empresas);
+            
+            // Buscar la empresa actual del usuario
+            let empresa = database.empresas.find(e => e.ID === empresaId);
+            
+            if (!empresa && currentUser.empresa) {
+                console.log('Empresa no encontrada por ID, buscando por nombre...');
+                empresa = database.empresas.find(e => 
+                    e.Nombre && e.Nombre.toLowerCase() === currentUser.empresa.toLowerCase()
+                );
+            }
+            
+            console.log('Empresa encontrada:', empresa);
+            
+            // Si no se encuentra en la caché, cargarla directamente de la API
+            if (!empresa && empresaId) {
+                console.log('Empresa no en caché, cargando desde API...');
+                fetchEmpresaDirectamente(empresaId).then(empresaDirecta => {
+                    if (empresaDirecta) {
+                        empresa = empresaDirecta;
+                        // Actualizar caché
+                        const index = database.empresas.findIndex(e => e.ID === empresaId);
+                        if (index === -1) {
+                            database.empresas.push(empresaDirecta);
+                        } else {
+                            database.empresas[index] = empresaDirecta;
+                        }
+                        actualizarDashboardJefe(empresaDirecta);
+                    } else {
+                        actualizarDashboardJefe({});
+                    }
+                });
+                return; // Salir temprano, la función se completará asíncronamente
+            }
+            
+            actualizarDashboardJefe(empresa || {});
+        }
+        
+        function fetchEmpresaDirectamente(empresaId) {
+            return new Promise((resolve) => {
+                fetchFromAPI('getEmpresas').then(result => {
+                    if (result && result.success && result.empresas) {
+                        const empresaEncontrada = result.empresas.find(e => e.ID === empresaId);
+                        resolve(empresaEncontrada || null);
+                    } else {
+                        resolve(null);
+                    }
+                }).catch(error => {
+                    console.error('Error cargando empresa:', error);
+                    resolve(null);
+                });
+            });
+        }
+        
+        function actualizarDashboardJefe(empresa) {
+            console.log('Actualizando dashboard con empresa:', empresa);
+            
+            const empresaId = currentUser.empresa_id;
             const usuariosEmpresa = database.usuarios.filter(u => u.EmpresaID === empresaId);
             const empleadosEmpresa = database.empleados.filter(e => e.EmpresaID === empresaId);
+            
+            // Función auxiliar para obtener valores con defaults
+            const getEmpresaValue = (field, defaultValue = 'No registrado') => {
+                if (!empresa) return defaultValue;
+                const value = empresa[field];
+                return (value !== undefined && value !== null && value !== '') ? value : defaultValue;
+            };
+            
+            // Determinar el nombre de la empresa
+            let nombreEmpresa = empresa?.Nombre || currentUser.empresa || 'Mi Empresa';
             
             document.getElementById('viewJefe').innerHTML = `
                 <div class="stats-grid">
@@ -1558,9 +1650,9 @@
                             <div class="stat-title">Empresa</div>
                             <div class="stat-icon"><i class="fas fa-building"></i></div>
                         </div>
-                        <div class="stat-value" style="font-size: 1.5rem;">${empresa.Nombre || 'Mi Empresa'}</div>
+                        <div class="stat-value" style="font-size: 1.5rem;">${nombreEmpresa}</div>
                         <div class="stat-change positive">
-                            <i class="fas fa-check-circle"></i> ${empresa.Estado || 'Activa'}
+                            <i class="fas fa-check-circle"></i> ${getEmpresaValue('Estado', 'Activa')}
                         </div>
                     </div>
                     
@@ -1593,15 +1685,15 @@
                                 <tbody>
                                     ${usuariosEmpresa.map(usuario => `
                                         <tr>
-                                            <td>${usuario.Nombre}</td>
+                                            <td>${usuario.Nombre || usuario.Email || 'Sin nombre'}</td>
                                             <td>
                                                 <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; background: ${getRoleColor(usuario.Role)}; font-size: 0.8rem;">
                                                     ${getRoleName(usuario.Role)}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="status-badge ${usuario.Activo === 'Sí' ? 'status-active' : 'status-inactive'}">
-                                                    ${usuario.Activo === 'Sí' ? 'Activo' : 'Inactivo'}
+                                                <span class="status-badge ${(usuario.Activo === 'Sí' || usuario.Activo === 'Si' || usuario.Activo === true) ? 'status-active' : 'status-inactive'}">
+                                                    ${(usuario.Activo === 'Sí' || usuario.Activo === 'Si' || usuario.Activo === true) ? 'Activo' : 'Inactivo'}
                                                 </span>
                                             </td>
                                         </tr>
@@ -1621,14 +1713,22 @@
                     <div class="table-card">
                         <div class="table-header">
                             <h3 class="table-title">Información de la Empresa</h3>
+                            <div class="table-actions">
+                                <button class="btn btn-secondary" onclick="editarInformacionEmpresa()">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </div>
                         </div>
                         <div style="padding: 1rem;">
-                            <p><strong>RUC/NIT:</strong> ${empresa.RUC || 'No registrado'}</p>
-                            <p><strong>Contacto:</strong> ${empresa.Contacto || 'No registrado'}</p>
-                            <p><strong>Email:</strong> ${empresa.Email || 'No registrado'}</p>
-                            <p><strong>Teléfono:</strong> ${empresa.Teléfono || 'No registrado'}</p>
-                            <p><strong>Industria:</strong> ${empresa.Industria || 'No especificada'}</p>
-                            <p><strong>Dirección:</strong> ${empresa.Dirección || 'No registrada'}</p>
+                            <p><strong>RUC/NIT:</strong> ${getEmpresaValue('RUC')}</p>
+                            <p><strong>Contacto:</strong> ${getEmpresaValue('Contacto')}</p>
+                            <p><strong>Email:</strong> ${getEmpresaValue('Email')}</p>
+                            <p><strong>Teléfono:</strong> ${getEmpresaValue('Teléfono')}</p>
+                            <p><strong>Industria:</strong> ${getEmpresaValue('Industria', 'No especificada')}</p>
+                            <p><strong>Dirección:</strong> ${getEmpresaValue('Dirección', 'No registrada')}</p>
+                            <p><strong>Ciudad:</strong> ${getEmpresaValue('Ciudad', 'No especificada')}</p>
+                            <p><strong>Estado:</strong> <span class="status-badge ${getEmpresaValue('Estado') === 'Activa' ? 'status-active' : 'status-inactive'}">${getEmpresaValue('Estado')}</span></p>
+                            <p><strong>Fecha Registro:</strong> ${formatDate(getEmpresaValue('FechaRegistro'))}</p>
                         </div>
                     </div>
                 </div>
@@ -1637,13 +1737,31 @@
                     <button class="btn btn-primary" onclick="loadUsuariosEmpresa()" style="margin-right: 1rem;">
                         <i class="fas fa-users-cog"></i> Gestionar Usuarios
                     </button>
-                    <button class="btn btn-secondary" onclick="editarInformacionEmpresa()">
-                        <i class="fas fa-edit"></i> Editar Información
+                    <button class="btn btn-secondary" onclick="actualizarDatosEmpresa()">
+                        <i class="fas fa-sync-alt"></i> Actualizar Datos
                     </button>
                 </div>
             `;
             
-            document.getElementById('pageTitle').textContent = `Dashboard - ${empresa.Nombre || 'Mi Empresa'}`;
+            document.getElementById('pageTitle').textContent = `Dashboard - ${nombreEmpresa}`;
+        }
+        
+        // Añade esta función para actualizar los datos de la empresa
+        async function actualizarDatosEmpresa() {
+            showLoading();
+            try {
+                await loadEmpresasFromAPI();
+                await loadUsuariosFromAPI(currentUser.empresa_id);
+                await loadEmpleadosFromAPI(currentUser.empresa_id);
+                
+                loadJefeDashboard();
+                showNotification('success', 'Datos Actualizados', 'La información de la empresa se ha actualizado correctamente');
+            } catch (error) {
+                console.error('Error actualizando datos:', error);
+                showNotification('error', 'Error', 'No se pudieron actualizar los datos');
+            } finally {
+                hideLoading();
+            }
         }
 
         function loadUsuariosEmpresa() {
@@ -3132,6 +3250,7 @@
     </script>
 </body>
 </html>
+
 
 
 
