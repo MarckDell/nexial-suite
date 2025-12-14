@@ -1624,31 +1624,27 @@
                 activeView.classList.add('active');
             }
             
-            // Cargar dashboard según rol
-            showLoading();
-            setTimeout(() => {
-                switch(currentUser.role) {
-                    case 'super':
-                        loadSuperDashboard();
-                        break;
-                    case 'jefe':
-                        loadJefeDashboard();
-                        break;
-                    case 'comercial':
-                        loadComercialDashboard();
-                        break;
-                    case 'admin':
-                        loadAdminDashboard();
-                        break;
-                    case 'vendedor':
-                        loadVendedorDashboard();
-                        break;
-                    case 'almacen':
-                        loadAlmacenDashboard();
-                        break;
-                }
-                hideLoading();
-            }, 100);
+            // Cargar dashboard según rol INMEDIATAMENTE
+            switch(currentUser.role) {
+                case 'super':
+                    loadSuperDashboard();
+                    break;
+                case 'jefe':
+                    loadJefeDashboard();
+                    break;
+                case 'comercial':
+                    loadComercialDashboard();
+                    break;
+                case 'admin':
+                    loadAdminDashboard();
+                    break;
+                case 'vendedor':
+                    loadVendedorDashboard();
+                    break;
+                case 'almacen':
+                    loadAlmacenDashboard();
+                    break;
+            }
                         
             console.log('✅ Interfaz configurada exitosamente');
         }
@@ -1658,6 +1654,30 @@
         // =============================================
         
         function loadSuperDashboard() {
+            // Si no hay datos, mostrar mensaje temporal
+            if (database.empresas.length === 0 && database.usuarios.length === 0) {
+                document.getElementById('viewSuper').innerHTML = `
+                    <div style="text-align: center; padding: 4rem;">
+                        <i class="fas fa-sync-alt fa-spin" style="font-size: 3rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--secondary);">Cargando datos...</h3>
+                        <p style="color: rgba(255,255,255,0.7);">Obteniendo información de Google Sheets</p>
+                    </div>
+                `;
+                return;
+            }
+            if (database.empresas.length === 0) {
+                document.getElementById('viewSuper').innerHTML = `
+                    <div style="text-align: center; padding: 4rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--warning);">No se pudieron cargar los datos</h3>
+                        <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Error al conectar con Google Sheets</p>
+                        <button class="btn btn-primary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> Reintentar
+                        </button>
+                    </div>
+                `;
+                return;
+            }
             const empresasCount = database.empresas.length;
             const usuariosCount = database.usuarios.length;
             const empleadosCount = database.empleados.length;
@@ -2805,14 +2825,33 @@
                 currentRole = currentUser.role;
                 console.log('👤 Usuario cargado:', currentUser);
                 
-                // Cargar datos según el rol
-                showLoading();
-                await loadAllData();
-                
-                // Configurar interfaz
+                // Configurar interfaz PRIMERO para mostrar algo
                 configureInterface();
                 
-                hideLoading();
+                // Luego cargar datos en segundo plano
+                showLoading();
+                setTimeout(async () => {
+                    try {
+                        await loadAllData();
+                        
+                        // Recargar dashboard con datos actualizados
+                        if (currentUser.role === 'super') {
+                            loadSuperDashboard();
+                        } else if (currentUser.role === 'jefe') {
+                            loadJefeDashboard();
+                        } else if (currentUser.role === 'comercial') {
+                            loadComercialDashboard();
+                        } else if (currentUser.role === 'admin') {
+                            loadAdminDashboard();
+                        }
+                        
+                        hideLoading();
+                    } catch (error) {
+                        console.error('Error cargando datos:', error);
+                        hideLoading();
+                    }
+                }, 100);
+                
                 console.log('✅ Sistema inicializado correctamente');
                 
             } catch (error) {
