@@ -368,7 +368,7 @@
             cursor: text;
         }
         
-        /* Estilos específicos para select - VISIBLE Y NÍTIDO */
+        /* Estilos específicos para select */
         .form-group select option {
             background: rgba(15, 15, 35, 1) !important;
             color: white !important;
@@ -1148,7 +1148,10 @@
                 
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email Personal *</label>
-                    <input type="email" id="directorEmail" required placeholder="juan.carlos@email.com">
+                    <input type="email" id="directorEmail" required placeholder="juan.carlos@gmail.com">
+                    <small style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+                        Este será su email de acceso al sistema
+                    </small>
                 </div>
                 
                 <div class="form-group">
@@ -1267,11 +1270,17 @@
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Persona de Contacto *</label>
                     <input type="text" id="companyContact" required placeholder="Nombre del contacto principal">
+                    <small style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+                        Generalmente el director ejecutivo
+                    </small>
                 </div>
                 
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email Corporativo *</label>
                     <input type="email" id="companyEmail" required placeholder="contacto@empresa.com">
+                    <small style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-top: 0.25rem;">
+                        Email oficial de la empresa
+                    </small>
                 </div>
                 
                 <div class="form-group">
@@ -1593,14 +1602,14 @@
             
             const companyData = {
                 nombre: document.getElementById('companyName').value.trim(),
-                documento: document.getElementById('companyRUC').value.trim(), // Cambiado de 'ruc' a 'documento'
+                documento: document.getElementById('companyRUC').value.trim(),
                 industria: document.getElementById('companyIndustry').value,
                 contacto: document.getElementById('companyContact').value.trim(),
                 email: document.getElementById('companyEmail').value.trim().toLowerCase(),
                 telefono: countryCode + ' ' + phoneNumber,
                 direccion: document.getElementById('companyAddress').value.trim(),
                 ciudad: document.getElementById('companyCity').value.trim(),
-                password: directorData.password // Enviar contraseña también
+                password: directorData.password
             };
             
             // Validar campos requeridos de empresa
@@ -1651,7 +1660,8 @@
                     telefono: companyData.telefono,
                     direccion: companyData.direccion,
                     ciudad: companyData.ciudad,
-                    password: companyData.password
+                    password: companyData.password,
+                    director_email: directorData.email // Enviar email personal del director
                 };
                 
                 console.log('Enviando datos de empresa:', completeData);
@@ -1675,23 +1685,18 @@
                 console.log('Respuesta del servidor:', result);
                 
                 if (result.success) {
-                    // Generar email profesional para el director
-                    const emailUsername = directorData.nombres.toLowerCase().split(' ')[0] + '.' + 
-                                         directorData.primer_apellido.toLowerCase().replace(/\s+/g, '');
-                    const emailDomain = companyData.email.split('@')[1] || 'nexialsuite.com';
-                    const professionalEmail = emailUsername + '@' + emailDomain;
-                    
                     hideLoading();
                     
                     // Mostrar mensaje de éxito con detalles del servidor
                     let successMessage = '✅ ¡Registro completado exitosamente!<br><br>' +
-                                        'Su empresa y usuario han sido registrados en Google Sheets.<br><br>' +
+                                        'Su empresa, usuario y empleado han sido registrados en Google Sheets.<br><br>' +
                                         '<strong>Información de acceso:</strong><br>' +
                                         '🏢 Empresa: ' + companyData.nombre + '<br>' +
                                         '👤 Usuario: ' + directorData.nombres + ' ' + directorData.primer_apellido + '<br>' +
-                                        '📧 Email: ' + (result.email || professionalEmail) + '<br>' +
+                                        '📧 Email: ' + directorData.email + '<br>' +
                                         '🔑 Contraseña: ' + directorData.password + '<br>' +
-                                        '👔 Rol: Director Ejecutivo<br><br>' +
+                                        '👔 Rol: Director Ejecutivo<br>' +
+                                        '📊 También registrado como Empleado<br><br>' +
                                         'Puede iniciar sesión ahora con estas credenciales.';
                     
                     if (result.empresa_id) {
@@ -1699,6 +1704,9 @@
                     }
                     if (result.usuario_id) {
                         successMessage += '<br>👤 ID Usuario: ' + result.usuario_id;
+                    }
+                    if (result.empleado_id) {
+                        successMessage += '<br>👷 ID Empleado: ' + result.empleado_id;
                     }
                     
                     showAlert('registerCompanyAlert', 'success', successMessage);
@@ -1714,10 +1722,10 @@
                         closeRegisterCompanyModal();
                         openLoginModal();
                         // Rellenar el email en el login
-                        document.getElementById('loginUser').value = result.email || professionalEmail;
-                        document.getElementById('loginPass').value = directorData ? directorData.password : '';
+                        document.getElementById('loginUser').value = directorData ? directorData.email : result.email;
+                        document.getElementById('loginPass').value = '';
                         document.getElementById('loginPass').focus();
-                    }, 5000);
+                    }, 6000);
                     
                 } else {
                     hideLoading();
@@ -1729,22 +1737,17 @@
                 hideLoading();
                 
                 // Modo offline: mostrar credenciales generadas localmente
-                const emailUsername = directorData.nombres.toLowerCase().split(' ')[0] + '.' + 
-                                     directorData.primer_apellido.toLowerCase().replace(/\s+/g, '');
-                const emailDomain = companyData.email.split('@')[1] || 'nexialsuite.com';
-                const professionalEmail = emailUsername + '@' + emailDomain;
-                
-                // Mostrar mensaje de advertencia
-                showAlert('registerCompanyAlert', 'error', 
-                    '⚠️ Error de conexión con Google Sheets<br><br>' +
+                const successMessage = '⚠️ Error de conexión con Google Sheets<br><br>' +
                     'Su registro fue procesado localmente pero no se guardó en el servidor.<br><br>' +
                     '<strong>Credenciales generadas:</strong><br>' +
                     '🏢 Empresa: ' + companyData.nombre + '<br>' +
                     '👤 Usuario: ' + directorData.nombres + ' ' + directorData.primer_apellido + '<br>' +
-                    '📧 Email: ' + professionalEmail + '<br>' +
+                    '📧 Email: ' + directorData.email + '<br>' +
                     '🔑 Contraseña: ' + directorData.password + '<br>' +
                     '👔 Rol: Director Ejecutivo<br><br>' +
-                    '<strong>Importante:</strong> Contacte a soporte para completar el registro.');
+                    '<strong>Importante:</strong> Contacte a soporte para completar el registro.';
+                
+                showAlert('registerCompanyAlert', 'error', successMessage);
                 
                 // Limpiar datos temporales
                 localStorage.removeItem('temp_director_data');
@@ -1838,7 +1841,7 @@
                 closeLoginModal();
                 window.location.href = 'dashboard.html';
             } else {
-                showAlert('loginAlert', 'error', result?.error || 'Usuario o contraseña incorrectos');
+                showAlert('loginAlert', 'error', result?.message || 'Usuario o contraseña incorrectos');
             }
         }
         
@@ -1899,6 +1902,14 @@
             if (e.key === 'Enter') login();
         });
         
+        // Enter en director email va al siguiente campo
+        document.getElementById('directorEmail')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('directorCountryCode').focus();
+            }
+        });
+        
         // Validaciones de entrada
         setupDocumentValidation();
         setupPhoneValidation();
@@ -1912,7 +1923,7 @@
             createParticles();
             
             console.log('🚀 Nexial Suite - Sistema Empresarial');
-            console.log('📊 Versión: 4.0 (Registro en 2 pasos)');
+            console.log('📊 Versión: 4.1 (Corregido - Email personal)');
             console.log('🔗 API URL:', API_URL);
             console.log('📁 Google Sheets ID: 15lTP0GBO0RKeIKBvAmC-8UFijJKOcawYzjhO5CCndRo');
             
@@ -1935,4 +1946,3 @@
     </script>
 </body>
 </html>
-
