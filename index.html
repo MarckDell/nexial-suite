@@ -1332,12 +1332,14 @@
         // =============================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbx13UIbngpbvrl5TvzVLxQxEu8ofldXxKlQnVOaKdFKsG_Nn9ZNSS9agDdNqygAuxFc/exec';
         
+        // Datos temporales del Director Ejecutivo
         let directorData = null;
         
         // =============================================
         // MÓDULO: UTILIDADES VISUALES
         // =============================================
         
+        // FUNCIÓN: Crear partículas de fondo
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             for (let i = 0; i < 50; i++) {
@@ -1352,14 +1354,17 @@
             }
         }
         
+        // FUNCIÓN: Mostrar loading
         function showLoading() {
             document.getElementById('globalLoading').style.display = 'flex';
         }
         
+        // FUNCIÓN: Ocultar loading
         function hideLoading() {
             document.getElementById('globalLoading').style.display = 'none';
         }
         
+        // FUNCIÓN: Mostrar alerta
         function showAlert(elementId, type, message) {
             const alertElement = document.getElementById(elementId);
             alertElement.className = `alert alert-${type}`;
@@ -1369,7 +1374,7 @@
             if (type === 'success') {
                 setTimeout(() => {
                     alertElement.style.display = 'none';
-                }, 10000);
+                }, 5000);
             }
         }
         
@@ -1377,6 +1382,7 @@
         // MÓDULO: MANEJO DE MODALES
         // =============================================
         
+        // FUNCIÓN: Abrir modal de login
         function openLoginModal() {
             closeAllModals();
             document.getElementById('loginModal').style.display = 'flex';
@@ -1384,6 +1390,7 @@
             document.body.style.overflow = 'hidden';
         }
         
+        // FUNCIÓN: Cerrar modal de login
         function closeLoginModal() {
             document.getElementById('loginModal').style.display = 'none';
             document.getElementById('loginAlert').style.display = 'none';
@@ -1392,14 +1399,16 @@
             document.body.style.overflow = 'auto';
         }
         
+        // FUNCIÓN: Abrir modal de registro (Paso 1)
         function openRegisterModal() {
             closeAllModals();
-            directorData = null;
+            directorData = null; // Resetear datos
             document.getElementById('registerDirectorModal').style.display = 'flex';
             document.getElementById('directorNames').focus();
             document.body.style.overflow = 'hidden';
         }
         
+        // FUNCIÓN: Cerrar modal de registro Director
         function closeRegisterDirectorModal() {
             if (confirm('¿Está seguro de cancelar el registro? Se perderán todos los datos ingresados.')) {
                 document.getElementById('registerDirectorModal').style.display = 'none';
@@ -1410,12 +1419,14 @@
             }
         }
         
+        // FUNCIÓN: Abrir modal de registro Empresa (Paso 2)
         function openRegisterCompanyModal() {
             document.getElementById('registerDirectorModal').style.display = 'none';
             document.getElementById('registerCompanyModal').style.display = 'flex';
             document.getElementById('companyName').focus();
         }
         
+        // FUNCIÓN: Cerrar modal de registro Empresa
         function closeRegisterCompanyModal() {
             if (confirm('¿Está seguro de cancelar el registro de empresa?')) {
                 document.getElementById('registerCompanyModal').style.display = 'none';
@@ -1426,11 +1437,13 @@
             }
         }
         
+        // FUNCIÓN: Volver al paso 1
         function goBackToDirector() {
             document.getElementById('registerCompanyModal').style.display = 'none';
             document.getElementById('registerDirectorModal').style.display = 'flex';
         }
         
+        // FUNCIÓN: Cerrar todos los modales
         function closeAllModals() {
             document.getElementById('loginModal').style.display = 'none';
             document.getElementById('registerDirectorModal').style.display = 'none';
@@ -1441,6 +1454,7 @@
         // MÓDULO: FUNCIONES DEL FORMULARIO
         // =============================================
         
+        // FUNCIÓN: Mostrar/ocultar contraseña
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
             const button = field.parentElement.querySelector('.toggle-password');
@@ -1457,19 +1471,22 @@
             }
         }
         
+        // FUNCIÓN: Mostrar términos y condiciones
         function showTerms() {
             alert('TÉRMINOS Y CONDICIONES NEXIAL SUITE\n\n1. Uso exclusivo para empresas registradas\n2. Los datos serán tratados conforme a las leyes de protección de datos del país correspondiente\n3. Período de prueba gratuito de 30 días\n4. Cancelación en cualquier momento desde el panel de control\n5. Responsabilidad del usuario sobre la veracidad de los datos proporcionados\n6. Nexial Suite se reserva el derecho de suspender cuentas con información falsa\n\nPara ver los términos completos, contacte a soporte: marcelodanielcc@gmail.com');
             return false;
         }
         
         // =============================================
-        // MÓDULO: REGISTRO (PASO 1)
+        // MÓDULO: REGISTRO DE DIRECTOR EJECUTIVO (PASO 1)
         // =============================================
         
+        // FUNCIÓN: Procesar registro del Director Ejecutivo
         async function registerDirector(event) {
             event.preventDefault();
             showLoading();
             
+            // Validar contraseñas
             const password = document.getElementById('directorPassword').value;
             const confirmPassword = document.getElementById('directorConfirmPassword').value;
             
@@ -1485,6 +1502,7 @@
                 return;
             }
             
+            // Recopilar datos
             const countryCode = document.getElementById('directorCountryCode').value;
             const phoneNumber = document.getElementById('directorPhone').value;
             
@@ -1494,10 +1512,36 @@
                 segundo_apellido: document.getElementById('directorSecondLastName').value.trim() || '',
                 dni: document.getElementById('directorDNI').value.trim(),
                 email: document.getElementById('directorEmail').value.trim().toLowerCase(),
-                telefono: countryCode + phoneNumber,
+                telefono: countryCode + ' ' + phoneNumber,
                 password: password
             };
             
+            // Validar campos requeridos
+            const requiredFields = ['nombres', 'primer_apellido', 'dni', 'email', 'telefono'];
+            
+            for (const field of requiredFields) {
+                if (!directorData[field]) {
+                    const fieldNames = {
+                        'nombres': 'Nombres Completos',
+                        'primer_apellido': 'Primer Apellido',
+                        'dni': 'DNI / Documento de Identidad',
+                        'email': 'Email Personal',
+                        'telefono': 'Teléfono/Celular'
+                    };
+                    showAlert('registerDirectorAlert', 'error', `Por favor complete el campo: ${fieldNames[field] || field}`);
+                    hideLoading();
+                    return;
+                }
+            }
+            
+            // Validar DNI
+            if (!directorData.dni || directorData.dni.trim() === '' || directorData.dni.length < 3) {
+                showAlert('registerDirectorAlert', 'error', 'Por favor ingrese un DNI válido');
+                hideLoading();
+                return;
+            }
+            
+            // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(directorData.email)) {
                 showAlert('registerDirectorAlert', 'error', 'Por favor ingrese un email válido');
@@ -1505,6 +1549,7 @@
                 return;
             }
             
+            // Validar teléfono
             const phoneDigits = phoneNumber.replace(/\D/g, '');
             if (phoneDigits.length < 7) {
                 showAlert('registerDirectorAlert', 'error', 'Por favor ingrese un número de teléfono válido (mínimo 7 dígitos)');
@@ -1513,18 +1558,24 @@
             }
             
             hideLoading();
+            
+            // Almacenar datos en localStorage temporal
             localStorage.setItem('temp_director_data', JSON.stringify(directorData));
+            
+            // Continuar al paso 2
             openRegisterCompanyModal();
         }
         
         // =============================================
-        // MÓDULO: REGISTRO (PASO 2) - COMPATIBLE CON CODIGO.GS
+        // MÓDULO: REGISTRO DE EMPRESA (PASO 2)
         // =============================================
         
+        // FUNCIÓN: Procesar registro de empresa
         async function registerCompany(event) {
             event.preventDefault();
             showLoading();
             
+            // Recuperar datos del director
             if (!directorData) {
                 const storedData = localStorage.getItem('temp_director_data');
                 if (storedData) {
@@ -1536,22 +1587,51 @@
                 }
             }
             
+            // Recopilar datos de la empresa
             const countryCode = document.getElementById('companyCountryCode').value;
             const phoneNumber = document.getElementById('companyPhone').value;
             
-            // FORMATO EXACTO QUE ESPERA TU CODIGO.GS
             const companyData = {
                 nombre: document.getElementById('companyName').value.trim(),
-                documento: document.getElementById('companyRUC').value.trim(), // documento, NO ruc
+                documento: document.getElementById('companyRUC').value.trim(), // Cambiado de 'ruc' a 'documento'
                 industria: document.getElementById('companyIndustry').value,
                 contacto: document.getElementById('companyContact').value.trim(),
                 email: document.getElementById('companyEmail').value.trim().toLowerCase(),
-                telefono: countryCode + phoneNumber,
+                telefono: countryCode + ' ' + phoneNumber,
                 direccion: document.getElementById('companyAddress').value.trim(),
                 ciudad: document.getElementById('companyCity').value.trim(),
-                password: directorData.password // Incluir password para crear usuario
+                password: directorData.password // Enviar contraseña también
             };
             
+            // Validar campos requeridos de empresa
+            const requiredCompanyFields = ['nombre', 'documento', 'industria', 'contacto', 'email', 'telefono', 'direccion', 'ciudad'];
+            
+            for (const field of requiredCompanyFields) {
+                if (!companyData[field]) {
+                    const fieldNames = {
+                        'nombre': 'Razón Social',
+                        'documento': 'NIT / RUC',
+                        'industria': 'Tipo de Industria',
+                        'contacto': 'Persona de Contacto',
+                        'email': 'Email Corporativo',
+                        'telefono': 'Teléfono de la Empresa',
+                        'direccion': 'Dirección',
+                        'ciudad': 'Ciudad'
+                    };
+                    showAlert('registerCompanyAlert', 'error', `Por favor complete el campo: ${fieldNames[field] || field}`);
+                    hideLoading();
+                    return;
+                }
+            }
+            
+            // Validar RUC
+            if (!companyData.documento || companyData.documento.trim() === '' || companyData.documento.length < 3) {
+                showAlert('registerCompanyAlert', 'error', 'Por favor ingrese un NIT/RUC válido');
+                hideLoading();
+                return;
+            }
+            
+            // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(companyData.email)) {
                 showAlert('registerCompanyAlert', 'error', 'Por favor ingrese un email corporativo válido');
@@ -1560,119 +1640,130 @@
             }
             
             try {
-                console.log('📤 Enviando registro a API con formato compatible...');
+                // Preparar datos combinados para enviar a la API
+                const completeData = {
+                    action: 'addEmpresa',
+                    nombre: companyData.nombre,
+                    documento: companyData.documento,
+                    industria: companyData.industria,
+                    contacto: companyData.contacto,
+                    email: companyData.email,
+                    telefono: companyData.telefono,
+                    direccion: companyData.direccion,
+                    ciudad: companyData.ciudad,
+                    password: companyData.password
+                };
                 
-                // Construir URL con parámetros GET (formato que tu código.gs espera)
-                let url = `${API_URL}?action=addEmpresa`;
-                url += `&nombre=${encodeURIComponent(companyData.nombre)}`;
-                url += `&documento=${encodeURIComponent(companyData.documento)}`;
-                url += `&industria=${encodeURIComponent(companyData.industria)}`;
-                url += `&contacto=${encodeURIComponent(companyData.contacto)}`;
-                url += `&email=${encodeURIComponent(companyData.email)}`;
-                url += `&telefono=${encodeURIComponent(companyData.telefono)}`;
-                url += `&direccion=${encodeURIComponent(companyData.direccion)}`;
-                url += `&ciudad=${encodeURIComponent(companyData.ciudad)}`;
-                url += `&password=${encodeURIComponent(companyData.password)}`;
-                url += `&_t=${Date.now()}`;
+                console.log('Enviando datos de empresa:', completeData);
                 
-                console.log('🔗 URL construida (primeros 200 chars):', url.substring(0, 200));
+                // Enviar datos a la API usando GET
+                const queryParams = new URLSearchParams();
+                for (const key in completeData) {
+                    queryParams.append(key, completeData[key]);
+                }
                 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 20000);
-                
-                const response = await fetch(url, {
+                const response = await fetch(`${API_URL}?${queryParams.toString()}`, {
                     method: 'GET',
-                    headers: { 'Accept': 'application/json' },
-                    mode: 'cors',
-                    signal: controller.signal
+                    mode: 'cors'
                 });
                 
-                clearTimeout(timeoutId);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
                 
-                console.log('📥 Respuesta recibida, status:', response.status);
+                const result = await response.json();
+                console.log('Respuesta del servidor:', result);
                 
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('✅ Resultado API:', result);
+                if (result.success) {
+                    // Generar email profesional para el director
+                    const emailUsername = directorData.nombres.toLowerCase().split(' ')[0] + '.' + 
+                                         directorData.primer_apellido.toLowerCase().replace(/\s+/g, '');
+                    const emailDomain = companyData.email.split('@')[1] || 'nexialsuite.com';
+                    const professionalEmail = emailUsername + '@' + emailDomain;
                     
-                    if (result.success) {
-                        // Generar email profesional
-                        const emailUsername = directorData.nombres.toLowerCase().split(' ')[0] + '.' + 
-                                             directorData.primer_apellido.toLowerCase().replace(/\s+/g, '');
-                        const emailDomain = companyData.email.split('@')[1] || 'nexialsuite.com';
-                        const professionalEmail = emailUsername + '@' + emailDomain;
-                        
-                        hideLoading();
-                        
-                        showAlert('registerCompanyAlert', 'success', 
-                            '✅ ¡Registro completado exitosamente!<br><br>' +
-                            'Su empresa y usuario han sido registrados correctamente.<br><br>' +
-                            '<strong>Información de acceso:</strong><br>' +
-                            '🏢 Empresa: ' + companyData.nombre + '<br>' +
-                            '👤 Usuario: ' + directorData.nombres + ' ' + directorData.primer_apellido + '<br>' +
-                            '📧 Email: ' + professionalEmail + '<br>' +
-                            '🔑 Contraseña: ' + directorData.password + '<br>' +
-                            '💼 Rol: Director Ejecutivo<br><br>' +
-                            '<small>Puede iniciar sesión ahora con estas credenciales.</small>');
-                        
-                        localStorage.removeItem('temp_director_data');
-                        directorData = null;
-                        
-                        setTimeout(() => {
-                            document.getElementById('registerDirectorForm').reset();
-                            document.getElementById('registerCompanyForm').reset();
-                            closeRegisterCompanyModal();
-                            openLoginModal();
-                            document.getElementById('loginUser').value = professionalEmail;
-                            document.getElementById('loginPass').focus();
-                        }, 6000);
-                        
-                    } else {
-                        throw new Error(result.message || 'Error en el registro');
+                    hideLoading();
+                    
+                    // Mostrar mensaje de éxito con detalles del servidor
+                    let successMessage = '✅ ¡Registro completado exitosamente!<br><br>' +
+                                        'Su empresa y usuario han sido registrados en Google Sheets.<br><br>' +
+                                        '<strong>Información de acceso:</strong><br>' +
+                                        '🏢 Empresa: ' + companyData.nombre + '<br>' +
+                                        '👤 Usuario: ' + directorData.nombres + ' ' + directorData.primer_apellido + '<br>' +
+                                        '📧 Email: ' + (result.email || professionalEmail) + '<br>' +
+                                        '🔑 Contraseña: ' + directorData.password + '<br>' +
+                                        '👔 Rol: Director Ejecutivo<br><br>' +
+                                        'Puede iniciar sesión ahora con estas credenciales.';
+                    
+                    if (result.empresa_id) {
+                        successMessage += '<br>📋 ID Empresa: ' + result.empresa_id;
                     }
+                    if (result.usuario_id) {
+                        successMessage += '<br>👤 ID Usuario: ' + result.usuario_id;
+                    }
+                    
+                    showAlert('registerCompanyAlert', 'success', successMessage);
+                    
+                    // Limpiar datos temporales
+                    localStorage.removeItem('temp_director_data');
+                    directorData = null;
+                    
+                    // Cerrar modales después de 5 segundos y redirigir al login
+                    setTimeout(() => {
+                        document.getElementById('registerDirectorForm').reset();
+                        document.getElementById('registerCompanyForm').reset();
+                        closeRegisterCompanyModal();
+                        openLoginModal();
+                        // Rellenar el email en el login
+                        document.getElementById('loginUser').value = result.email || professionalEmail;
+                        document.getElementById('loginPass').value = directorData ? directorData.password : '';
+                        document.getElementById('loginPass').focus();
+                    }, 5000);
+                    
                 } else {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    hideLoading();
+                    showAlert('registerCompanyAlert', 'error', 'Error en el registro: ' + (result.message || 'Error desconocido'));
                 }
                 
             } catch (error) {
-                console.error('❌ Error en registro:', error);
+                console.error('Error en registro de empresa:', error);
                 hideLoading();
                 
-                // Modo fallback: mostrar credenciales aunque haya error
+                // Modo offline: mostrar credenciales generadas localmente
                 const emailUsername = directorData.nombres.toLowerCase().split(' ')[0] + '.' + 
                                      directorData.primer_apellido.toLowerCase().replace(/\s+/g, '');
                 const emailDomain = companyData.email.split('@')[1] || 'nexialsuite.com';
                 const professionalEmail = emailUsername + '@' + emailDomain;
                 
-                showAlert('registerCompanyAlert', 'success', 
-                    '✅ Registro procesado<br><br>' +
-                    'Su solicitud ha sido recibida.<br><br>' +
-                    '<strong>Credenciales de acceso:</strong><br>' +
+                // Mostrar mensaje de advertencia
+                showAlert('registerCompanyAlert', 'error', 
+                    '⚠️ Error de conexión con Google Sheets<br><br>' +
+                    'Su registro fue procesado localmente pero no se guardó en el servidor.<br><br>' +
+                    '<strong>Credenciales generadas:</strong><br>' +
                     '🏢 Empresa: ' + companyData.nombre + '<br>' +
                     '👤 Usuario: ' + directorData.nombres + ' ' + directorData.primer_apellido + '<br>' +
                     '📧 Email: ' + professionalEmail + '<br>' +
                     '🔑 Contraseña: ' + directorData.password + '<br>' +
-                    '💼 Rol: Director Ejecutivo<br><br>' +
-                    '<small>Intente iniciar sesión con estas credenciales.</small>');
+                    '👔 Rol: Director Ejecutivo<br><br>' +
+                    '<strong>Importante:</strong> Contacte a soporte para completar el registro.');
                 
+                // Limpiar datos temporales
                 localStorage.removeItem('temp_director_data');
                 directorData = null;
                 
+                // Cerrar modales después de 8 segundos
                 setTimeout(() => {
                     document.getElementById('registerDirectorForm').reset();
                     document.getElementById('registerCompanyForm').reset();
                     closeRegisterCompanyModal();
-                    openLoginModal();
-                    document.getElementById('loginUser').value = professionalEmail;
-                    document.getElementById('loginPass').focus();
-                }, 6000);
+                }, 8000);
             }
         }
         
         // =============================================
-        // MÓDULO: LOGIN - COMPATIBLE CON CODIGO.GS
+        // MÓDULO: LOGIN DEL SISTEMA
         // =============================================
         
+        // FUNCIÓN: Procesar login
         async function login() {
             const user = document.getElementById('loginUser').value.trim();
             const password = document.getElementById('loginPass').value;
@@ -1685,39 +1776,23 @@
             showLoading();
             
             try {
-                // Construir URL con parámetros GET (formato que tu código.gs espera)
-                const url = `${API_URL}?action=login&email=${encodeURIComponent(user)}&password=${encodeURIComponent(password)}&_t=${Date.now()}`;
-                
-                console.log('🔐 Intentando login...');
-                
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' },
-                    mode: 'cors',
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
+                const response = await fetch(`${API_URL}?action=login&email=${encodeURIComponent(user)}&password=${encodeURIComponent(password)}&_t=${Date.now()}`);
                 
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('📥 Respuesta login:', result);
                     processLoginResponse(result);
                 } else {
-                    // Fallback: Super Admin local
+                    // Probar con super admin como respaldo
                     if (user === 'marcelodanielcc@gmail.com' && password === '789') {
                         processLoginResponse({
                             success: true,
                             user: {
-                                id: 'USR-NEX-000001',
+                                id: 'SUPER-ADMIN-001',
                                 email: 'marcelodanielcc@gmail.com',
-                                nombre: 'Marcelo Daniel Condori',
+                                nombre: 'Administrador Corporativo - Marcelo Daniel Coarite Condori',
                                 role: 'super',
-                                empresa: 'NEXIAL SUITE',
-                                empresa_id: 'EMP-NEX-0001',
+                                empresa: 'Nexial Suite',
+                                empresa_id: '',
                                 activo: 'Sí'
                             }
                         });
@@ -1727,40 +1802,43 @@
                 }
                 
             } catch (error) {
-                console.error('❌ Error en login:', error);
+                console.error('Error en login:', error);
                 hideLoading();
                 
-                // Fallback: Super Admin local
+                // Modo offline: verificar credenciales básicas
                 if (user === 'marcelodanielcc@gmail.com' && password === '789') {
                     processLoginResponse({
                         success: true,
                         user: {
-                            id: 'USR-NEX-000001',
+                            id: 'SUPER-ADMIN-001',
                             email: 'marcelodanielcc@gmail.com',
-                            nombre: 'Marcelo Daniel Condori',
+                            nombre: 'Administrador Corporativo - Marcelo Daniel Coarite Condori',
                             role: 'super',
-                            empresa: 'NEXIAL SUITE',
-                            empresa_id: 'EMP-NEX-0001',
+                            empresa: 'Nexial Suite',
+                            empresa_id: '',
                             activo: 'Sí'
                         }
                     });
                 } else {
                     showAlert('loginAlert', 'error', 
-                        'Error de conexión o credenciales incorrectas. Por favor verifique su internet e intente nuevamente.');
+                        'Error de conexión. Por favor verifique su internet o contacte a soporte.');
                 }
             }
         }
         
+        // FUNCIÓN: Procesar respuesta de login
         function processLoginResponse(result) {
             hideLoading();
             
-            if (result && result.success && result.user) {
-                console.log('✅ Login exitoso, guardando datos...');
+            if (result && result.success) {
+                // Guardar datos de usuario
                 localStorage.setItem('nexial_user', JSON.stringify(result.user));
+                
+                // Redirigir al dashboard
                 closeLoginModal();
                 window.location.href = 'dashboard.html';
             } else {
-                showAlert('loginAlert', 'error', result?.message || 'Usuario o contraseña incorrectos');
+                showAlert('loginAlert', 'error', result?.error || 'Usuario o contraseña incorrectos');
             }
         }
         
@@ -1768,6 +1846,7 @@
         // MÓDULO: FUNCIONES AUXILIARES
         // =============================================
         
+        // FUNCIÓN: Recuperar contraseña
         function recoverPassword() {
             const email = prompt('Ingrese su email para recuperar contraseña:');
             if (email) {
@@ -1775,6 +1854,7 @@
             }
         }
         
+        // FUNCIÓN: Validar documento mientras se escribe
         function setupDocumentValidation() {
             const dniInput = document.getElementById('directorDNI');
             const rucInput = document.getElementById('companyRUC');
@@ -1792,6 +1872,7 @@
             }
         }
         
+        // FUNCIÓN: Validar teléfono mientras se escribe
         function setupPhoneValidation() {
             const directorPhone = document.getElementById('directorPhone');
             const companyPhone = document.getElementById('companyPhone');
@@ -1813,38 +1894,43 @@
         // EVENT LISTENERS
         // =============================================
         
+        // Enter para login
         document.getElementById('loginPass')?.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
+        
+        // Validaciones de entrada
+        setupDocumentValidation();
+        setupPhoneValidation();
         
         // =============================================
         // INICIALIZACIÓN
         // =============================================
         
+        // FUNCIÓN: Inicializar aplicación
         function initializeApp() {
             createParticles();
             
             console.log('🚀 Nexial Suite - Sistema Empresarial');
-            console.log('📊 Versión: 4.0 (Compatible con Codigo.gs)');
+            console.log('📊 Versión: 4.0 (Registro en 2 pasos)');
             console.log('🔗 API URL:', API_URL);
-            console.log('📄 Google Sheets ID: 15lTP0GBO0RKeIKBvAmC-8UFijJKOcawYzjhO5CCndRo');
-            console.log('✅ Formato de datos compatible con handleAddEmpresa()');
+            console.log('📁 Google Sheets ID: 15lTP0GBO0RKeIKBvAmC-8UFijJKOcawYzjhO5CCndRo');
             
+            // Recuperar datos temporales del director si existen
             const storedData = localStorage.getItem('temp_director_data');
             if (storedData) {
                 directorData = JSON.parse(storedData);
-                console.log('📋 Datos de director recuperados');
+                console.log('📝 Datos de director recuperados');
             }
             
+            // Verificar si hay usuario guardado
             const savedUser = localStorage.getItem('nexial_user');
             if (savedUser) {
                 console.log('👤 Usuario encontrado en sesión');
             }
-            
-            setupDocumentValidation();
-            setupPhoneValidation();
         }
         
+        // EVENTO: Cargar página
         document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
