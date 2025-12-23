@@ -1337,7 +1337,7 @@
 
     <script>
         // =============================================
-        // REGIÓN: CONFIGURACIÓN GLOBAL
+        // REGIÓN: CONFIGURACIÓN GLOBAL CORREGIDA
         // =============================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbyjBUdaScO3rXhSz3DpY_zr2NalpO-aB7KfOQC1tHyKcEL-uY-G3tFEtJHJ71uK_Ryy/exec';
         
@@ -1516,26 +1516,25 @@
             const phoneNumber = document.getElementById('directorPhone').value;
             
             directorData = {
-                nombres: document.getElementById('directorNames').value.trim(),
-                primer_apellido: document.getElementById('directorFirstLastName').value.trim(),
-                segundo_apellido: document.getElementById('directorSecondLastName').value.trim() || '',
-                dni: document.getElementById('directorDNI').value.trim(),
-                email: document.getElementById('directorEmail').value.trim().toLowerCase(),
-                telefono: countryCode + ' ' + phoneNumber,
-                password: password
+                directorNames: document.getElementById('directorNames').value.trim(),
+                directorFirstLastName: document.getElementById('directorFirstLastName').value.trim(),
+                directorSecondLastName: document.getElementById('directorSecondLastName').value.trim() || '',
+                directorDNI: document.getElementById('directorDNI').value.trim(),
+                directorEmail: document.getElementById('directorEmail').value.trim().toLowerCase(),
+                directorPhone: countryCode + ' ' + phoneNumber,
+                directorPassword: password
             };
             
             // Validar campos requeridos
-            const requiredFields = ['nombres', 'primer_apellido', 'dni', 'email', 'telefono'];
+            const requiredFields = ['directorNames', 'directorFirstLastName', 'directorDNI', 'directorEmail'];
             
             for (const field of requiredFields) {
-                if (!directorData[field]) {
+                if (!directorData[field] || directorData[field].toString().trim() === '') {
                     const fieldNames = {
-                        'nombres': 'Nombres Completos',
-                        'primer_apellido': 'Primer Apellido',
-                        'dni': 'DNI / Documento de Identidad',
-                        'email': 'Email Personal',
-                        'telefono': 'Teléfono/Celular'
+                        'directorNames': 'Nombres Completos',
+                        'directorFirstLastName': 'Primer Apellido',
+                        'directorDNI': 'DNI / Documento de Identidad',
+                        'directorEmail': 'Email Personal'
                     };
                     showAlert('registerDirectorAlert', 'error', `Por favor complete el campo: ${fieldNames[field] || field}`);
                     hideLoading();
@@ -1544,7 +1543,7 @@
             }
             
             // Validar DNI
-            if (!directorData.dni || directorData.dni.trim() === '' || directorData.dni.length < 3) {
+            if (!directorData.directorDNI || directorData.directorDNI.trim() === '' || directorData.directorDNI.length < 3) {
                 showAlert('registerDirectorAlert', 'error', 'Por favor ingrese un DNI válido');
                 hideLoading();
                 return;
@@ -1552,7 +1551,7 @@
             
             // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(directorData.email)) {
+            if (!emailRegex.test(directorData.directorEmail)) {
                 showAlert('registerDirectorAlert', 'error', 'Por favor ingrese un email válido');
                 hideLoading();
                 return;
@@ -1601,31 +1600,27 @@
             const phoneNumber = document.getElementById('companyPhone').value;
             
             const companyData = {
-                nombre: document.getElementById('companyName').value.trim(),
-                documento: document.getElementById('companyRUC').value.trim(),
-                industria: document.getElementById('companyIndustry').value,
-                contacto: document.getElementById('companyContact').value.trim(),
-                email: document.getElementById('companyEmail').value.trim().toLowerCase(),
-                telefono: countryCode + ' ' + phoneNumber,
-                direccion: document.getElementById('companyAddress').value.trim(),
-                ciudad: document.getElementById('companyCity').value.trim(),
-                password: directorData.password
+                companyName: document.getElementById('companyName').value.trim(),
+                companyRUC: document.getElementById('companyRUC').value.trim(),
+                companyIndustry: document.getElementById('companyIndustry').value,
+                companyContact: document.getElementById('companyContact').value.trim(),
+                companyEmail: document.getElementById('companyEmail').value.trim().toLowerCase(),
+                companyPhone: countryCode + ' ' + phoneNumber,
+                companyAddress: document.getElementById('companyAddress').value.trim(),
+                companyCity: document.getElementById('companyCity').value.trim()
             };
             
             // Validar campos requeridos de empresa
-            const requiredCompanyFields = ['nombre', 'documento', 'industria', 'contacto', 'email', 'telefono', 'direccion', 'ciudad'];
+            const requiredCompanyFields = ['companyName', 'companyRUC', 'companyIndustry', 'companyContact', 'companyEmail'];
             
             for (const field of requiredCompanyFields) {
-                if (!companyData[field]) {
+                if (!companyData[field] || companyData[field].toString().trim() === '') {
                     const fieldNames = {
-                        'nombre': 'Razón Social',
-                        'documento': 'NIT / RUC',
-                        'industria': 'Tipo de Industria',
-                        'contacto': 'Persona de Contacto',
-                        'email': 'Email Corporativo',
-                        'telefono': 'Teléfono de la Empresa',
-                        'direccion': 'Dirección',
-                        'ciudad': 'Ciudad'
+                        'companyName': 'Razón Social',
+                        'companyRUC': 'NIT / RUC',
+                        'companyIndustry': 'Tipo de Industria',
+                        'companyContact': 'Persona de Contacto',
+                        'companyEmail': 'Email Corporativo'
                     };
                     showAlert('registerCompanyAlert', 'error', `Por favor complete el campo: ${fieldNames[field] || field}`);
                     hideLoading();
@@ -1634,7 +1629,7 @@
             }
             
             // Validar RUC
-            if (!companyData.documento || companyData.documento.trim() === '' || companyData.documento.length < 3) {
+            if (!companyData.companyRUC || companyData.companyRUC.trim() === '' || companyData.companyRUC.length < 3) {
                 showAlert('registerCompanyAlert', 'error', 'Por favor ingrese un NIT/RUC válido');
                 hideLoading();
                 return;
@@ -1642,8 +1637,15 @@
             
             // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(companyData.email)) {
+            if (!emailRegex.test(companyData.companyEmail)) {
                 showAlert('registerCompanyAlert', 'error', 'Por favor ingrese un email corporativo válido');
+                hideLoading();
+                return;
+            }
+            
+            // Verificar términos aceptados
+            if (!document.getElementById('termsCheckbox').checked) {
+                showAlert('registerCompanyAlert', 'error', 'Debe aceptar los términos y condiciones');
                 hideLoading();
                 return;
             }
@@ -1651,26 +1653,23 @@
             try {
                 // Preparar datos combinados para enviar a la API
                 const completeData = {
-                    action: 'addEmpresa',
-                    nombre: companyData.nombre,
-                    documento: companyData.documento,
-                    industria: companyData.industria,
-                    contacto: companyData.contacto,
-                    email: companyData.email,
-                    telefono: companyData.telefono,
-                    direccion: companyData.direccion,
-                    ciudad: companyData.ciudad,
-                    password: companyData.password,
-                    director_email: directorData.email // Enviar email personal del director
+                    action: 'registerEmpresa',
+                    ...companyData,
+                    ...directorData
                 };
                 
-                console.log('Enviando datos de empresa:', completeData);
+                console.log('📤 Enviando datos de registro:', completeData);
                 
-                // Enviar datos a la API usando GET
+                // Enviar datos a la API usando GET con parámetros
                 const queryParams = new URLSearchParams();
                 for (const key in completeData) {
-                    queryParams.append(key, completeData[key]);
+                    if (completeData[key] !== undefined && completeData[key] !== null) {
+                        queryParams.append(key, completeData[key].toString());
+                    }
                 }
+                
+                // Agregar timestamp para evitar cache
+                queryParams.append('_t', Date.now());
                 
                 const response = await fetch(`${API_URL}?${queryParams.toString()}`, {
                     method: 'GET',
@@ -1678,35 +1677,35 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
                 }
                 
                 const result = await response.json();
-                console.log('Respuesta del servidor:', result);
+                console.log('📥 Respuesta del servidor:', result);
                 
                 if (result.success) {
                     hideLoading();
                     
-                    // Mostrar mensaje de éxito con detalles del servidor
+                    // Mostrar mensaje de éxito con detalles
                     let successMessage = '✅ ¡Registro completado exitosamente!<br><br>' +
-                                        'Su empresa, usuario y empleado han sido registrados en Google Sheets.<br><br>' +
-                                        '<strong>Información de acceso:</strong><br>' +
-                                        '🏢 Empresa: ' + companyData.nombre + '<br>' +
-                                        '👤 Usuario: ' + directorData.nombres + ' ' + directorData.primer_apellido + '<br>' +
-                                        '📧 Email: ' + directorData.email + '<br>' +
-                                        '🔑 Contraseña: ' + directorData.password + '<br>' +
-                                        '👔 Rol: Director Ejecutivo<br>' +
-                                        '📊 También registrado como Empleado<br><br>' +
-                                        'Puede iniciar sesión ahora con estas credenciales.';
+                                        '<strong>📊 Resumen del registro:</strong><br>' +
+                                        '🏢 <strong>Empresa:</strong> ' + companyData.companyName + '<br>' +
+                                        '📋 <strong>ID Empresa:</strong> ' + (result.data?.empresa?.id || 'Generado') + '<br>' +
+                                        '👤 <strong>Director:</strong> ' + directorData.directorNames + ' ' + directorData.directorFirstLastName + '<br>' +
+                                        '📧 <strong>Email de acceso:</strong> ' + directorData.directorEmail + '<br>' +
+                                        '🔑 <strong>Contraseña:</strong> ' + directorData.directorPassword + '<br>' +
+                                        '👔 <strong>Rol:</strong> Director Ejecutivo (jefe)<br>' +
+                                        '📅 <strong>Fecha:</strong> ' + new Date().toLocaleDateString() + '<br><br>' +
+                                        '✅ Usuario creado en Google Sheets<br>' +
+                                        '✅ Empresa registrada<br>' +
+                                        '✅ Empleado director creado<br><br>' +
+                                        'Puede iniciar sesión ahora con sus credenciales.';
                     
-                    if (result.empresa_id) {
-                        successMessage += '<br>📋 ID Empresa: ' + result.empresa_id;
+                    if (result.data?.usuario?.id) {
+                        successMessage += '<br>👤 <strong>ID Usuario:</strong> ' + result.data.usuario.id;
                     }
-                    if (result.usuario_id) {
-                        successMessage += '<br>👤 ID Usuario: ' + result.usuario_id;
-                    }
-                    if (result.empleado_id) {
-                        successMessage += '<br>👷 ID Empleado: ' + result.empleado_id;
+                    if (result.data?.empleado?.id) {
+                        successMessage += '<br>👷 <strong>ID Empleado:</strong> ' + result.data.empleado.id;
                     }
                     
                     showAlert('registerCompanyAlert', 'success', successMessage);
@@ -1715,17 +1714,17 @@
                     localStorage.removeItem('temp_director_data');
                     directorData = null;
                     
-                    // Cerrar modales después de 5 segundos y redirigir al login
+                    // Cerrar modales después de 8 segundos y redirigir al login
                     setTimeout(() => {
                         document.getElementById('registerDirectorForm').reset();
                         document.getElementById('registerCompanyForm').reset();
                         closeRegisterCompanyModal();
                         openLoginModal();
                         // Rellenar el email en el login
-                        document.getElementById('loginUser').value = directorData ? directorData.email : result.email;
+                        document.getElementById('loginUser').value = directorData ? directorData.directorEmail : '';
                         document.getElementById('loginPass').value = '';
                         document.getElementById('loginPass').focus();
-                    }, 6000);
+                    }, 8000);
                     
                 } else {
                     hideLoading();
@@ -1733,19 +1732,19 @@
                 }
                 
             } catch (error) {
-                console.error('Error en registro de empresa:', error);
+                console.error('❌ Error en registro de empresa:', error);
                 hideLoading();
                 
                 // Modo offline: mostrar credenciales generadas localmente
-                const successMessage = '⚠️ Error de conexión con Google Sheets<br><br>' +
+                const successMessage = '⚠️ <strong>Error de conexión con Google Sheets</strong><br><br>' +
                     'Su registro fue procesado localmente pero no se guardó en el servidor.<br><br>' +
-                    '<strong>Credenciales generadas:</strong><br>' +
-                    '🏢 Empresa: ' + companyData.nombre + '<br>' +
-                    '👤 Usuario: ' + directorData.nombres + ' ' + directorData.primer_apellido + '<br>' +
-                    '📧 Email: ' + directorData.email + '<br>' +
-                    '🔑 Contraseña: ' + directorData.password + '<br>' +
-                    '👔 Rol: Director Ejecutivo<br><br>' +
-                    '<strong>Importante:</strong> Contacte a soporte para completar el registro.';
+                    '<strong>📋 Credenciales generadas:</strong><br>' +
+                    '🏢 <strong>Empresa:</strong> ' + companyData.companyName + '<br>' +
+                    '👤 <strong>Director:</strong> ' + directorData.directorNames + ' ' + directorData.directorFirstLastName + '<br>' +
+                    '📧 <strong>Email:</strong> ' + directorData.directorEmail + '<br>' +
+                    '🔑 <strong>Contraseña:</strong> ' + directorData.directorPassword + '<br>' +
+                    '👔 <strong>Rol:</strong> Director Ejecutivo<br><br>' +
+                    '<strong>⚠️ IMPORTANTE:</strong> Contacte a soporte para completar el registro en el sistema.';
                 
                 showAlert('registerCompanyAlert', 'error', successMessage);
                 
@@ -1753,12 +1752,12 @@
                 localStorage.removeItem('temp_director_data');
                 directorData = null;
                 
-                // Cerrar modales después de 8 segundos
+                // Cerrar modales después de 10 segundos
                 setTimeout(() => {
                     document.getElementById('registerDirectorForm').reset();
                     document.getElementById('registerCompanyForm').reset();
                     closeRegisterCompanyModal();
-                }, 8000);
+                }, 10000);
             }
         }
         
@@ -1789,14 +1788,16 @@
                     if (user === 'marcelodanielcc@gmail.com' && password === '789') {
                         processLoginResponse({
                             success: true,
-                            user: {
-                                id: 'SUPER-ADMIN-001',
-                                email: 'marcelodanielcc@gmail.com',
-                                nombre: 'Administrador Corporativo - Marcelo Daniel Coarite Condori',
-                                role: 'super',
-                                empresa: 'Nexial Suite',
-                                empresa_id: '',
-                                activo: 'Sí'
+                            data: {
+                                user: {
+                                    id: 'SUPER-ADMIN-001',
+                                    email: 'marcelodanielcc@gmail.com',
+                                    nombre: 'Administrador Corporativo - Marcelo Daniel Coarite Condori',
+                                    role: 'super',
+                                    empresa: 'Nexial Suite',
+                                    empresa_id: '',
+                                    activo: 'Sí'
+                                }
                             }
                         });
                     } else {
@@ -1812,14 +1813,16 @@
                 if (user === 'marcelodanielcc@gmail.com' && password === '789') {
                     processLoginResponse({
                         success: true,
-                        user: {
-                            id: 'SUPER-ADMIN-001',
-                            email: 'marcelodanielcc@gmail.com',
-                            nombre: 'Administrador Corporativo - Marcelo Daniel Coarite Condori',
-                            role: 'super',
-                            empresa: 'Nexial Suite',
-                            empresa_id: '',
-                            activo: 'Sí'
+                        data: {
+                            user: {
+                                id: 'SUPER-ADMIN-001',
+                                email: 'marcelodanielcc@gmail.com',
+                                nombre: 'Administrador Corporativo - Marcelo Daniel Coarite Condori',
+                                role: 'super',
+                                empresa: 'Nexial Suite',
+                                empresa_id: '',
+                                activo: 'Sí'
+                            }
                         }
                     });
                 } else {
@@ -1833,15 +1836,22 @@
         function processLoginResponse(result) {
             hideLoading();
             
-            if (result && result.success) {
+            if (result && result.success && result.data && result.data.user) {
                 // Guardar datos de usuario
-                localStorage.setItem('nexial_user', JSON.stringify(result.user));
+                localStorage.setItem('nexial_user', JSON.stringify(result.data.user));
                 
-                // Redirigir al dashboard
-                closeLoginModal();
-                window.location.href = 'dashboard.html';
+                // Mostrar mensaje de éxito
+                showAlert('loginAlert', 'success', 
+                    '✅ Login exitoso! Redirigiendo al dashboard...');
+                
+                // Redirigir al dashboard después de 2 segundos
+                setTimeout(() => {
+                    closeLoginModal();
+                    window.location.href = 'dashboard.html';
+                }, 2000);
             } else {
-                showAlert('loginAlert', 'error', result?.message || 'Usuario o contraseña incorrectos');
+                showAlert('loginAlert', 'error', 
+                    result?.message || 'Usuario o contraseña incorrectos');
             }
         }
         
@@ -1923,7 +1933,7 @@
             createParticles();
             
             console.log('🚀 Nexial Suite - Sistema Empresarial');
-            console.log('📊 Versión: 4.1 (Corregido - Email personal)');
+            console.log('📊 Versión: 4.2 (Corregido - Estructura Google Sheets)');
             console.log('🔗 API URL:', API_URL);
             console.log('📁 Google Sheets ID: 15lTP0GBO0RKeIKBvAmC-8UFijJKOcawYzjhO5CCndRo');
             
@@ -1931,13 +1941,29 @@
             const storedData = localStorage.getItem('temp_director_data');
             if (storedData) {
                 directorData = JSON.parse(storedData);
-                console.log('📝 Datos de director recuperados');
+                console.log('📝 Datos de director recuperados del almacenamiento local');
             }
             
             // Verificar si hay usuario guardado
             const savedUser = localStorage.getItem('nexial_user');
             if (savedUser) {
-                console.log('👤 Usuario encontrado en sesión');
+                console.log('👤 Usuario encontrado en sesión local');
+            }
+            
+            // Test de conexión inicial
+            testConnection();
+        }
+        
+        // FUNCIÓN: Test de conexión
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_URL}?action=testConnection&_t=${Date.now()}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Conexión con Google Sheets:', result);
+                }
+            } catch (error) {
+                console.warn('⚠️ No se pudo verificar la conexión con Google Sheets');
             }
         }
         
