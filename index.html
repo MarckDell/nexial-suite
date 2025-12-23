@@ -1276,10 +1276,10 @@
                 </div>
                 
                 <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Email Corporativo *</label>
-                    <input type="email" id="companyEmail" required placeholder="contacto@empresa.com">
+                    <label><i class="fas fa-envelope"></i> Email Corporativo</label>
+                    <input type="email" id="companyEmail" placeholder="contacto@empresa.com">
                     <small style="color: rgba(255,255,255,0.6); font-size: 0.85rem; display: block; margin-top: 0.25rem;">
-                        Email oficial de la empresa
+                        Email oficial de la empresa (opcional)
                     </small>
                 </div>
                 
@@ -1611,7 +1611,7 @@
             };
             
             // Validar campos requeridos de empresa
-            const requiredCompanyFields = ['companyName', 'companyRUC', 'companyIndustry', 'companyContact', 'companyEmail'];
+            const requiredCompanyFields = ['companyName', 'companyRUC', 'companyIndustry', 'companyContact'];
             
             for (const field of requiredCompanyFields) {
                 if (!companyData[field] || companyData[field].toString().trim() === '') {
@@ -1619,8 +1619,7 @@
                         'companyName': 'Razón Social',
                         'companyRUC': 'NIT / RUC',
                         'companyIndustry': 'Tipo de Industria',
-                        'companyContact': 'Persona de Contacto',
-                        'companyEmail': 'Email Corporativo'
+                        'companyContact': 'Persona de Contacto'
                     };
                     showAlert('registerCompanyAlert', 'error', `Por favor complete el campo: ${fieldNames[field] || field}`);
                     hideLoading();
@@ -1635,14 +1634,6 @@
                 return;
             }
             
-            // Validar email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(companyData.companyEmail)) {
-                showAlert('registerCompanyAlert', 'error', 'Por favor ingrese un email corporativo válido');
-                hideLoading();
-                return;
-            }
-            
             // Verificar términos aceptados
             if (!document.getElementById('termsCheckbox').checked) {
                 showAlert('registerCompanyAlert', 'error', 'Debe aceptar los términos y condiciones');
@@ -1653,7 +1644,7 @@
             try {
                 // Preparar datos combinados para enviar a la API
                 const completeData = {
-                    action: 'registerEmpresa',
+                    action: 'registerComplete',
                     ...companyData,
                     ...directorData
                 };
@@ -1721,7 +1712,9 @@
                         closeRegisterCompanyModal();
                         openLoginModal();
                         // Rellenar el email en el login
-                        document.getElementById('loginUser').value = directorData ? directorData.directorEmail : '';
+                        if (directorData && directorData.directorEmail) {
+                            document.getElementById('loginUser').value = directorData.directorEmail;
+                        }
                         document.getElementById('loginPass').value = '';
                         document.getElementById('loginPass').focus();
                     }, 8000);
@@ -1933,7 +1926,7 @@
             createParticles();
             
             console.log('🚀 Nexial Suite - Sistema Empresarial');
-            console.log('📊 Versión: 4.2 (Corregido - Estructura Google Sheets)');
+            console.log('📊 Versión: 4.3 (CORREGIDO - Registro con email personal)');
             console.log('🔗 API URL:', API_URL);
             console.log('📁 Google Sheets ID: 15lTP0GBO0RKeIKBvAmC-8UFijJKOcawYzjhO5CCndRo');
             
